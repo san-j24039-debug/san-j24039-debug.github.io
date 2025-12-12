@@ -3,468 +3,341 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>CHAOS TERMINAL</title>
+<title>CLOCKWORK CYBER CORE</title>
 
 <link rel="manifest" href="manifest.json" />
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="apple-touch-icon" href="icon.png">
 
-<link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=DotGothic16&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rye&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 
 <style>
 /* === 基本設定 === */
 :root {
-    --c-bg: #050505;
-    --c-neon-cyan: #00ffff;
-    --c-neon-pink: #ff0055;
-    --c-steam-gold: #cca43b;
-    --c-steam-rust: #8b4513;
-    --scan-line-color: rgba(0, 255, 255, 0.05);
+    --bg-color: #050505;
+    --neon-cyan: #00f3ff;
+    --neon-pink: #ff0055;
+    --neon-gold: #ffcc00;
+    --steam-bronze: #cd7f32;
+    --steam-dark: #1a1005;
 }
 
 body {
     margin: 0;
-    background-color: var(--c-bg);
+    background-color: var(--bg-color);
     color: #fff;
-    font-family: 'Share Tech Mono', 'DotGothic16', monospace;
+    font-family: 'Share Tech Mono', monospace;
     overflow: hidden;
     height: 100vh;
     width: 100vw;
     -webkit-touch-callout: none;
     user-select: none;
-}
-
-/* === 起動画面 (Boot Screen) === */
-#boot-screen {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: #000;
-    z-index: 9999;
     display: flex;
     flex-direction: column;
-    justify-content: flex-end;
-    padding: 20px;
-    box-sizing: border-box;
-    font-size: 14px;
-    color: var(--c-neon-cyan);
-    text-shadow: 0 0 5px var(--c-neon-cyan);
+    align-items: center;
+    justify-content: center;
 }
-.boot-log { margin: 2px 0; }
 
-/* === 背景エフェクト === */
+/* === 背景装飾 === */
 #bg-layer {
     position: fixed;
     top: 0; left: 0;
     width: 100%; height: 100%;
-    z-index: 0;
-    pointer-events: none;
+    z-index: -1;
     background: 
-        radial-gradient(circle at center, #1a1a1a 0%, #000 100%),
-        repeating-linear-gradient(0deg, transparent 0, transparent 2px, var(--scan-line-color) 3px);
-    background-blend-mode: overlay;
+        radial-gradient(circle at center, #221100 0%, #000000 90%),
+        repeating-linear-gradient(0deg, transparent 0, transparent 2px, rgba(0, 243, 255, 0.03) 3px);
+    pointer-events: none;
 }
-
-/* 歯車 (背景) */
-.gear-bg {
+.smoke {
     position: absolute;
-    fill: none;
-    stroke: var(--c-steam-rust);
-    stroke-width: 1;
-    opacity: 0.3;
-    animation: rotate 60s linear infinite;
-}
-@keyframes rotate { to { transform: rotate(360deg); } }
-
-/* === メインUI (HUD) === */
-#interface {
-    position: relative;
-    z-index: 10;
     width: 100%; height: 100%;
-    display: grid;
-    grid-template-rows: auto 1fr auto; /* ヘッダー / メイン / フッター */
-    padding: 15px;
-    box-sizing: border-box;
-    opacity: 0; /* 起動後に表示 */
-    transition: opacity 1s;
+    background: url('https://upload.wikimedia.org/wikipedia/commons/e/ec/Smoke_particle_assets.png'); /* ダミー用だが雰囲気出る */
+    opacity: 0.1;
+    animation: drift 20s linear infinite;
+    z-index: -1;
 }
+@keyframes drift { from { background-position: 0 0; } to { background-position: 100% 0; } }
 
-/* ヘッダー：時計とタイトル */
-header {
+/* === 1. 中央時計 (Clockwork Core) === */
+.clock-container {
+    position: relative;
+    width: 280px;
+    height: 280px;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 2px solid var(--c-steam-gold);
-    padding-bottom: 10px;
-    background: rgba(0,0,0,0.6);
-    box-shadow: 0 5px 15px rgba(204, 164, 59, 0.2);
-}
-
-.title {
-    font-family: 'Black Ops One', cursive;
-    font-size: 20px;
-    color: var(--c-steam-gold);
-    text-shadow: 2px 2px 0px var(--c-steam-rust);
-    letter-spacing: 2px;
-}
-
-.clock-panel {
-    border: 1px solid var(--c-steam-rust);
-    padding: 5px 10px;
-    background: #110d0a;
-    color: #ffaa00;
-    font-size: 22px;
-    text-shadow: 0 0 8px #ff4400;
-    border-radius: 4px;
-}
-
-/* メインエリア */
-main {
-    display: flex;
-    flex-direction: column;
     justify-content: center;
-    gap: 20px;
-    position: relative;
     align-items: center;
+    margin-bottom: 40px;
+    filter: drop-shadow(0 0 15px var(--neon-gold));
 }
 
-/* 検索バー（ハッキングコンソール風） */
-.hack-input-box {
-    position: relative;
-    width: 100%;
-    max-width: 400px;
-    margin-top: 20px;
-}
-.hack-input-box::before {
-    content: ">";
+/* 時計の盤面（巨大歯車） */
+.clock-gear-face {
     position: absolute;
-    left: 10px; top: 50%;
-    transform: translateY(-50%);
-    color: var(--c-neon-cyan);
+    width: 100%; height: 100%;
+    animation: rotate-slow 60s linear infinite;
 }
-#searchBox {
-    width: 100%;
-    background: rgba(0, 20, 30, 0.8);
-    border: 1px solid var(--c-neon-cyan);
-    color: var(--c-neon-cyan);
-    padding: 15px 10px 15px 30px;
-    font-size: 16px;
-    font-family: 'Share Tech Mono', monospace;
-    outline: none;
-    box-sizing: border-box;
-    box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
-    transition: 0.2s;
+/* 盤面のSVGはHTML内に記述 */
+
+/* 時計の針 */
+.hand {
+    position: absolute;
+    bottom: 50%; left: 50%;
+    transform-origin: bottom center;
+    border-radius: 4px;
+    z-index: 5;
+    box-shadow: 0 0 5px #000;
 }
-#searchBox:focus {
-    background: rgba(0, 40, 60, 0.9);
-    box-shadow: 0 0 20px var(--c-neon-cyan);
+.hand-hour {
+    width: 6px; height: 70px;
+    background: var(--steam-bronze);
+    border: 1px solid var(--neon-gold);
+}
+.hand-min {
+    width: 4px; height: 100px;
+    background: var(--neon-cyan);
+    box-shadow: 0 0 8px var(--neon-cyan);
+}
+.hand-sec {
+    width: 2px; height: 120px;
+    background: var(--neon-pink);
+    box-shadow: 0 0 10px var(--neon-pink);
+    transition: transform 0.1s cubic-bezier(0.4, 2.08, 0.55, 0.44); /* チクタク動くバネ感 */
+}
+.center-pin {
+    position: absolute;
+    width: 16px; height: 16px;
+    background: var(--neon-gold);
+    border-radius: 50%;
+    z-index: 10;
+    box-shadow: 0 0 10px var(--neon-gold);
 }
 
-/* ショートカットボタン（六角形ハニカム構造） */
-.hex-grid {
+/* === 2. 検索バー (Neon Input) === */
+.search-box {
+    position: relative;
+    width: 80%;
+    max-width: 350px;
+    margin-bottom: 30px;
+    z-index: 10;
+}
+input#search {
+    width: 100%;
+    background: rgba(0,0,0,0.7);
+    border: 2px solid var(--steam-bronze);
+    border-radius: 20px;
+    padding: 12px 20px;
+    color: var(--neon-cyan);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 16px;
+    text-shadow: 0 0 5px var(--neon-cyan);
+    outline: none;
+    transition: 0.3s;
+    text-align: center;
+}
+input#search:focus {
+    border-color: var(--neon-cyan);
+    box-shadow: 0 0 20px var(--neon-cyan), inset 0 0 10px var(--neon-cyan);
+}
+
+/* === 3. 歯車ショートカット (Gear Shortcuts) === */
+.gear-grid {
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    gap: 15px; /* 間隔を広げる */
-    margin-top: 20px;
+    gap: 20px;
     width: 100%;
     max-width: 400px;
+    z-index: 10;
 }
-.hex-btn {
-    width: 100px;
-    height: 90px;
-    background: rgba(20, 10, 5, 0.9);
-    border: 2px solid var(--c-steam-gold);
-    color: var(--c-steam-gold);
-    /* 六角形のクリップパス */
-    clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+
+.gear-btn {
+    position: relative;
+    width: 80px;
+    height: 80px;
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    font-size: 13px;
-    transition: 0.2s;
+    transition: 0.3s;
     text-decoration: none;
-    box-shadow: inset 0 0 10px rgba(204, 164, 59, 0.3);
-    text-align: center;
-    position: relative;
-    font-weight: bold;
 }
-/* ホバー時の発光 */
-.hex-btn:hover, .hex-btn:active {
-    background: var(--c-steam-rust);
-    color: #fff;
-    transform: scale(1.1);
-    text-shadow: 0 0 8px #fff;
+
+/* 歯車の形 (SVG) */
+.gear-shape {
+    position: absolute;
+    width: 100%; height: 100%;
+    fill: rgba(30, 20, 10, 0.9);
+    stroke: var(--steam-bronze);
+    stroke-width: 2;
+    transition: all 0.5s ease;
+    filter: drop-shadow(0 0 5px var(--steam-bronze));
+}
+
+/* テキスト */
+.gear-text {
+    position: relative;
     z-index: 2;
-}
-/* ボタン内のグリッチ演出用 */
-.hex-btn::after {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: linear-gradient(transparent 50%, rgba(255,0,255,0.2) 50%);
-    background-size: 100% 4px;
-    pointer-events: none;
-}
-
-/* フッター：ログとステータス */
-footer {
-    display: flex;
-    gap: 10px;
-    height: 120px;
-    width: 100%;
-    max-width: 500px;
-    margin: 0 auto;
-}
-
-/* 左：圧力計（スチームパンク） */
-.gauge-box {
-    width: 80px;
-    border: 2px solid var(--c-steam-rust);
-    background: #000;
-    border-radius: 50% 50% 0 0;
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 0 10px rgba(139, 69, 19, 0.5);
-}
-.gauge-liquid {
-    position: absolute;
-    bottom: 0; left: 0;
-    width: 100%;
-    height: 60%;
-    background: linear-gradient(to top, #ff0000, #ffaa00);
-    opacity: 0.8;
-    animation: liquidMove 3s infinite ease-in-out;
-}
-@keyframes liquidMove {
-    0%, 100% { height: 60%; }
-    50% { height: 85%; }
-}
-.gauge-label {
-    position: absolute;
-    bottom: 5px; width: 100%;
-    text-align: center;
+    font-family: 'Orbitron', sans-serif;
     font-size: 10px;
-    color: #fff;
-    z-index: 2;
-    text-shadow: 1px 1px 0 #000;
+    color: var(--neon-gold);
+    text-shadow: 0 0 5px var(--neon-gold);
+    font-weight: bold;
+    text-align: center;
+    pointer-events: none; /* ホバー干渉防止 */
 }
 
-/* 右：ログウィンドウ（サイバーパンク） */
-.log-window {
-    flex: 1;
-    border: 1px dashed var(--c-neon-pink);
-    background: rgba(20, 0, 10, 0.8);
-    padding: 10px;
-    font-size: 11px;
-    color: var(--c-neon-pink);
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    box-shadow: 0 0 10px rgba(255, 0, 85, 0.3);
+/* ホバーアクション */
+.gear-btn:active { transform: scale(0.95); }
+
+.gear-btn:hover .gear-shape {
+    fill: #331100;
+    stroke: var(--neon-cyan);
+    filter: drop-shadow(0 0 10px var(--neon-cyan));
+    transform: rotate(180deg); /* ホバーで回転 */
 }
-.log-line {
-    border-left: 2px solid var(--c-neon-pink);
-    padding-left: 5px;
-    margin-bottom: 4px;
-    opacity: 0.8;
+.gear-btn:hover .gear-text {
+    color: var(--neon-cyan);
+    text-shadow: 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-cyan);
 }
 
-/* === 全体グリッチエフェクト === */
-.glitch-overlay {
+/* === アニメーション === */
+@keyframes rotate-slow { 100% { transform: rotate(360deg); } }
+
+/* 画面揺れ */
+.shake { animation: shake 0.3s cubic-bezier(.36,.07,.19,.97) both; }
+@keyframes shake {
+    10%, 90% { transform: translate3d(-1px, 0, 0); }
+    20%, 80% { transform: translate3d(2px, 0, 0); }
+}
+
+/* 起動オーバーレイ */
+#overlay {
     position: fixed;
     top: 0; left: 0; width: 100%; height: 100%;
+    background: #000;
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--neon-cyan);
+    font-family: 'Orbitron';
+    animation: fadeOut 2.5s forwards;
     pointer-events: none;
-    z-index: 100;
-    opacity: 0;
-    background: rgba(255, 0, 0, 0.1);
-    mix-blend-mode: color-dodge;
 }
-@keyframes glitch-anim {
-    0% { transform: translate(0); opacity: 0; }
-    20% { transform: translate(-3px, 3px); opacity: 0.2; }
-    40% { transform: translate(-3px, -3px); opacity: 0; }
-    60% { transform: translate(3px, 3px); opacity: 0.2; filter: hue-rotate(90deg); }
-    80% { transform: translate(3px, -3px); opacity: 0; }
-    100% { transform: translate(0); opacity: 0; }
-}
-.screen-shake {
-    animation: shake 0.3s cubic-bezier(.36,.07,.19,.97) both;
-}
-@keyframes shake {
-    10%, 90% { transform: translate3d(-2px, 0, 0); }
-    20%, 80% { transform: translate3d(4px, 0, 0); }
-    30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
-    40%, 60% { transform: translate3d(6px, 0, 0); }
+@keyframes fadeOut {
+    0% { opacity: 1; }
+    80% { opacity: 1; }
+    100% { opacity: 0; }
 }
 
 </style>
 </head>
 <body>
 
-    <div id="boot-screen"></div>
+    <div id="overlay">SYSTEM BOOTING...</div>
+    <div id="bg-layer"><div class="smoke"></div></div>
 
-    <div id="bg-layer">
-        <svg class="gear-bg" style="top: -20%; right: -20%; width: 80vh; height: 80vh;" viewBox="0 0 100 100">
-             <path d="M50 0 L56 10 L68 8 L72 20 L84 18 L88 30 L100 30 L94 40 L100 50 L94 60 L100 70 L88 70 L84 82 L72 80 L68 92 L56 90 L50 100 L44 90 L32 92 L28 80 L16 82 L12 70 L0 70 L6 60 L0 50 L6 40 L0 30 L12 30 L16 18 L28 20 L32 8 L44 10 Z" />
+    <div class="clock-container">
+        <svg class="clock-gear-face" viewBox="0 0 100 100">
+            <path d="M50 0 L55 8 L65 8 L68 18 L78 20 L80 30 L90 35 L88 45 L98 50 L88 55 L90 65 L80 70 L78 80 L68 82 L65 92 L55 92 L50 100 L45 92 L35 92 L32 82 L22 80 L20 70 L10 65 L12 55 L2 50 L12 45 L10 35 L20 30 L22 20 L32 18 L35 8 L45 8 Z" 
+                  fill="none" stroke="#cca43b" stroke-width="1.5" />
+            <circle cx="50" cy="50" r="35" stroke="#8b4513" stroke-width="1" fill="rgba(0,0,0,0.5)" />
+            <circle cx="50" cy="50" r="30" stroke="#00f3ff" stroke-width="0.5" stroke-dasharray="2,2" />
+            <text x="50" y="12" font-size="8" fill="#cca43b" text-anchor="middle" class="neon-text">12</text>
+            <text x="88" y="52" font-size="8" fill="#cca43b" text-anchor="middle" class="neon-text">3</text>
+            <text x="50" y="92" font-size="8" fill="#cca43b" text-anchor="middle" class="neon-text">6</text>
+            <text x="12" y="52" font-size="8" fill="#cca43b" text-anchor="middle" class="neon-text">9</text>
         </svg>
+
+        <div class="hand hand-hour" id="hour"></div>
+        <div class="hand hand-min" id="min"></div>
+        <div class="hand hand-sec" id="sec"></div>
+        <div class="center-pin"></div>
     </div>
 
-    <div class="glitch-overlay" id="glitch"></div>
+    <div class="search-box">
+        <input type="text" id="search" placeholder="> COMMAND SEARCH...">
+    </div>
 
-    <div id="interface">
-        <header>
-            <div class="title">CHAOS<br>TERMINAL</div>
-            <div class="clock-panel" id="clock">00:00:00</div>
-        </header>
+    <div class="gear-grid">
+        <a class="gear-btn" onclick="openLink('https://google.com')">
+            <svg class="gear-shape" viewBox="0 0 100 100">
+                <path d="M50 5 L56 15 L66 15 L72 25 L82 25 L88 35 L98 35 L92 45 L100 50 L92 55 L98 65 L88 65 L82 75 L72 75 L66 85 L56 85 L50 95 L44 85 L34 85 L28 75 L18 75 L12 65 L2 65 L8 55 L0 50 L8 45 L2 35 L12 35 L18 25 L28 25 L34 15 L44 15 Z" />
+            </svg>
+            <div class="gear-text">GOOGLE</div>
+        </a>
 
-        <main>
-            <div class="hack-input-box">
-                <input type="text" id="searchBox" placeholder="ACCESS_CODE_REQUIRED...">
-            </div>
+        <a class="gear-btn" onclick="openLink('https://youtube.com')">
+            <svg class="gear-shape" viewBox="0 0 100 100">
+                <path d="M50 5 L56 15 L66 15 L72 25 L82 25 L88 35 L98 35 L92 45 L100 50 L92 55 L98 65 L88 65 L82 75 L72 75 L66 85 L56 85 L50 95 L44 85 L34 85 L28 75 L18 75 L12 65 L2 65 L8 55 L0 50 L8 45 L2 35 L12 35 L18 25 L28 25 L34 15 L44 15 Z" />
+            </svg>
+            <div class="gear-text">YOUTUBE</div>
+        </a>
 
-            <div class="hex-grid">
-                <a class="hex-btn" onclick="openApp('https://google.com')">GOOGLE<br>SEARCH</a>
-                <a class="hex-btn" onclick="openApp('https://youtube.com')">VIDEO<br>ARCHIVE</a>
-                <a class="hex-btn" onclick="openApp('https://x.com')">X<br>NETWORK</a>
-                <a class="hex-btn" onclick="openApp('https://chatgpt.com')">A.I.<br>CORE</a>
-                <a class="hex-btn" onclick="reloadSystem()">SYSTEM<br>REBOOT</a>
-            </div>
-        </main>
+        <a class="gear-btn" onclick="openLink('https://x.com')">
+            <svg class="gear-shape" viewBox="0 0 100 100">
+                <path d="M50 5 L56 15 L66 15 L72 25 L82 25 L88 35 L98 35 L92 45 L100 50 L92 55 L98 65 L88 65 L82 75 L72 75 L66 85 L56 85 L50 95 L44 85 L34 85 L28 75 L18 75 L12 65 L2 65 L8 55 L0 50 L8 45 L2 35 L12 35 L18 25 L28 25 L34 15 L44 15 Z" />
+            </svg>
+            <div class="gear-text">X / NET</div>
+        </a>
 
-        <footer>
-            <div class="gauge-box">
-                <div class="gauge-liquid"></div>
-                <div class="gauge-label">PRESSURE</div>
-            </div>
-            <div class="log-window" id="log-display">
-                <div class="log-line">System initialized.</div>
-            </div>
-        </footer>
+        <a class="gear-btn" onclick="openLink('https://chatgpt.com')">
+            <svg class="gear-shape" viewBox="0 0 100 100">
+                <path d="M50 5 L56 15 L66 15 L72 25 L82 25 L88 35 L98 35 L92 45 L100 50 L92 55 L98 65 L88 65 L82 75 L72 75 L66 85 L56 85 L50 95 L44 85 L34 85 L28 75 L18 75 L12 65 L2 65 L8 55 L0 50 L8 45 L2 35 L12 35 L18 25 L28 25 L34 15 L44 15 Z" />
+            </svg>
+            <div class="gear-text">AI CORE</div>
+        </a>
     </div>
 
     <script>
-        // === 1. 起動シーケンス (Boot Sequence) ===
-        const bootScreen = document.getElementById('boot-screen');
-        const ui = document.getElementById('interface');
-        const bootTexts = [
-            "INITIALIZING BIOS...",
-            "CHECKING MEMORY... OK",
-            "LOADING DRIVERS... FAILED",
-            "BYPASSING SECURITY PROTOCOLS...",
-            "CONNECTING TO DARK WEB...",
-            "STEAM PRESSURE: OPTIMAL",
-            "NEURAL LINK: ESTABLISHED",
-            "WELCOME USER."
-        ];
+        // === 時計の動作（ゼンマイ式風） ===
+        const hHand = document.getElementById('hour');
+        const mHand = document.getElementById('min');
+        const sHand = document.getElementById('sec');
 
-        let lineIndex = 0;
-        function playBootSequence() {
-            if (lineIndex < bootTexts.length) {
-                const p = document.createElement('div');
-                p.className = 'boot-log';
-                p.innerText = "> " + bootTexts[lineIndex];
-                bootScreen.appendChild(p);
-                lineIndex++;
-                // ランダムな速度でテキストを表示
-                setTimeout(playBootSequence, Math.random() * 200 + 50);
-            } else {
-                // 起動完了
-                setTimeout(() => {
-                    bootScreen.style.opacity = '0';
-                    setTimeout(() => bootScreen.style.display = 'none', 500);
-                    ui.style.opacity = '1';
-                    startGlitchEffect(); // グリッチ開始
-                }, 800);
-            }
-        }
-        // ページ読み込み時に実行
-        window.onload = playBootSequence;
-
-        // === 2. 時計 (Clock) ===
         function updateClock() {
             const d = new Date();
-            // ランダムに秒数がバグる演出を入れる
-            let s = d.getSeconds();
-            if (Math.random() > 0.95) s = Math.floor(Math.random() * 99); 
-            
-            document.getElementById('clock').innerText = 
-                `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-        }
-        setInterval(updateClock, 100);
+            const h = d.getHours();
+            const m = d.getMinutes();
+            const s = d.getSeconds();
 
-        // === 3. アプリ起動 & 画面揺れ演出 ===
-        function openApp(url) {
-            triggerShake();
-            addLog("Opening gateway: " + url);
+            // 角度計算
+            const sDeg = (s / 60) * 360;
+            const mDeg = ((m + s / 60) / 60) * 360;
+            const hDeg = ((h + m / 60) / 12) * 360;
+
+            // 針を回転
+            sHand.style.transform = `translateX(-50%) rotate(${sDeg}deg)`;
+            mHand.style.transform = `translateX(-50%) rotate(${mDeg}deg)`;
+            hHand.style.transform = `translateX(-50%) rotate(${hDeg}deg)`;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // === リンク機能 ===
+        function openLink(url) {
+            document.body.classList.add('shake'); // 画面揺れ演出
             setTimeout(() => {
                 window.location.href = url;
             }, 300);
         }
 
-        function reloadSystem() {
-            triggerShake();
-            location.reload();
-        }
-
-        function triggerShake() {
-            document.body.classList.add('screen-shake');
-            setTimeout(() => document.body.classList.remove('screen-shake'), 300);
-        }
-
-        // === 4. グリッチ演出 (Random Glitch) ===
-        const glitchLayer = document.getElementById('glitch');
-        function startGlitchEffect() {
-            setInterval(() => {
-                if (Math.random() > 0.7) { // 30%の確率で発生
-                    glitchLayer.style.animation = 'glitch-anim 0.2s linear';
-                    setTimeout(() => glitchLayer.style.animation = 'none', 200);
-                }
-            }, 3000);
-        }
-
-        // === 5. 検索機能 ===
-        const sBox = document.getElementById('searchBox');
+        // === 検索機能 ===
+        const sBox = document.getElementById('search');
         sBox.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 const q = sBox.value;
-                addLog("Searching database for: " + q);
-                setTimeout(() => {
-                    location.href = `https://www.google.com/search?q=${encodeURIComponent(q)}`;
-                }, 500);
+                if(q) location.href = `https://www.google.com/search?q=${encodeURIComponent(q)}`;
             }
         });
 
-        // === 6. ログ更新 ===
-        const logDisplay = document.getElementById('log-display');
-        const randomLogs = [
-            "Packet loss detected...",
-            "Warning: High temperature",
-            "Unauthorized access blocked",
-            "Downloading aesthetic patches...",
-            "Steam valve #4 pressure rising",
-            "Syncing with chaos network..."
-        ];
-
-        function addLog(text) {
-            const div = document.createElement('div');
-            div.className = 'log-line';
-            div.innerText = "> " + text;
-            logDisplay.appendChild(div);
-            if (logDisplay.children.length > 4) logDisplay.removeChild(logDisplay.firstChild);
-        }
-
-        setInterval(() => {
-            if(Math.random() > 0.6) addLog(randomLogs[Math.floor(Math.random() * randomLogs.length)]);
-        }, 3000);
-
-        // Service Worker
+        // Service Worker登録（アプリ化対応）
         if ("serviceWorker" in navigator) {
             navigator.serviceWorker.register("service-worker.js");
         }
     </script>
+
 </body>
 </html>
