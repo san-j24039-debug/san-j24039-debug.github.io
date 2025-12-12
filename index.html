@@ -1,108 +1,319 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>NeonPunk App</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NEON STEAM DEVICE</title>
 
     <link rel="manifest" href="manifest.json" />
-
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-title" content="NeonPunk">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="icon.png">
 
-    <link rel="stylesheet" href="style.css" />
+    <style>
+    /* === ここに新しいデザインが入ります === */
+    body {
+        margin: 0;
+        background: #000;
+        font-family: 'Share Tech Mono', monospace;
+        color: #fff;
+        overflow: hidden; /* スクロール禁止 */
+        -webkit-touch-callout: none; /* iOS長押しメニュー無効化 */
+        user-select: none;
+    }
+
+    /* 起動時ノイズ画面 */
+    #startup {
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: #000;
+        z-index: 9999;
+        animation: startupNoise 2s forwards;
+        pointer-events: none;
+    }
+    @keyframes startupNoise {
+        0% { opacity: 1; } 90% { opacity: 1; }
+        100% { opacity: 0; display: none; }
+    }
+
+    /* CRTノイズ */
+    #crt {
+        position: fixed;
+        pointer-events: none;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: url('https://upload.wikimedia.org/wikipedia/commons/3/3f/CRT_noise.gif');
+        opacity: 0.08;
+        z-index: 10;
+        background-size: cover;
+    }
+
+    /* コンテンツ全体を中央寄せ */
+    .container {
+        position: relative;
+        z-index: 5;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        overflow-y: auto; /* コンテンツが多い場合はスクロール可 */
+        padding-bottom: 20px;
+    }
+
+    /* タイトル（グリッチ + ネオン） */
+    #title {
+        font-size: 26px;
+        text-align: center;
+        margin-top: 40px;
+        color: #0affff;
+        text-shadow: 0 0 8px #0affff;
+        animation: glitch 1.5s infinite;
+        font-weight: bold;
+    }
+    @keyframes glitch {
+        0% { text-shadow: 2px 0 #ff00f7; }
+        50% { text-shadow: -2px 0 #38ff66; }
+        100% { text-shadow: 2px 0 #ff00f7; }
+    }
+
+    /* 時計 */
+    #clock {
+        font-size: 50px;
+        text-align: center;
+        margin-top: 10px;
+        letter-spacing: 4px;
+        color: #ff00f7;
+        text-shadow: 0 0 15px #ff00f7;
+        font-family: monospace;
+    }
+
+    /* ネオンちらつき */
+    .neonFlicker {
+        animation: flicker 4s infinite;
+    }
+    @keyframes flicker {
+        0%,19%,21%,23%,25%,54%,56%,100% { opacity: 1; }
+        20%,24%,55% { opacity: 0.5; }
+    }
+
+    /* 検索バー */
+    #searchBox {
+        display: block;
+        width: 80%;
+        max-width: 400px;
+        margin: 20px auto;
+        padding: 12px;
+        background: rgba(17, 17, 17, 0.8);
+        border: 2px solid #0affff;
+        color: #0affff;
+        font-size: 16px;
+        border-radius: 8px;
+        outline: none;
+        box-shadow: 0 0 10px rgba(10, 255, 255, 0.5);
+    }
+    #searchBox::placeholder {
+        color: rgba(10, 255, 255, 0.5);
+    }
+
+    /* ショートカット */
+    .shortcuts {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 15px;
+        margin-top: 10px;
+        max-width: 400px;
+    }
+    .shortcut {
+        width: 80px;
+        height: 80px;
+        background: rgba(26, 26, 26, 0.9);
+        border: 2px solid #b87333; /* 銅色 */
+        border-radius: 12px;
+        color: #c4a484;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 0 6px #b87333;
+        font-size: 13px;
+        transition: 0.2s;
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+        text-decoration: none;
+        flex-direction: column;
+    }
+    .shortcut:active {
+        transform: scale(0.95);
+        border-color: #ff00f7;
+        box-shadow: 0 0 15px #ff00f7;
+        color: #ff00f7;
+    }
+
+    /* 蒸気エフェクト */
+    .steam {
+        position: absolute;
+        bottom: 0;
+        width: 20px;
+        height: 20px;
+        background: rgba(255,255,255,0.4);
+        filter: blur(8px);
+        border-radius: 50%;
+        animation: steamRise 2s linear infinite;
+        pointer-events: none;
+    }
+    @keyframes steamRise {
+        from { transform: translateY(0) scale(1); opacity: 0.7; }
+        to { transform: translateY(-80px) scale(2); opacity: 0; }
+    }
+
+    /* 歯車アニメ */
+    #gearBox {
+        width: 60px;
+        height: 60px;
+        margin: 20px auto;
+        animation: rotateGear 10s linear infinite;
+        opacity: 0.8;
+    }
+    @keyframes rotateGear {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    /* メモ */
+    #memo {
+        width: 80%;
+        max-width: 400px;
+        height: 100px;
+        margin: 10px auto;
+        display: block;
+        background: rgba(17, 17, 17, 0.8);
+        border: 2px solid #38ff66;
+        color: #38ff66;
+        padding: 10px;
+        border-radius: 10px;
+        font-size: 14px;
+        box-shadow: 0 0 5px #38ff66;
+        outline: none;
+        resize: none;
+    }
+
+    /* 語録 */
+    #quote {
+        width: 80%;
+        max-width: 400px;
+        margin: 20px auto;
+        text-align: center;
+        background: rgba(26, 26, 26, 0.9);
+        padding: 15px;
+        border-radius: 8px;
+        border: 1px solid #ff00f7;
+        font-size: 14px;
+        box-shadow: 0 0 5px #ff00f7;
+        color: #ff00f7;
+        line-height: 1.6;
+    }
+
+    /* 背景動画 */
+    #bgVideo {
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        object-fit: cover;
+        z-index: -1;
+        opacity: 0.4;
+        filter: contrast(1.2) brightness(0.8);
+    }
+    </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>NeonPunk App</h1>
-        <p>サブカル × ネオンパンク × スチームパンク × ダーク系アプリ</p>
+    <video id="bgVideo" autoplay loop muted playsinline src="https://files.catbox.moe/3a18zu.mp4"></video>
 
-        <button id="actionBtn">世界をハックする</button>
-        <div id="log"></div>
+    <div id="startup"></div>
+    <div id="crt"></div>
+
+    <div class="container">
+        <div id="title" class="neonFlicker">NEON STEAM DEVICE</div>
+        <div id="clock">00:00</div>
+
+        <input id="searchBox" type="text" placeholder="SEARCH NETWORK...">
+
+        <div class="shortcuts">
+            <div class="shortcut" onclick="openLink('https://www.google.com')">
+                Google<div class="steam"></div>
+            </div>
+            <div class="shortcut" onclick="openLink('https://www.youtube.com')">
+                YouTube<div class="steam"></div>
+            </div>
+            <div class="shortcut" onclick="openLink('https://twitter.com')">
+                X / Twitter<div class="steam"></div>
+            </div>
+            <div class="shortcut" onclick="openLink('https://chatgpt.com')">
+                ChatGPT<div class="steam"></div>
+            </div>
+        </div>
+
+        <img id="gearBox" src="https://upload.wikimedia.org/wikipedia/commons/3/3a/Gear_icon.svg" style="filter: invert(56%) sepia(96%) saturate(296%) hue-rotate(87deg) brightness(98%) contrast(92%);">
+
+        <textarea id="memo" placeholder="LOG_MEMORY... (Auto Save)"></textarea>
+
+        <div id="quote">Loading system message...</div>
     </div>
 
     <script>
-        const log = document.getElementById("log");
-        const btn = document.getElementById("actionBtn");
+        // 時計機能
+        function updateClock() {
+            const d = new Date();
+            const h = String(d.getHours()).padStart(2, '0');
+            const m = String(d.getMinutes()).padStart(2, '0');
+            document.getElementById('clock').textContent = `${h}:${m}`;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
 
-        // ランダムな文字列（ハッキングコード風）を作る関数
-        function generateRandomHex(length) {
-            const chars = "0123456789ABCDEFxykz#&%ERROR_404_SYSTEM_CORE";
-            let result = "";
-            for (let i = 0; i < length; i++) {
-                result += chars.charAt(Math.floor(Math.random() * chars.length));
+        // 検索機能
+        const searchBox = document.getElementById('searchBox');
+        searchBox.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                const q = searchBox.value;
+                if (q) location.href = `https://www.google.com/search?q=${encodeURIComponent(q)}`;
             }
-            return result;
+        });
+
+        // リンクを開く
+        function openLink(url) {
+            window.location.href = url;
         }
 
-        // 文字を1文字ずつ表示する関数（タイプライター演出）
-        function typeWriter(text, element, speed = 50) {
-            element.innerHTML = "";
-            element.classList.add("typing"); // 点滅カーソル追加
-            let i = 0;
-            
-            function type() {
-                if (i < text.length) {
-                    // <br>タグの場合は一気に処理する
-                    if (text.substring(i, i + 4) === "<br>") {
-                        element.innerHTML += "<br>";
-                        i += 4;
-                    } else {
-                        element.innerHTML += text.charAt(i);
-                        i++;
-                    }
-                    setTimeout(type, speed);
-                } else {
-                    // 表示完了したらカーソルを消したい場合はここでクラス削除
-                    // element.classList.remove("typing"); 
-                }
-            }
-            type();
-        }
+        // メモの自動保存（LocalStorage）
+        const memo = document.getElementById('memo');
+        memo.value = localStorage.getItem('memoData') || '';
+        memo.addEventListener('input', () => {
+            localStorage.setItem('memoData', memo.value);
+        });
 
-        // ボタンが押されたときのメイン動作
-        btn.onclick = () => {
-            // 連打できないようにボタンを無効化
-            btn.disabled = true;
-            log.className = ""; // 色をリセット
-            log.innerHTML = "";
+        // 語録システム（ランダム表示）
+        const quotes = [
+            "深夜テンションは世界を救う。",
+            "ネオンの下では嘘も光る。",
+            "蒸気の音は心臓のリズム。",
+            "サブカルは反逆のエネルギーだ。",
+            "闇に落ちるな、闇を使え。",
+            "System Status: UNSTABLE",
+            "現実とネットの境界線を探せ。",
+            "歯車が軋む音が聞こえるか？",
+            "アクセス承認。ようこそ、放浪者よ。",
+            "情報は血液、ネットワークは血管。"
+        ];
 
-            // 1. ハッキング演出（ランダム文字を高速表示）
-            let counter = 0;
-            const hackInterval = setInterval(() => {
-                // 画面にランダムな文字を表示
-                log.innerHTML = `> CONNECTING TO SERVER...<br>> PROXY: ${generateRandomHex(8)}<br>> KEY: ${generateRandomHex(16)}`;
-                log.style.color = "#ff00ff"; // ピンク色
-                counter++;
-                
-                // 20回（約1.4秒）ループしたら停止して次の段階へ
-                if (counter > 20) {
-                    clearInterval(hackInterval);
-                    finishSequence();
-                }
-            }, 70); // 0.07秒ごとに書き換え
-        };
+        // 起動時にランダムな語録を表示
+        const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+        document.getElementById('quote').innerText = `> ${randomQuote}`;
 
-        // 成功時のメッセージ表示
-        function finishSequence() {
-            log.innerHTML = "";
-            log.classList.add("success"); // 緑色にする
-            
-            const successMsg = "> ACCESS GRANTED.<br>> 暗黒領域への接続を確立しました。<br>> Welcome, User.";
-            
-            // タイプライター風に表示開始
-            typeWriter(successMsg, log, 60);
-            
-            // 少し待ってからボタンを復活させる
-            setTimeout(() => {
-                btn.disabled = false;
-                btn.innerText = "再接続する";
-            }, 3000);
-        }
-
-        // service worker 登録（これは消さない）
+        // Service Workerの登録（アプリ化に必須）
         if ("serviceWorker" in navigator) {
             navigator.serviceWorker.register("service-worker.js");
         }
