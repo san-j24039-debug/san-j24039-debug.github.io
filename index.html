@@ -3,53 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NEON STEAM DEVICE</title>
+    <title>STEAM NEON CORE</title>
 
     <link rel="manifest" href="manifest.json" />
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="icon.png">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rye&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 
     <style>
-    /* === ここに新しいデザインが入ります === */
+    :root {
+        --neon-blue: #0affff;
+        --neon-pink: #ff00f7;
+        --steam-gold: #ffb700;
+        --steam-copper: #b87333;
+        --steam-dark: #2b1d0e;
+        --bg-overlay: rgba(10, 5, 0, 0.85);
+    }
+
     body {
         margin: 0;
         background: #000;
         font-family: 'Share Tech Mono', monospace;
-        color: #fff;
-        overflow: hidden; /* スクロール禁止 */
-        -webkit-touch-callout: none; /* iOS長押しメニュー無効化 */
+        color: #e0e0e0;
+        overflow: hidden;
+        -webkit-touch-callout: none;
         user-select: none;
     }
 
-    /* 起動時ノイズ画面 */
-    #startup {
+    /* === 背景演出 === */
+    
+    /* 背景動画（セピア調に加工） */
+    #bgVideo {
         position: fixed;
         top: 0; left: 0;
         width: 100%; height: 100%;
-        background: #000;
-        z-index: 9999;
-        animation: startupNoise 2s forwards;
-        pointer-events: none;
-    }
-    @keyframes startupNoise {
-        0% { opacity: 1; } 90% { opacity: 1; }
-        100% { opacity: 0; display: none; }
+        object-fit: cover;
+        z-index: -2;
+        opacity: 0.3;
+        filter: sepia(100%) hue-rotate(-30deg) contrast(1.2);
     }
 
-    /* CRTノイズ */
-    #crt {
+    /* 背景の巨大歯車 */
+    .bg-gear {
         position: fixed;
-        pointer-events: none;
+        z-index: -1;
+        opacity: 0.15;
+        fill: var(--steam-copper);
+        animation: rotateGear linear infinite;
+    }
+    #gear1 {
+        top: -10%; left: -20%;
+        width: 80vw; height: 80vw;
+        animation-duration: 40s;
+    }
+    #gear2 {
+        bottom: -10%; right: -20%;
+        width: 90vw; height: 90vw;
+        animation-duration: 50s;
+        animation-direction: reverse;
+    }
+
+    @keyframes rotateGear {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    /* CRTスキャンライン */
+    #scanline {
+        position: fixed;
         top: 0; left: 0;
         width: 100%; height: 100%;
-        background: url('https://upload.wikimedia.org/wikipedia/commons/3/3f/CRT_noise.gif');
-        opacity: 0.08;
+        background: repeating-linear-gradient(
+            to bottom,
+            transparent 0px,
+            transparent 2px,
+            rgba(0, 0, 0, 0.3) 3px
+        );
+        pointer-events: none;
         z-index: 10;
-        background-size: cover;
     }
 
-    /* コンテンツ全体を中央寄せ */
+    /* 画面端のヴィネット効果（古びたレンズ感） */
+    #vignette {
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: radial-gradient(circle, transparent 60%, #000 100%);
+        pointer-events: none;
+        z-index: 9;
+    }
+
+    /* === メインレイアウト === */
     .container {
         position: relative;
         z-index: 5;
@@ -57,174 +105,157 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: flex-start;
-        overflow-y: auto; /* コンテンツが多い場合はスクロール可 */
-        padding-bottom: 20px;
+        padding: 20px;
+        box-sizing: border-box;
+        border: 4px double var(--steam-copper); /* 銅の二重枠 */
+        margin: 10px;
+        border-radius: 15px;
+        background: rgba(20, 10, 5, 0.6);
+        box-shadow: inset 0 0 30px rgba(0,0,0,0.8);
     }
 
-    /* タイトル（グリッチ + ネオン） */
+    /* 四隅のリベット（ネジ） */
+    .rivet {
+        position: absolute;
+        width: 12px; height: 12px;
+        background: radial-gradient(circle, #ffeebb 0%, #b87333 100%);
+        border-radius: 50%;
+        box-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+        z-index: 6;
+    }
+    .r-tl { top: 10px; left: 10px; }
+    .r-tr { top: 10px; right: 10px; }
+    .r-bl { bottom: 10px; left: 10px; }
+    .r-br { bottom: 10px; right: 10px; }
+
+    /* タイトル */
     #title {
-        font-size: 26px;
-        text-align: center;
-        margin-top: 40px;
-        color: #0affff;
-        text-shadow: 0 0 8px #0affff;
-        animation: glitch 1.5s infinite;
-        font-weight: bold;
-    }
-    @keyframes glitch {
-        0% { text-shadow: 2px 0 #ff00f7; }
-        50% { text-shadow: -2px 0 #38ff66; }
-        100% { text-shadow: 2px 0 #ff00f7; }
+        font-family: 'Rye', serif; /* スチームパンク風フォント */
+        font-size: 24px;
+        margin-top: 30px;
+        color: var(--steam-gold);
+        text-shadow: 0 0 5px var(--steam-copper);
+        letter-spacing: 2px;
     }
 
-    /* 時計 */
+    /* 時計（ニキシー管風） */
+    #clock-container {
+        background: #000;
+        padding: 10px 20px;
+        border-radius: 8px;
+        border: 2px solid #553311;
+        margin-top: 15px;
+        box-shadow: 0 0 10px var(--steam-copper);
+    }
     #clock {
-        font-size: 50px;
-        text-align: center;
-        margin-top: 10px;
+        font-size: 48px;
+        color: #ffaa00; /* アンバー色 */
+        text-shadow: 
+            0 0 5px #ff4400,
+            0 0 10px #ffaa00;
+        font-family: 'Share Tech Mono', monospace;
         letter-spacing: 4px;
-        color: #ff00f7;
-        text-shadow: 0 0 15px #ff00f7;
-        font-family: monospace;
-    }
-
-    /* ネオンちらつき */
-    .neonFlicker {
-        animation: flicker 4s infinite;
-    }
-    @keyframes flicker {
-        0%,19%,21%,23%,25%,54%,56%,100% { opacity: 1; }
-        20%,24%,55% { opacity: 0.5; }
     }
 
     /* 検索バー */
     #searchBox {
-        display: block;
-        width: 80%;
-        max-width: 400px;
-        margin: 20px auto;
+        margin-top: 25px;
+        width: 85%;
         padding: 12px;
-        background: rgba(17, 17, 17, 0.8);
-        border: 2px solid #0affff;
-        color: #0affff;
+        background: #1a120b;
+        border: 2px solid var(--steam-copper);
+        color: var(--steam-gold);
+        font-family: 'Share Tech Mono', monospace;
         font-size: 16px;
-        border-radius: 8px;
+        border-radius: 4px;
         outline: none;
-        box-shadow: 0 0 10px rgba(10, 255, 255, 0.5);
+        box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
+        transition: 0.3s;
+    }
+    #searchBox:focus {
+        border-color: var(--neon-blue);
+        box-shadow: 0 0 15px var(--neon-blue);
     }
     #searchBox::placeholder {
-        color: rgba(10, 255, 255, 0.5);
+        color: #664422;
     }
 
-    /* ショートカット */
+    /* ショートカットアイコン */
     .shortcuts {
         display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
         gap: 15px;
-        margin-top: 10px;
-        max-width: 400px;
+        margin-top: 20px;
     }
     .shortcut {
-        width: 80px;
-        height: 80px;
-        background: rgba(26, 26, 26, 0.9);
-        border: 2px solid #b87333; /* 銅色 */
-        border-radius: 12px;
-        color: #c4a484;
+        width: 70px; height: 70px;
+        border: 2px solid var(--steam-copper);
+        background: linear-gradient(145deg, #2b1d0e, #1a120b);
+        border-radius: 50%; /* 丸いボタンに変更 */
         display: flex;
+        flex-direction: column;
         justify-content: center;
         align-items: center;
-        box-shadow: 0 0 6px #b87333;
-        font-size: 13px;
-        transition: 0.2s;
-        position: relative;
-        overflow: hidden;
+        color: #c4a484;
+        font-size: 11px;
+        box-shadow: 3px 3px 6px rgba(0,0,0,0.6);
         cursor: pointer;
+        transition: 0.2s;
         text-decoration: none;
-        flex-direction: column;
     }
     .shortcut:active {
         transform: scale(0.95);
-        border-color: #ff00f7;
-        box-shadow: 0 0 15px #ff00f7;
-        color: #ff00f7;
+        border-color: var(--steam-gold);
+        color: var(--steam-gold);
+        box-shadow: 0 0 10px var(--steam-gold);
     }
 
-    /* 蒸気エフェクト */
-    .steam {
-        position: absolute;
-        bottom: 0;
-        width: 20px;
-        height: 20px;
-        background: rgba(255,255,255,0.4);
-        filter: blur(8px);
-        border-radius: 50%;
-        animation: steamRise 2s linear infinite;
-        pointer-events: none;
-    }
-    @keyframes steamRise {
-        from { transform: translateY(0) scale(1); opacity: 0.7; }
-        to { transform: translateY(-80px) scale(2); opacity: 0; }
-    }
-
-    /* 歯車アニメ */
-    #gearBox {
-        width: 60px;
-        height: 60px;
-        margin: 20px auto;
-        animation: rotateGear 10s linear infinite;
-        opacity: 0.8;
-    }
-    @keyframes rotateGear {
-        from { transform: rotate(0deg); }
-        to { transform: rotate(360deg); }
-    }
-
-    /* メモ */
+    /* メモエリア */
     #memo {
-        width: 80%;
-        max-width: 400px;
-        height: 100px;
-        margin: 10px auto;
-        display: block;
-        background: rgba(17, 17, 17, 0.8);
-        border: 2px solid #38ff66;
-        color: #38ff66;
+        width: 85%;
+        height: 80px;
+        margin-top: 25px;
+        background: rgba(0,0,0,0.6);
+        border: 1px dashed var(--steam-copper);
+        color: var(--neon-blue);
         padding: 10px;
-        border-radius: 10px;
-        font-size: 14px;
-        box-shadow: 0 0 5px #38ff66;
+        font-family: 'Share Tech Mono', monospace;
+        border-radius: 4px;
         outline: none;
-        resize: none;
+    }
+
+    /* 装飾：パイプライン */
+    .pipe {
+        width: 90%;
+        height: 4px;
+        background: linear-gradient(to right, transparent, var(--steam-copper), transparent);
+        margin: 20px 0;
+        opacity: 0.7;
     }
 
     /* 語録 */
     #quote {
-        width: 80%;
-        max-width: 400px;
-        margin: 20px auto;
+        margin-top: auto;
+        margin-bottom: 20px;
+        font-size: 12px;
+        color: #886644;
         text-align: center;
-        background: rgba(26, 26, 26, 0.9);
-        padding: 15px;
-        border-radius: 8px;
-        border: 1px solid #ff00f7;
-        font-size: 14px;
-        box-shadow: 0 0 5px #ff00f7;
-        color: #ff00f7;
-        line-height: 1.6;
+        padding: 0 20px;
     }
 
-    /* 背景動画 */
-    #bgVideo {
-        position: fixed;
-        top: 0; left: 0;
-        width: 100%; height: 100%;
-        object-fit: cover;
-        z-index: -1;
-        opacity: 0.4;
-        filter: contrast(1.2) brightness(0.8);
+    /* 蒸気アニメーション */
+    .steam-particle {
+        position: absolute;
+        bottom: 20px;
+        background: rgba(200, 200, 200, 0.2);
+        border-radius: 50%;
+        filter: blur(8px);
+        animation: rise 3s linear infinite;
+        pointer-events: none;
+    }
+    @keyframes rise {
+        0% { transform: translateY(0) scale(1); opacity: 0; }
+        50% { opacity: 0.5; }
+        100% { transform: translateY(-100px) scale(2); opacity: 0; }
     }
     </style>
 </head>
@@ -232,49 +263,58 @@
 
     <video id="bgVideo" autoplay loop muted playsinline src="https://files.catbox.moe/3a18zu.mp4"></video>
 
-    <div id="startup"></div>
-    <div id="crt"></div>
+    <svg class="bg-gear" id="gear1" viewBox="0 0 100 100">
+        <path d="M50 0 L55 10 L65 8 L70 18 L80 15 L85 25 L95 22 L92 32 L100 35 L95 45 L100 50 L95 55 L100 65 L92 68 L95 78 L85 75 L80 85 L70 82 L65 92 L55 90 L50 100 L45 90 L35 92 L30 82 L20 85 L15 75 L5 78 L8 68 L0 65 L5 55 L0 50 L5 45 L0 35 L8 32 L5 22 L15 25 L20 15 L30 18 L35 8 L45 10 Z" />
+        <circle cx="50" cy="50" r="20" fill="transparent" stroke="currentColor" stroke-width="2"/>
+    </svg>
+    <svg class="bg-gear" id="gear2" viewBox="0 0 100 100">
+        <path d="M50 0 L55 10 L65 8 L70 18 L80 15 L85 25 L95 22 L92 32 L100 35 L95 45 L100 50 L95 55 L100 65 L92 68 L95 78 L85 75 L80 85 L70 82 L65 92 L55 90 L50 100 L45 90 L35 92 L30 82 L20 85 L15 75 L5 78 L8 68 L0 65 L5 55 L0 50 L5 45 L0 35 L8 32 L5 22 L15 25 L20 15 L30 18 L35 8 L45 10 Z" />
+    </svg>
+
+    <div id="scanline"></div>
+    <div id="vignette"></div>
 
     <div class="container">
-        <div id="title" class="neonFlicker">NEON STEAM DEVICE</div>
-        <div id="clock">00:00</div>
+        <div class="rivet r-tl"></div>
+        <div class="rivet r-tr"></div>
+        <div class="rivet r-bl"></div>
+        <div class="rivet r-br"></div>
 
-        <input id="searchBox" type="text" placeholder="SEARCH NETWORK...">
-
-        <div class="shortcuts">
-            <div class="shortcut" onclick="openLink('https://www.google.com')">
-                Google<div class="steam"></div>
-            </div>
-            <div class="shortcut" onclick="openLink('https://www.youtube.com')">
-                YouTube<div class="steam"></div>
-            </div>
-            <div class="shortcut" onclick="openLink('https://twitter.com')">
-                X / Twitter<div class="steam"></div>
-            </div>
-            <div class="shortcut" onclick="openLink('https://chatgpt.com')">
-                ChatGPT<div class="steam"></div>
-            </div>
+        <div id="title">STEAM NEON CORE</div>
+        
+        <div id="clock-container">
+            <div id="clock">00:00</div>
         </div>
 
-        <img id="gearBox" src="https://upload.wikimedia.org/wikipedia/commons/3/3a/Gear_icon.svg" style="filter: invert(56%) sepia(96%) saturate(296%) hue-rotate(87deg) brightness(98%) contrast(92%);">
+        <input id="searchBox" type="text" placeholder="ACCESS DATABASE...">
 
-        <textarea id="memo" placeholder="LOG_MEMORY... (Auto Save)"></textarea>
+        <div class="shortcuts">
+            <div class="shortcut" onclick="openLink('https://google.com')">Search</div>
+            <div class="shortcut" onclick="openLink('https://youtube.com')">Tube</div>
+            <div class="shortcut" onclick="openLink('https://x.com')">X</div>
+            <div class="shortcut" onclick="openLink('https://chatgpt.com')">AI</div>
+        </div>
 
-        <div id="quote">Loading system message...</div>
+        <div class="pipe"></div>
+
+        <textarea id="memo" placeholder="INPUT LOG DATA..."></textarea>
+
+        <div id="quote">Initializing steam pressure...</div>
     </div>
 
     <script>
-        // 時計機能
+        // 時計
         function updateClock() {
             const d = new Date();
             const h = String(d.getHours()).padStart(2, '0');
             const m = String(d.getMinutes()).padStart(2, '0');
-            document.getElementById('clock').textContent = `${h}:${m}`;
+            const s = String(d.getSeconds()).padStart(2, '0'); // 秒も追加
+            document.getElementById('clock').innerText = `${h}:${m}:${s}`;
         }
         setInterval(updateClock, 1000);
         updateClock();
 
-        // 検索機能
+        // 検索
         const searchBox = document.getElementById('searchBox');
         searchBox.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
@@ -283,41 +323,47 @@
             }
         });
 
-        // リンクを開く
+        // リンク
         function openLink(url) {
             window.location.href = url;
         }
 
-        // メモの自動保存（LocalStorage）
+        // メモ
         const memo = document.getElementById('memo');
-        memo.value = localStorage.getItem('memoData') || '';
+        memo.value = localStorage.getItem('steamMemo') || '';
         memo.addEventListener('input', () => {
-            localStorage.setItem('memoData', memo.value);
+            localStorage.setItem('steamMemo', memo.value);
         });
 
-        // 語録システム（ランダム表示）
+        // 語録
         const quotes = [
-            "深夜テンションは世界を救う。",
-            "ネオンの下では嘘も光る。",
-            "蒸気の音は心臓のリズム。",
-            "サブカルは反逆のエネルギーだ。",
-            "闇に落ちるな、闇を使え。",
-            "System Status: UNSTABLE",
-            "現実とネットの境界線を探せ。",
-            "歯車が軋む音が聞こえるか？",
-            "アクセス承認。ようこそ、放浪者よ。",
-            "情報は血液、ネットワークは血管。"
+            "蒸気圧、正常値を確認。",
+            "歯車の狂いは心の狂い。",
+            "ネオンの灯火が路地を照らす。",
+            "過去の技術で未来を拓け。",
+            "SYSTEM: ONLINE",
+            "鉄錆の匂いが落ち着く。",
+            "現実はただの信号に過ぎない。"
         ];
+        document.getElementById('quote').innerText = `> ${quotes[Math.floor(Math.random() * quotes.length)]}`;
 
-        // 起動時にランダムな語録を表示
-        const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
-        document.getElementById('quote').innerText = `> ${randomQuote}`;
+        // 蒸気エフェクト生成
+        function createSteam() {
+            const steam = document.createElement('div');
+            steam.className = 'steam-particle';
+            steam.style.left = Math.random() * 80 + 10 + '%';
+            steam.style.width = Math.random() * 20 + 10 + 'px';
+            steam.style.height = steam.style.width;
+            document.querySelector('.container').appendChild(steam);
+            
+            setTimeout(() => { steam.remove(); }, 3000);
+        }
+        setInterval(createSteam, 800);
 
-        // Service Workerの登録（アプリ化に必須）
+        // Service Worker
         if ("serviceWorker" in navigator) {
             navigator.serviceWorker.register("service-worker.js");
         }
     </script>
-
 </body>
 </html>
