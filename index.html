@@ -3,328 +3,333 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>CLOCKWORK CYBER CORE</title>
+<title>CHRONO ABYSS</title>
 
 <link rel="manifest" href="manifest.json" />
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="apple-touch-icon" href="icon.png">
 
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rye&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Orbitron:wght@500;900&family=Zen+Old+Mincho&display=swap" rel="stylesheet">
 
 <style>
-/* === 基本設定 === */
+/* === 変数定義 === */
 :root {
-    --bg-color: #050505;
-    --neon-cyan: #00f3ff;
-    --neon-pink: #ff0055;
-    --neon-gold: #ffcc00;
-    --steam-bronze: #cd7f32;
-    --steam-dark: #1a1005;
+    --bg-deep: #020202;
+    --neon-cyan: #00fff2;
+    --neon-magenta: #ff0055;
+    --steam-gold: #cfaa68;
+    --steam-dark: #1a1105;
+    --glass: rgba(255, 255, 255, 0.05);
 }
 
 body {
     margin: 0;
-    background-color: var(--bg-color);
+    background-color: var(--bg-deep);
     color: #fff;
-    font-family: 'Share Tech Mono', monospace;
+    font-family: 'Orbitron', sans-serif;
     overflow: hidden;
     height: 100vh;
     width: 100vw;
-    -webkit-touch-callout: none;
-    user-select: none;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    -webkit-touch-callout: none;
+    user-select: none;
 }
 
-/* === 背景装飾 === */
-#bg-layer {
+/* === 背景：情報の暴力（サブカル的カオス） === */
+.bg-layer {
     position: fixed;
     top: 0; left: 0;
     width: 100%; height: 100%;
     z-index: -1;
     background: 
-        radial-gradient(circle at center, #221100 0%, #000000 90%),
-        repeating-linear-gradient(0deg, transparent 0, transparent 2px, rgba(0, 243, 255, 0.03) 3px);
+        radial-gradient(circle at 50% 50%, #110800 0%, #000000 80%);
     pointer-events: none;
 }
-.smoke {
+/* グリッドとノイズ */
+.grid-overlay {
     position: absolute;
     width: 100%; height: 100%;
-    background: url('https://upload.wikimedia.org/wikipedia/commons/e/ec/Smoke_particle_assets.png'); /* ダミー用だが雰囲気出る */
-    opacity: 0.1;
-    animation: drift 20s linear infinite;
-    z-index: -1;
+    background-image: 
+        linear-gradient(rgba(0, 255, 242, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 255, 242, 0.03) 1px, transparent 1px);
+    background-size: 30px 30px;
+    mask-image: radial-gradient(circle, black 40%, transparent 80%);
 }
-@keyframes drift { from { background-position: 0 0; } to { background-position: 100% 0; } }
+/* 魔法陣のような幾何学模様 */
+.magic-circle {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 120vw; height: 120vw;
+    border: 1px dashed rgba(207, 170, 104, 0.1);
+    border-radius: 50%;
+    animation: rotate-bg 120s linear infinite;
+}
+.magic-circle::before {
+    content: '';
+    position: absolute;
+    top: 10%; left: 10%; right: 10%; bottom: 10%;
+    border: 1px solid rgba(255, 0, 85, 0.1);
+    border-radius: 50%;
+    animation: rotate-bg 60s linear infinite reverse;
+}
 
-/* === 1. 中央時計 (Clockwork Core) === */
-.clock-container {
+@keyframes rotate-bg { from { transform: translate(-50%, -50%) rotate(0deg); } to { transform: translate(-50%, -50%) rotate(360deg); } }
+
+/* === メイン時計エリア (Spiral Core) === */
+.core-container {
     position: relative;
-    width: 280px;
-    height: 280px;
+    width: 300px;
+    height: 300px;
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-bottom: 40px;
-    filter: drop-shadow(0 0 15px var(--neon-gold));
+    margin-bottom: 50px;
 }
 
-/* 時計の盤面（巨大歯車） */
-.clock-gear-face {
+/* ゼンマイ（SVGアニメーション） */
+.spiral-svg {
     position: absolute;
     width: 100%; height: 100%;
-    animation: rotate-slow 60s linear infinite;
+    animation: breathe 6s ease-in-out infinite alternate;
 }
-/* 盤面のSVGはHTML内に記述 */
-
-/* 時計の針 */
-.hand {
-    position: absolute;
-    bottom: 50%; left: 50%;
-    transform-origin: bottom center;
-    border-radius: 4px;
-    z-index: 5;
-    box-shadow: 0 0 5px #000;
-}
-.hand-hour {
-    width: 6px; height: 70px;
-    background: var(--steam-bronze);
-    border: 1px solid var(--neon-gold);
-}
-.hand-min {
-    width: 4px; height: 100px;
-    background: var(--neon-cyan);
-    box-shadow: 0 0 8px var(--neon-cyan);
-}
-.hand-sec {
-    width: 2px; height: 120px;
-    background: var(--neon-pink);
-    box-shadow: 0 0 10px var(--neon-pink);
-    transition: transform 0.1s cubic-bezier(0.4, 2.08, 0.55, 0.44); /* チクタク動くバネ感 */
-}
-.center-pin {
-    position: absolute;
-    width: 16px; height: 16px;
-    background: var(--neon-gold);
-    border-radius: 50%;
-    z-index: 10;
-    box-shadow: 0 0 10px var(--neon-gold);
+.spiral-path {
+    fill: none;
+    stroke: var(--steam-gold);
+    stroke-width: 2;
+    stroke-linecap: round;
+    filter: drop-shadow(0 0 5px var(--steam-gold));
+    stroke-dasharray: 1000;
+    stroke-dashoffset: 0;
+    animation: wind-up 20s linear infinite;
 }
 
-/* === 2. 検索バー (Neon Input) === */
-.search-box {
+@keyframes wind-up {
+    0% { stroke-dashoffset: 0; opacity: 0.5; }
+    50% { stroke-dashoffset: 300; opacity: 1; }
+    100% { stroke-dashoffset: 0; opacity: 0.5; }
+}
+@keyframes breathe {
+    0% { transform: scale(0.95) rotate(0deg); }
+    100% { transform: scale(1.05) rotate(5deg); }
+}
+
+/* 時間表示 */
+.time-display {
     position: relative;
-    width: 80%;
-    max-width: 350px;
-    margin-bottom: 30px;
     z-index: 10;
+    text-align: center;
+    mix-blend-mode: hard-light;
 }
-input#search {
+#main-time {
+    font-size: 52px;
+    font-weight: 900;
+    color: #fff;
+    text-shadow: 
+        0 0 10px var(--neon-cyan),
+        0 0 20px var(--neon-cyan),
+        2px 2px 0px rgba(0,0,0,0.8);
+    letter-spacing: 2px;
+}
+#sub-info {
+    font-family: 'Zen Old Mincho', serif; /* 明朝体でサブカル/和風ダーク感 */
+    font-size: 14px;
+    color: var(--neon-magenta);
+    letter-spacing: 5px;
+    opacity: 0.8;
+    margin-top: -5px;
+}
+
+/* === 入力エリア (Cyber Console) === */
+.input-wrapper {
+    position: relative;
+    width: 85%;
+    max-width: 400px;
+    margin-bottom: 40px;
+}
+.input-deco {
+    position: absolute;
+    top: -10px; left: 0;
+    font-size: 10px;
+    color: var(--steam-gold);
+    opacity: 0.7;
+}
+#search {
     width: 100%;
-    background: rgba(0,0,0,0.7);
-    border: 2px solid var(--steam-bronze);
-    border-radius: 20px;
-    padding: 12px 20px;
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid var(--steam-gold);
+    border-left: 4px solid var(--neon-cyan);
+    padding: 15px;
     color: var(--neon-cyan);
-    font-family: 'Orbitron', sans-serif;
+    font-family: 'Orbitron', monospace;
     font-size: 16px;
-    text-shadow: 0 0 5px var(--neon-cyan);
     outline: none;
     transition: 0.3s;
-    text-align: center;
+    box-shadow: 0 0 15px rgba(0,0,0,0.5);
+    backdrop-filter: blur(5px);
 }
-input#search:focus {
-    border-color: var(--neon-cyan);
-    box-shadow: 0 0 20px var(--neon-cyan), inset 0 0 10px var(--neon-cyan);
+#search:focus {
+    background: rgba(0, 20, 30, 0.8);
+    box-shadow: 0 0 20px rgba(0, 255, 242, 0.2);
 }
 
-/* === 3. 歯車ショートカット (Gear Shortcuts) === */
-.gear-grid {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 20px;
-    width: 100%;
+/* === ボタン群 (Runes) === */
+.btn-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    width: 85%;
     max-width: 400px;
-    z-index: 10;
 }
 
-.gear-btn {
+.rune-btn {
     position: relative;
-    width: 80px;
-    height: 80px;
+    height: 60px;
+    background: linear-gradient(90deg, transparent, rgba(207, 170, 104, 0.1), transparent);
+    border: 1px solid rgba(207, 170, 104, 0.3);
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
-    cursor: pointer;
-    transition: 0.3s;
+    padding: 0 20px;
     text-decoration: none;
+    cursor: pointer;
+    overflow: hidden;
+    transition: 0.3s;
 }
-
-/* 歯車の形 (SVG) */
-.gear-shape {
+/* ホバーエフェクト */
+.rune-btn:hover {
+    border-color: var(--neon-cyan);
+    background: rgba(0, 255, 242, 0.1);
+}
+.rune-btn::before {
+    content: '';
     position: absolute;
+    top: 0; left: -100%;
     width: 100%; height: 100%;
-    fill: rgba(30, 20, 10, 0.9);
-    stroke: var(--steam-bronze);
-    stroke-width: 2;
-    transition: all 0.5s ease;
-    filter: drop-shadow(0 0 5px var(--steam-bronze));
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: 0.5s;
+}
+.rune-btn:hover::before {
+    left: 100%;
 }
 
-/* テキスト */
-.gear-text {
-    position: relative;
+.btn-text {
+    font-size: 14px;
+    color: #e0e0e0;
     z-index: 2;
-    font-family: 'Orbitron', sans-serif;
-    font-size: 10px;
-    color: var(--neon-gold);
-    text-shadow: 0 0 5px var(--neon-gold);
-    font-weight: bold;
-    text-align: center;
-    pointer-events: none; /* ホバー干渉防止 */
+    text-shadow: 0 0 5px black;
+}
+.btn-icon {
+    font-size: 18px;
+    color: var(--steam-gold);
 }
 
-/* ホバーアクション */
-.gear-btn:active { transform: scale(0.95); }
-
-.gear-btn:hover .gear-shape {
-    fill: #331100;
-    stroke: var(--neon-cyan);
-    filter: drop-shadow(0 0 10px var(--neon-cyan));
-    transform: rotate(180deg); /* ホバーで回転 */
-}
-.gear-btn:hover .gear-text {
-    color: var(--neon-cyan);
-    text-shadow: 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-cyan);
-}
-
-/* === アニメーション === */
-@keyframes rotate-slow { 100% { transform: rotate(360deg); } }
-
-/* 画面揺れ */
-.shake { animation: shake 0.3s cubic-bezier(.36,.07,.19,.97) both; }
-@keyframes shake {
-    10%, 90% { transform: translate3d(-1px, 0, 0); }
-    20%, 80% { transform: translate3d(2px, 0, 0); }
-}
-
-/* 起動オーバーレイ */
-#overlay {
+/* === CRT効果と周辺減光 === */
+.crt-overlay {
     position: fixed;
     top: 0; left: 0; width: 100%; height: 100%;
-    background: #000;
-    z-index: 9999;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: var(--neon-cyan);
-    font-family: 'Orbitron';
-    animation: fadeOut 2.5s forwards;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+    background-size: 100% 2px, 3px 100%;
     pointer-events: none;
+    z-index: 99;
+    opacity: 0.6;
 }
-@keyframes fadeOut {
-    0% { opacity: 1; }
-    80% { opacity: 1; }
-    100% { opacity: 0; }
+.vignette {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: radial-gradient(circle, transparent 50%, black 120%);
+    pointer-events: none;
+    z-index: 100;
 }
 
 </style>
 </head>
 <body>
 
-    <div id="overlay">SYSTEM BOOTING...</div>
-    <div id="bg-layer"><div class="smoke"></div></div>
+    <div class="bg-layer">
+        <div class="grid-overlay"></div>
+        <div class="magic-circle"></div>
+    </div>
+    <div class="crt-overlay"></div>
+    <div class="vignette"></div>
 
-    <div class="clock-container">
-        <svg class="clock-gear-face" viewBox="0 0 100 100">
-            <path d="M50 0 L55 8 L65 8 L68 18 L78 20 L80 30 L90 35 L88 45 L98 50 L88 55 L90 65 L80 70 L78 80 L68 82 L65 92 L55 92 L50 100 L45 92 L35 92 L32 82 L22 80 L20 70 L10 65 L12 55 L2 50 L12 45 L10 35 L20 30 L22 20 L32 18 L35 8 L45 8 Z" 
-                  fill="none" stroke="#cca43b" stroke-width="1.5" />
-            <circle cx="50" cy="50" r="35" stroke="#8b4513" stroke-width="1" fill="rgba(0,0,0,0.5)" />
-            <circle cx="50" cy="50" r="30" stroke="#00f3ff" stroke-width="0.5" stroke-dasharray="2,2" />
-            <text x="50" y="12" font-size="8" fill="#cca43b" text-anchor="middle" class="neon-text">12</text>
-            <text x="88" y="52" font-size="8" fill="#cca43b" text-anchor="middle" class="neon-text">3</text>
-            <text x="50" y="92" font-size="8" fill="#cca43b" text-anchor="middle" class="neon-text">6</text>
-            <text x="12" y="52" font-size="8" fill="#cca43b" text-anchor="middle" class="neon-text">9</text>
+    <div class="core-container">
+        <svg class="spiral-svg" viewBox="0 0 200 200">
+            <path class="spiral-path" d="M100,100 m0,0 
+                 a5,5 0 0,1 10,0 
+                 a10,10 0 0,1 -20,0 
+                 a15,15 0 0,1 30,0 
+                 a20,20 0 0,1 -40,0 
+                 a25,25 0 0,1 50,0 
+                 a30,30 0 0,1 -60,0 
+                 a35,35 0 0,1 70,0 
+                 a40,40 0 0,1 -80,0 
+                 a45,45 0 0,1 90,0 
+                 a50,50 0 0,1 -100,0
+                 a55,55 0 0,1 110,0" />
+            
+            <circle cx="100" cy="100" r="4" fill="#00fff2" filter="drop-shadow(0 0 8px #00fff2)"/>
         </svg>
 
-        <div class="hand hand-hour" id="hour"></div>
-        <div class="hand hand-min" id="min"></div>
-        <div class="hand hand-sec" id="sec"></div>
-        <div class="center-pin"></div>
+        <div class="time-display">
+            <div id="main-time">00:00</div>
+            <div id="sub-info">境界線・接続中</div>
+        </div>
     </div>
 
-    <div class="search-box">
-        <input type="text" id="search" placeholder="> COMMAND SEARCH...">
+    <div class="input-wrapper">
+        <div class="input-deco">>> SYSTEM.INPUT_READY</div>
+        <input type="text" id="search" placeholder="Enter Command Code...">
     </div>
 
-    <div class="gear-grid">
-        <a class="gear-btn" onclick="openLink('https://google.com')">
-            <svg class="gear-shape" viewBox="0 0 100 100">
-                <path d="M50 5 L56 15 L66 15 L72 25 L82 25 L88 35 L98 35 L92 45 L100 50 L92 55 L98 65 L88 65 L82 75 L72 75 L66 85 L56 85 L50 95 L44 85 L34 85 L28 75 L18 75 L12 65 L2 65 L8 55 L0 50 L8 45 L2 35 L12 35 L18 25 L28 25 L34 15 L44 15 Z" />
-            </svg>
-            <div class="gear-text">GOOGLE</div>
+    <div class="btn-grid">
+        <a class="rune-btn" onclick="openLink('https://google.com')">
+            <span class="btn-text">GOOGLE</span>
+            <span class="btn-icon">🔍</span>
         </a>
-
-        <a class="gear-btn" onclick="openLink('https://youtube.com')">
-            <svg class="gear-shape" viewBox="0 0 100 100">
-                <path d="M50 5 L56 15 L66 15 L72 25 L82 25 L88 35 L98 35 L92 45 L100 50 L92 55 L98 65 L88 65 L82 75 L72 75 L66 85 L56 85 L50 95 L44 85 L34 85 L28 75 L18 75 L12 65 L2 65 L8 55 L0 50 L8 45 L2 35 L12 35 L18 25 L28 25 L34 15 L44 15 Z" />
-            </svg>
-            <div class="gear-text">YOUTUBE</div>
+        <a class="rune-btn" onclick="openLink('https://youtube.com')">
+            <span class="btn-text">YOUTUBE</span>
+            <span class="btn-icon">▶</span>
         </a>
-
-        <a class="gear-btn" onclick="openLink('https://x.com')">
-            <svg class="gear-shape" viewBox="0 0 100 100">
-                <path d="M50 5 L56 15 L66 15 L72 25 L82 25 L88 35 L98 35 L92 45 L100 50 L92 55 L98 65 L88 65 L82 75 L72 75 L66 85 L56 85 L50 95 L44 85 L34 85 L28 75 L18 75 L12 65 L2 65 L8 55 L0 50 L8 45 L2 35 L12 35 L18 25 L28 25 L34 15 L44 15 Z" />
-            </svg>
-            <div class="gear-text">X / NET</div>
+        <a class="rune-btn" onclick="openLink('https://x.com')">
+            <span class="btn-text">X / NET</span>
+            <span class="btn-icon">✖</span>
         </a>
-
-        <a class="gear-btn" onclick="openLink('https://chatgpt.com')">
-            <svg class="gear-shape" viewBox="0 0 100 100">
-                <path d="M50 5 L56 15 L66 15 L72 25 L82 25 L88 35 L98 35 L92 45 L100 50 L92 55 L98 65 L88 65 L82 75 L72 75 L66 85 L56 85 L50 95 L44 85 L34 85 L28 75 L18 75 L12 65 L2 65 L8 55 L0 50 L8 45 L2 35 L12 35 L18 25 L28 25 L34 15 L44 15 Z" />
-            </svg>
-            <div class="gear-text">AI CORE</div>
+        <a class="rune-btn" onclick="openLink('https://chatgpt.com')">
+            <span class="btn-text">AI CORE</span>
+            <span class="btn-icon">🧠</span>
         </a>
     </div>
 
     <script>
-        // === 時計の動作（ゼンマイ式風） ===
-        const hHand = document.getElementById('hour');
-        const mHand = document.getElementById('min');
-        const sHand = document.getElementById('sec');
-
+        // 時計更新
         function updateClock() {
             const d = new Date();
-            const h = d.getHours();
-            const m = d.getMinutes();
-            const s = d.getSeconds();
-
-            // 角度計算
-            const sDeg = (s / 60) * 360;
-            const mDeg = ((m + s / 60) / 60) * 360;
-            const hDeg = ((h + m / 60) / 12) * 360;
-
-            // 針を回転
-            sHand.style.transform = `translateX(-50%) rotate(${sDeg}deg)`;
-            mHand.style.transform = `translateX(-50%) rotate(${mDeg}deg)`;
-            hHand.style.transform = `translateX(-50%) rotate(${hDeg}deg)`;
+            const h = String(d.getHours()).padStart(2, '0');
+            const m = String(d.getMinutes()).padStart(2, '0');
+            const s = String(d.getSeconds()).padStart(2, '0');
+            
+            document.getElementById('main-time').innerText = `${h}:${m}`;
+            
+            // 秒数に応じてサブテキストを変化させる（サブカル演出）
+            const subTexts = ["観測中...", "世界線変動率 1.04", "ノイズ検知", "境界線・接続中", "エネルギー充填"];
+            if (s % 10 === 0) {
+                document.getElementById('sub-info').innerText = subTexts[Math.floor(Math.random() * subTexts.length)];
+            }
         }
         setInterval(updateClock, 1000);
         updateClock();
 
-        // === リンク機能 ===
+        // リンク
         function openLink(url) {
-            document.body.classList.add('shake'); // 画面揺れ演出
-            setTimeout(() => {
-                window.location.href = url;
-            }, 300);
+            window.location.href = url;
         }
 
-        // === 検索機能 ===
+        // 検索
         const sBox = document.getElementById('search');
         sBox.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
@@ -333,11 +338,10 @@ input#search:focus {
             }
         });
 
-        // Service Worker登録（アプリ化対応）
+        // Service Worker
         if ("serviceWorker" in navigator) {
             navigator.serviceWorker.register("service-worker.js");
         }
     </script>
-
 </body>
 </html>
