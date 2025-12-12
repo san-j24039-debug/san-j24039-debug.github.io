@@ -3,325 +3,484 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>NEON STEAM DEVICE</title>
+<title>CHRONO ATLAS</title>
 
 <link rel="manifest" href="manifest.json" />
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="apple-touch-icon" href="icon.png">
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Orbitron:wght@500;900&family=Zen+Old+Mincho&display=swap" rel="stylesheet">
 
 <style>
+/* === 変数定義 === */
+:root {
+    --bg-void: #050202;
+    --neon-cyan: #00f3ff;
+    --neon-amber: #ffaa00;
+    --steam-gold: #cfaa68;
+    --steam-rust: #8b4513;
+    --glass-panel: rgba(20, 10, 5, 0.7);
+}
+
 body {
-  margin: 0;
-  background: #000;
-  font-family: 'Share Tech Mono', monospace;
-  color: #fff;
-  overflow: hidden; /* スクロール防止 */
-  -webkit-touch-callout: none;
-  user-select: none;
+    margin: 0;
+    background-color: var(--bg-void);
+    color: #fff;
+    font-family: 'Orbitron', sans-serif;
+    overflow-x: hidden;
+    overflow-y: auto; /* コンテンツが多いので縦スクロール許可 */
+    height: 100vh;
+    width: 100vw;
+    -webkit-touch-callout: none;
+    user-select: none;
 }
 
-/* 起動時ノイズ画面 */
-#startup {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: #000;
-  z-index: 9999;
-  animation: startupNoise 1.5s forwards;
-  pointer-events: none;
-}
-@keyframes startupNoise {
-  0% { opacity: 1; } 
-  80% { opacity: 1; }
-  100% { opacity: 0; display: none; }
+/* === 背景装飾 === */
+.bg-layer {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: -2;
+    background: radial-gradient(circle at center, #1a0d00 0%, #000000 90%);
+    pointer-events: none;
 }
 
-/* CRTノイズ（画面全体のザラザラ感） */
-#crt {
-  position: fixed;
-  pointer-events: none;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: url('https://upload.wikimedia.org/wikipedia/commons/3/3f/CRT_noise.gif');
-  opacity: 0.08;
-  z-index: 10;
-  background-size: cover;
+/* 巨大歯車（背景） */
+.giant-gear {
+    position: fixed;
+    top: -20%; right: -30%;
+    width: 100vw; height: 100vw;
+    opacity: 0.15;
+    animation: rotate 120s linear infinite;
+    fill: var(--steam-gold);
+    z-index: -1;
+}
+@keyframes rotate { to { transform: rotate(360deg); } }
+
+/* 星座パーティクル */
+.stars {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-image: 
+        radial-gradient(2px 2px at 20px 30px, #fff, transparent),
+        radial-gradient(2px 2px at 40px 70px, #fff, transparent),
+        radial-gradient(2px 2px at 50px 160px, #fff, transparent),
+        radial-gradient(2px 2px at 90px 40px, #fff, transparent),
+        radial-gradient(2px 2px at 130px 80px, #fff, transparent);
+    background-size: 200px 200px;
+    opacity: 0.3;
+    animation: twinkle 5s infinite;
+    z-index: -1;
+}
+@keyframes twinkle { 50% { opacity: 0.1; } }
+
+/* === メインレイアウト === */
+.dashboard {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    gap: 20px;
+    width: 100%;
+    box-sizing: border-box;
+    max-width: 500px;
+    margin: 0 auto;
 }
 
-/* コンテンツ配置用コンテナ（中央寄せ） */
-.container {
-  position: relative;
-  z-index: 5;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  overflow-y: auto;
-  padding-bottom: 20px;
+/* 1. 懐中時計 (Main Clock) */
+.pocket-watch {
+    position: relative;
+    width: 220px; height: 220px;
+    margin-top: 20px;
+    background: radial-gradient(circle, #221100, #000);
+    border: 4px double var(--steam-gold);
+    border-radius: 50%;
+    box-shadow: 0 0 20px var(--steam-gold), inset 0 0 30px #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+/* 時計の飾り */
+.watch-top {
+    position: absolute;
+    top: -15px; left: 50%; transform: translateX(-50%);
+    width: 30px; height: 20px;
+    background: var(--steam-gold);
+    border-radius: 4px;
+}
+.watch-ring {
+    position: absolute;
+    top: -35px; left: 50%; transform: translateX(-50%);
+    width: 40px; height: 40px;
+    border: 4px solid var(--steam-gold);
+    border-radius: 50%;
+}
+#main-clock {
+    font-size: 42px;
+    color: var(--neon-amber);
+    text-shadow: 0 0 10px var(--neon-amber);
+    z-index: 2;
+}
+#date-display {
+    font-size: 14px;
+    color: var(--steam-gold);
+    margin-top: 5px;
+    font-family: 'Cinzel', serif;
 }
 
-/* タイトル（グリッチ + ネオン） */
-#title {
-  font-size: 28px;
-  text-align: center;
-  margin-top: 40px;
-  color: #0affff;
-  text-shadow: 0 0 8px #0affff;
-  animation: glitch 1.5s infinite;
-  letter-spacing: 2px;
+/* 2. 天気予報パネル (Weather Widget) */
+.weather-panel {
+    width: 100%;
+    background: var(--glass-panel);
+    border: 1px solid var(--steam-gold);
+    border-radius: 8px;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 0 10px rgba(0, 243, 255, 0.1);
+    backdrop-filter: blur(5px);
 }
-@keyframes glitch {
-  0% { text-shadow: 2px 0 #ff00f7; }
-  50% { text-shadow: -2px 0 #38ff66; }
-  100% { text-shadow: 2px 0 #ff00f7; }
+.weather-info {
+    text-align: left;
 }
-
-/* 時計 */
-#clock {
-  font-size: 48px;
-  text-align: center;
-  margin-top: 10px;
-  letter-spacing: 4px;
-  color: #ff00f7;
-  text-shadow: 0 0 10px #ff00f7, 2px 2px 0 #000;
+.temp-display {
+    font-size: 32px;
+    color: var(--neon-cyan);
+    text-shadow: 0 0 5px var(--neon-cyan);
 }
-
-/* ネオンちらつきアニメーション */
-.neonFlicker {
-  animation: flicker 2s infinite;
+.loc-display {
+    font-size: 12px;
+    color: #aaa;
 }
-@keyframes flicker {
-  0%,19%,21%,23%,25%,54%,56%,100% { opacity: 1; }
-  20%,24%,55% { opacity: 0.3; }
+.weather-icon {
+    font-size: 32px;
 }
 
-/* 検索バー */
-#searchBox {
-  display: block;
-  width: 80%;
-  max-width: 400px;
-  margin: 20px auto;
-  padding: 12px;
-  background: rgba(17, 17, 17, 0.8);
-  border: 2px solid #0affff;
-  color: #0affff;
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 16px;
-  border-radius: 8px;
-  outline: none;
-  box-shadow: 0 0 10px rgba(10, 255, 255, 0.3);
-  transition: 0.3s;
-}
-#searchBox:focus {
-  box-shadow: 0 0 20px #0affff;
-  background: rgba(0, 30, 40, 0.9);
+/* 3. ガジェットグリッド (Compass, Meter, etc.) */
+.widget-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    width: 100%;
 }
 
-/* ショートカット */
+.widget-box {
+    background: rgba(0,0,0,0.6);
+    border: 1px solid var(--steam-rust);
+    border-radius: 8px;
+    padding: 10px;
+    height: 100px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+.widget-title {
+    position: absolute;
+    top: 5px; left: 10px;
+    font-size: 10px;
+    color: var(--steam-gold);
+    opacity: 0.7;
+}
+
+/* コンパス */
+.compass-ring {
+    width: 60px; height: 60px;
+    border: 2px dashed var(--neon-cyan);
+    border-radius: 50%;
+    position: relative;
+    animation: driftCompass 5s ease-in-out infinite alternate;
+}
+.compass-needle {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 4px; height: 100%;
+    background: linear-gradient(to top, red 50%, white 50%);
+    transform: translate(-50%, -50%) rotate(0deg); /* JSで制御 */
+    clip-path: polygon(50% 0, 0 50%, 50% 100%, 100% 50%);
+}
+@keyframes driftCompass { from { transform: rotate(-5deg); } to { transform: rotate(5deg); } }
+
+/* 蒸気メーター */
+.steam-gauge {
+    width: 80%; height: 10px;
+    background: #333;
+    border-radius: 5px;
+    overflow: hidden;
+    margin-top: 10px;
+    border: 1px solid #555;
+}
+.steam-bar {
+    width: 50%; height: 100%;
+    background: linear-gradient(90deg, #ffaa00, #ff0000);
+    transition: width 0.5s;
+    box-shadow: 0 0 10px #ff0000;
+}
+.meter-val {
+    font-size: 20px; color: #ff5555;
+    margin-top: 5px;
+}
+
+/* アーティファクト（羽根・鍵） */
+.artifact-icon {
+    font-size: 40px;
+    filter: drop-shadow(0 0 5px var(--steam-gold));
+    cursor: pointer;
+    transition: 0.2s;
+}
+.artifact-icon:hover { transform: scale(1.1); filter: drop-shadow(0 0 10px var(--neon-cyan)); }
+
+/* 4. 検索バー */
+.search-wrapper {
+    width: 100%;
+    position: relative;
+    margin-top: 10px;
+}
+#search {
+    width: 100%;
+    background: rgba(0,0,0,0.8);
+    border: 1px solid var(--neon-cyan);
+    color: var(--neon-cyan);
+    padding: 12px;
+    font-family: 'Orbitron';
+    font-size: 16px;
+    box-sizing: border-box;
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 243, 255, 0.3);
+}
+
+/* 5. ショートカット */
 .shortcuts {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin-top: 10px;
-  gap: 15px;
-  max-width: 400px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    width: 100%;
 }
-.shortcut {
-  width: 80px;
-  height: 80px;
-  background: rgba(26, 26, 26, 0.8);
-  border: 2px solid #b87333;
-  border-radius: 12px;
-  color: #c4a484;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  box-shadow: 0 0 6px #b87333;
-  font-size: 13px;
-  transition: 0.2s;
-  position: relative;
-  overflow: hidden;
-  cursor: pointer;
+.sc-btn {
+    aspect-ratio: 1;
+    background: linear-gradient(135deg, #1a1a1a, #0a0a0a);
+    border: 1px solid var(--steam-gold);
+    border-radius: 50%; /* 懐中時計風の丸ボタン */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-size: 10px;
+    color: #aaa;
+    text-decoration: none;
+    cursor: pointer;
+    box-shadow: inset 0 0 10px #000;
 }
-.shortcut:active {
-  transform: scale(0.95);
-  box-shadow: 0 0 15px #ff00f7;
-  border-color: #ff00f7;
-  color: #ff00f7;
+.sc-btn:hover {
+    border-color: var(--neon-cyan);
+    color: #fff;
+    box-shadow: 0 0 10px var(--neon-cyan);
 }
 
-/* 蒸気エフェクト（ボタン内） */
-.steam {
-  position: absolute;
-  bottom: 0;
-  width: 20px;
-  height: 20px;
-  background: rgba(255,255,255,0.4);
-  filter: blur(8px);
-  border-radius: 50%;
-  animation: steamRise 2s linear infinite;
-  pointer-events: none;
-}
-@keyframes steamRise {
-  from { transform: translateY(0) scale(1); opacity: 0.7; }
-  to { transform: translateY(-80px) scale(2); opacity: 0; }
+/* ログ表示 */
+.log-area {
+    width: 100%;
+    height: 60px;
+    font-size: 12px;
+    color: var(--steam-gold);
+    text-align: center;
+    font-family: 'Zen Old Mincho', serif;
+    opacity: 0.8;
+    margin-top: 20px;
 }
 
-/* 歯車アニメ */
-#gearBox {
-  width: 60px;
-  height: 60px;
-  margin: 20px auto;
-  animation: rotateGear 10s linear infinite;
-  filter: drop-shadow(0 0 5px #b87333);
-}
-@keyframes rotateGear {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-/* メモ帳エリア */
-#memo {
-  width: 80%;
-  max-width: 400px;
-  height: 100px;
-  margin: 0 auto 20px auto;
-  display: block;
-  background: rgba(17, 17, 17, 0.8);
-  border: 2px solid #38ff66;
-  color: #38ff66;
-  padding: 10px;
-  border-radius: 10px;
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 14px;
-  box-shadow: 0 0 10px rgba(56, 255, 102, 0.3);
-  outline: none;
-  resize: none;
-}
-
-/* 語録エリア */
-#quote {
-  width: 80%;
-  max-width: 400px;
-  margin: 0 auto 30px auto;
-  text-align: center;
-  background: rgba(26, 26, 26, 0.8);
-  padding: 15px;
-  border-radius: 8px;
-  border: 1px solid #ff00f7;
-  font-size: 14px;
-  box-shadow: 0 0 8px rgba(255, 0, 247, 0.4);
-  color: #ff00f7;
-  line-height: 1.5;
-}
-
-/* 背景動画 */
-#bgVideo {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  object-fit: cover;
-  z-index: -1;
-  opacity: 0.4;
-  filter: contrast(1.2) brightness(0.8);
-}
 </style>
 </head>
 <body>
 
-<video id="bgVideo" autoplay loop muted playsinline src="https://files.catbox.moe/3a18zu.mp4"></video>
-
-<div id="startup"></div>
-<div id="crt"></div>
-
-<div class="container">
-  <div id="title" class="neonFlicker">NEON STEAM DEVICE</div>
-  <div id="clock">00:00</div>
-
-  <input id="searchBox" type="text" placeholder="SEARCH NETWORK...">
-
-  <div class="shortcuts">
-    <div class="shortcut" onclick="openLink('https://www.google.com')">
-        Google<div class="steam"></div>
+    <div class="bg-layer">
+        <div class="stars"></div>
+        <svg class="giant-gear" viewBox="0 0 100 100">
+             <path d="M50 0 L56 10 L68 8 L72 20 L84 18 L88 30 L100 30 L94 40 L100 50 L94 60 L100 70 L88 70 L84 82 L72 80 L68 92 L56 90 L50 100 L44 90 L32 92 L28 80 L16 82 L12 70 L0 70 L6 60 L0 50 L6 40 L0 30 L12 30 L16 18 L28 20 L32 8 L44 10 Z" />
+        </svg>
     </div>
-    <div class="shortcut" onclick="openLink('https://www.youtube.com')">
-        YouTube<div class="steam"></div>
+
+    <div class="dashboard">
+        <div class="pocket-watch">
+            <div class="watch-ring"></div>
+            <div class="watch-top"></div>
+            <div id="main-clock">00:00</div>
+            <div id="date-display">----/--/--</div>
+        </div>
+
+        <div class="weather-panel">
+            <div class="weather-info">
+                <div class="loc-display" id="weather-loc">DETECTING LOCATION...</div>
+                <div class="temp-display" id="weather-temp">--°C</div>
+            </div>
+            <div class="weather-icon" id="weather-icon">☁</div>
+        </div>
+
+        <div class="widget-grid">
+            <div class="widget-box">
+                <div class="widget-title">COMPASS</div>
+                <div class="compass-ring">
+                    <div class="compass-needle" id="compass-needle"></div>
+                </div>
+                <div style="margin-top:5px; font-size:10px;">NORTH</div>
+            </div>
+
+            <div class="widget-box">
+                <div class="widget-title">STEAM PRESSURE</div>
+                <div class="meter-val" id="pressure-val">0%</div>
+                <div class="steam-gauge">
+                    <div class="steam-bar" id="steam-bar"></div>
+                </div>
+            </div>
+
+            <div class="widget-box" onclick="logMsg('星の配置を計算中...')">
+                <div class="widget-title">CONSTELLATION</div>
+                <div class="artifact-icon">✨</div>
+            </div>
+
+            <div class="widget-box" onclick="logMsg('セキュリティ・ゲート確認：正常')">
+                <div class="widget-title">KEY SYSTEM</div>
+                <div class="artifact-icon">🗝</div>
+            </div>
+            
+            <div class="widget-box" onclick="logMsg('伝書鳩プロトコル：待機中')">
+                <div class="widget-title">MESSENGER</div>
+                <div class="artifact-icon">🪶</div>
+            </div>
+            
+             <div class="widget-box" onclick="location.reload()">
+                <div class="widget-title">RELOAD</div>
+                <div class="artifact-icon">⚙</div>
+            </div>
+        </div>
+
+        <div class="search-wrapper">
+            <input type="text" id="search" placeholder="> COMMAND SEARCH...">
+        </div>
+
+        <div class="shortcuts">
+            <a class="sc-btn" onclick="openLink('https://google.com')">GOOGLE</a>
+            <a class="sc-btn" onclick="openLink('https://youtube.com')">YOUTUBE</a>
+            <a class="sc-btn" onclick="openLink('https://x.com')">X / NET</a>
+            <a class="sc-btn" onclick="openLink('https://chatgpt.com')">AI CHAT</a>
+        </div>
+
+        <div class="log-area" id="log-display">System Ready.</div>
     </div>
-    <div class="shortcut" onclick="openLink('https://twitter.com')">
-        X / TWITTER<div class="steam"></div>
-    </div>
-    <div class="shortcut" onclick="openLink('https://chatgpt.com')">
-        ChatGPT<div class="steam"></div>
-    </div>
-  </div>
 
-  <img id="gearBox" src="https://upload.wikimedia.org/wikipedia/commons/3/3a/Gear_icon.svg">
+    <script>
+        // === 1. 時計 ===
+        function updateClock() {
+            const now = new Date();
+            const h = String(now.getHours()).padStart(2, '0');
+            const m = String(now.getMinutes()).padStart(2, '0');
+            const s = String(now.getSeconds()).padStart(2, '0');
+            document.getElementById('main-clock').innerText = `${h}:${m}:${s}`;
+            
+            const days = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
+            document.getElementById('date-display').innerText = 
+                `${now.getFullYear()}.${now.getMonth()+1}.${now.getDate()} [${days[now.getDay()]}]`;
+        }
+        setInterval(updateClock, 1000);
 
-  <textarea id="memo" placeholder="LOG_MEMORY... (Auto Save)"></textarea>
+        // === 2. 実用的な天気予報 (Open-Meteo API) ===
+        // 登録不要の無料APIを使用
+        async function fetchWeather(lat, lon) {
+            try {
+                const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`;
+                const res = await fetch(url);
+                const data = await res.json();
+                
+                const temp = data.current_weather.temperature;
+                const code = data.current_weather.weathercode;
+                
+                document.getElementById('weather-temp').innerText = `${temp}°C`;
+                document.getElementById('weather-loc').innerText = `LAT:${lat.toFixed(2)} LON:${lon.toFixed(2)}`;
+                
+                // 天気コード簡易変換
+                let icon = "☁";
+                if(code === 0) icon = "☀"; // 快晴
+                else if(code <= 3) icon = "⛅"; // 曇り
+                else if(code <= 67) icon = "☂"; // 雨
+                else if(code <= 86) icon = "❄"; // 雪
+                else icon = "⛈"; // 雷雨
+                
+                document.getElementById('weather-icon').innerText = icon;
+                logMsg("気象データの受信完了");
+            } catch (e) {
+                document.getElementById('weather-loc').innerText = "CONNECTION FAILED";
+            }
+        }
 
-  <div id="quote">Loading system message...</div>
-</div>
+        // 位置情報取得
+        function initWeather() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => {
+                        fetchWeather(pos.coords.latitude, pos.coords.longitude);
+                    },
+                    (err) => {
+                        // 許可されない場合は東京の座標を使用
+                        document.getElementById('weather-loc').innerText = "LOCATION DENIED (DEFAULT: TOKYO)";
+                        fetchWeather(35.6895, 139.6917);
+                    }
+                );
+            } else {
+                fetchWeather(35.6895, 139.6917);
+            }
+        }
+        // 初回実行と10分ごとの更新
+        initWeather();
+        setInterval(initWeather, 600000); 
 
-<script>
-// 時計機能
-function updateClock() {
-  const d = new Date();
-  const h = String(d.getHours()).padStart(2, '0');
-  const m = String(d.getMinutes()).padStart(2, '0');
-  document.getElementById('clock').textContent = `${h}:${m}`;
-}
-setInterval(updateClock, 1000);
-updateClock();
+        // === 3. ギミック制御 ===
+        
+        // 蒸気メーターのランダム変動
+        setInterval(() => {
+            const val = Math.floor(Math.random() * 100);
+            document.getElementById('steam-bar').style.width = val + "%";
+            document.getElementById('pressure-val').innerText = val + "%";
+        }, 2000);
 
-// 検索機能
-const searchBox = document.getElementById('searchBox');
-searchBox.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') {
-    const q = searchBox.value;
-    if (q) location.href = `https://www.google.com/search?q=${encodeURIComponent(q)}`;
-  }
-});
+        // コンパス制御 (デバイスの方角取得は複雑なため、擬似的な揺らぎで演出)
+        // スマホの場合は実際に動くように試みる
+        if (window.DeviceOrientationEvent) {
+            window.addEventListener('deviceorientation', (event) => {
+                if(event.alpha) {
+                    const rotate = 360 - event.alpha;
+                    document.getElementById('compass-needle').style.transform = 
+                        `translate(-50%, -50%) rotate(${rotate}deg)`;
+                }
+            });
+        }
 
-// リンクを開く機能
-function openLink(url) {
-  window.location.href = url;
-}
+        // === 4. 共通機能 ===
+        function openLink(url) { window.location.href = url; }
+        
+        const sBox = document.getElementById('search');
+        sBox.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                const q = sBox.value;
+                if(q) location.href = `https://www.google.com/search?q=${encodeURIComponent(q)}`;
+            }
+        });
 
-// メモ自動保存機能
-const memo = document.getElementById('memo');
-memo.value = localStorage.getItem('memoData') || '';
-memo.addEventListener('input', () => {
-  localStorage.setItem('memoData', memo.value);
-});
+        function logMsg(msg) {
+            const log = document.getElementById('log-display');
+            log.innerText = "> " + msg;
+            log.style.opacity = 1;
+            setTimeout(() => { log.style.opacity = 0.7; }, 200);
+        }
 
-// 語録システム（修復・追記済み）
-const quotes = [
-  "深夜テンションは世界を救う。",
-  "ネオンの下では嘘も光る。",
-  "蒸気の音は心臓のリズム。",
-  "サブカルは反逆のエネルギーだ。",
-  "闇に落ちるな、闇を使え。",
-  "現実とネットの境界線を探せ。",
-  "SYSTEM: STABLE",
-  "思考は蒸気のように拡散する。",
-  "アクセス承認。ようこそ。"
-];
-
-// ランダムに語録を表示
-const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
-document.getElementById('quote').textContent = "> " + randomQuote;
-
-// Service Worker登録（アプリ化対応）
-if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("service-worker.js");
-}
-</script>
-
+        // Service Worker
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("service-worker.js");
+        }
+    </script>
 </body>
 </html>
