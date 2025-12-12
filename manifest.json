@@ -1,0 +1,15 @@
+{
+    "name": "NeonPunk App",
+    "short_name": "NeonPunk",
+    "start_url": "./index.html",
+    "display": "standalone",
+    "background_color": "#000000",
+    "theme_color": "#ff00ff",
+    "icons": [
+        {
+            "src": "icon.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}

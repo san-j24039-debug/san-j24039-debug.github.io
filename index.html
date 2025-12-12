@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NeonPunk App</title>
+
+    <!-- manifest -->
+    <link rel="manifest" href="manifest.json" />
+
+    <!-- iOS 追加 -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="NeonPunk">
+    <link rel="apple-touch-icon" href="icon.png">
+
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+    <div class="container">
+        <h1>NeonPunk App</h1>
+        <p>サブカル × ネオンパンク × スチームパンク × ダーク系アプリ</p>
+
+        <button id="actionBtn">世界をハックする</button>
+        <div id="log"></div>
+    </div>
+
+    <script>
+        // ボタン動作
+        document.getElementById("actionBtn").onclick = () => {
+            const log = document.getElementById("log");
+            log.innerHTML = "⚡ エネルギー転送中...";
+            setTimeout(() => {
+                log.innerHTML = "✨ 転送完了。暗黒領域へのアクセスが許可されました。";
+            }, 1200);
+        };
+
+        // service worker 登録
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("service-worker.js");
+        }
+    </script>
+
+</body>
+</html>
