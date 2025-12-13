@@ -13,14 +13,15 @@
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Orbitron:wght@500;900&family=Zen+Old+Mincho&display=swap" rel="stylesheet">
 
 <style>
-/* === デザイン変数 === */
+/* === CORE VARIABLES === */
 :root {
     --bg-void: #080808;
     --neon-cyan: #00f3ff;
     --neon-pink: #ff0055;
     --neon-purple: #bc13fe;
     --silver-metal: #e0e5eb;
-    --glass: rgba(20, 20, 30, 0.6);
+    --glass: rgba(10, 10, 15, 0.85);
+    --border: rgba(255, 255, 255, 0.15);
 }
 
 body {
@@ -28,7 +29,7 @@ body {
     background-color: var(--bg-void);
     color: #fff;
     font-family: 'Orbitron', sans-serif;
-    overflow-x: hidden;
+    overflow: hidden; /* モーダル展開のためスクロール制御 */
     height: 100vh;
     width: 100vw;
     -webkit-touch-callout: none;
@@ -38,12 +39,10 @@ body {
     align-items: center;
 }
 
-/* === 背景 (動く霧 + グリッド) === */
+/* === BACKGROUND === */
 .bg-layer {
     position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    z-index: -2;
+    top: 0; left: 0; width: 100%; height: 100%; z-index: -2;
     background: radial-gradient(circle at center, #1a1a2e 0%, #000 90%);
 }
 .grid-bg {
@@ -57,281 +56,205 @@ body {
     animation: gridMove 20s linear infinite;
 }
 @keyframes gridMove { from { transform: perspective(500px) rotateX(60deg) translateY(0) translateZ(-200px); } to { transform: perspective(500px) rotateX(60deg) translateY(40px) translateZ(-200px); } }
-
-/* 背景の歯車（シルエット） */
 .gear-bg {
-    position: fixed;
-    top: 50%; left: 50%;
+    position: fixed; top: 50%; left: 50%;
     transform: translate(-50%, -50%);
-    width: 90vw; height: 90vw;
-    opacity: 0.05;
+    width: 90vw; height: 90vw; opacity: 0.05;
     fill: var(--silver-metal);
     animation: rotateGear 60s linear infinite;
-    z-index: -1;
-    pointer-events: none;
+    z-index: -1; pointer-events: none;
 }
 @keyframes rotateGear { to { transform: translate(-50%, -50%) rotate(360deg); } }
 
-/* === 1. 上部：実用ショートカット (Shortcut Dock) === */
+/* === 1. TOP SHORTCUTS (Maintained) === */
 .top-dock {
-    width: 100%;
-    padding: 20px 0;
+    width: 100%; padding: 15px 0;
     background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
-    display: flex;
-    justify-content: center;
-    gap: 12px;
-    z-index: 100;
+    display: flex; justify-content: center; gap: 12px;
+    z-index: 10;
 }
-
 .icon-btn {
-    position: relative;
-    width: 70px; height: 70px;
+    width: 65px; height: 65px;
     background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid var(--border);
     border-radius: 14px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
+    text-decoration: none; color: #fff;
     backdrop-filter: blur(5px);
     transition: 0.3s;
-    overflow: hidden;
-    text-decoration: none;
-    color: #fff;
 }
-.icon-btn:active { transform: scale(0.95); }
-.icon-btn:hover {
-    border-color: var(--neon-cyan);
-    box-shadow: 0 0 15px var(--neon-cyan);
-}
-.icon-symbol { font-size: 22px; margin-bottom: 4px; color: var(--silver-metal); }
+.icon-btn:hover { border-color: var(--neon-cyan); box-shadow: 0 0 15px var(--neon-cyan); }
+.icon-symbol { font-size: 20px; margin-bottom: 4px; color: var(--silver-metal); }
 .icon-label { font-size: 9px; color: #aaa; letter-spacing: 0.5px; }
 
-/* === 2. 中央：時計 (Chrono Core) === */
+/* === 2. CENTER CLOCK (Maintained) === */
 .main-section {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    position: relative;
+    flex: 1; display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
+    width: 100%; position: relative;
+    padding-bottom: 20px;
 }
-
-/* 魔法陣のような時計サークル */
 .clock-circle {
-    position: relative;
-    width: 260px; height: 260px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    position: relative; width: 240px; height: 240px;
+    display: flex; justify-content: center; align-items: center;
 }
 .ring-outer {
-    position: absolute;
-    width: 100%; height: 100%;
-    border: 1px dashed var(--neon-purple);
-    border-radius: 50%;
-    animation: spin 30s linear infinite reverse;
-    opacity: 0.5;
+    position: absolute; width: 100%; height: 100%;
+    border: 1px dashed var(--neon-purple); border-radius: 50%;
+    animation: spin 30s linear infinite reverse; opacity: 0.5;
 }
 .ring-inner {
-    position: absolute;
-    width: 80%; height: 80%;
-    border: 2px solid var(--neon-cyan);
-    border-radius: 50%;
-    border-top-color: transparent;
-    border-bottom-color: transparent;
-    animation: spin 10s linear infinite;
-    box-shadow: 0 0 10px var(--neon-cyan);
+    position: absolute; width: 80%; height: 80%;
+    border: 2px solid var(--neon-cyan); border-radius: 50%;
+    border-top-color: transparent; border-bottom-color: transparent;
+    animation: spin 10s linear infinite; box-shadow: 0 0 10px var(--neon-cyan);
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* 時刻表示（グリッチエフェクト強化） */
 .time-box { text-align: center; z-index: 10; }
 #time-text {
-    font-size: 60px;
-    font-weight: 900;
-    color: #fff;
+    font-size: 56px; font-weight: 900; color: #fff;
     text-shadow: 2px 0 var(--neon-cyan), -2px 0 var(--neon-pink);
-    letter-spacing: 2px;
-    line-height: 1;
-    position: relative;
-    display: inline-block;
+    letter-spacing: 2px; line-height: 1;
 }
-/* 強烈なグリッチ */
-.glitch-effect {
-    animation: glitch-skew 1s infinite linear alternate-reverse;
+.glitch-effect { animation: glitch-skew 2s infinite linear alternate-reverse; }
+@keyframes glitch-skew {
+    0% { transform: skew(0deg); }
+    2% { transform: skew(-2deg); }
+    4% { transform: skew(2deg); }
+    6% { transform: skew(0deg); }
 }
-.glitch-effect::before, .glitch-effect::after {
-    content: attr(data-text);
-    position: absolute;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: var(--bg-void);
-}
-.glitch-effect::before {
-    left: 2px;
-    text-shadow: -1px 0 #ff00c1;
-    clip: rect(44px, 450px, 56px, 0);
-    animation: glitch-anim 5s infinite linear alternate-reverse;
-}
-.glitch-effect::after {
-    left: -2px;
-    text-shadow: -1px 0 #00fff9;
-    clip: rect(44px, 450px, 56px, 0);
-    animation: glitch-anim2 5s infinite linear alternate-reverse;
-}
-@keyframes glitch-anim {
-    0% { clip: rect(2px, 9999px, 5px, 0); }
-    20% { clip: rect(30px, 9999px, 60px, 0); }
-    40% { clip: rect(10px, 9999px, 85px, 0); }
-    60% { clip: rect(50px, 9999px, 20px, 0); }
-    80% { clip: rect(15px, 9999px, 40px, 0); }
-    100% { clip: rect(60px, 9999px, 70px, 0); }
-}
-@keyframes glitch-anim2 {
-    0% { clip: rect(60px, 9999px, 10px, 0); }
-    20% { clip: rect(10px, 9999px, 40px, 0); }
-    40% { clip: rect(50px, 9999px, 20px, 0); }
-    60% { clip: rect(15px, 9999px, 60px, 0); }
-    80% { clip: rect(70px, 9999px, 30px, 0); }
-    100% { clip: rect(30px, 9999px, 80px, 0); }
-}
+#date-text { font-family: 'Cinzel', serif; font-size: 13px; color: var(--neon-pink); letter-spacing: 3px; margin-top: 8px; }
 
-#date-text {
-    font-family: 'Cinzel', serif;
-    font-size: 14px;
-    color: var(--neon-pink);
-    letter-spacing: 4px;
-    margin-top: 10px;
-}
-
-/* 検索バー */
-.search-container {
-    width: 80%;
-    max-width: 400px;
-    margin-top: 30px;
-    position: relative;
-}
-#search {
-    width: 100%;
-    background: transparent;
-    border: none;
-    border-bottom: 2px solid var(--silver-metal);
-    color: #fff;
-    font-family: 'Orbitron';
-    font-size: 18px;
-    padding: 10px;
-    text-align: center;
-    outline: none;
-    transition: 0.3s;
-}
-#search:focus {
-    border-color: var(--neon-pink);
-    box-shadow: 0 4px 10px -2px rgba(255, 0, 85, 0.5);
-}
-
-/* === 3. 下部：ウィジェットデッキ === */
-.widget-deck {
-    width: 100%;
-    max-width: 500px;
-    padding: 20px;
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-    margin-bottom: 20px;
+/* === 3. APP LAUNCHER (New Design) === */
+.launcher-grid {
+    width: 100%; max-width: 500px;
+    display: grid; grid-template-columns: repeat(2, 1fr);
+    gap: 12px; padding: 0 20px 20px 20px;
     box-sizing: border-box;
 }
-
-.widget {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+.app-card {
+    height: 90px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
     border-radius: 8px;
     padding: 10px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    height: 100px;
-    position: relative;
-    overflow: hidden;
+    position: relative; overflow: hidden;
+    cursor: pointer; transition: 0.2s;
+    display: flex; flex-direction: column; justify-content: space-between;
+}
+.app-card:active { transform: scale(0.98); background: rgba(0, 243, 255, 0.1); }
+.app-title { font-size: 10px; color: var(--neon-cyan); letter-spacing: 1px; }
+.app-icon-bg {
+    position: absolute; right: 5px; bottom: 5px;
+    font-size: 40px; opacity: 0.2; color: #fff;
+}
+.app-status { font-family: 'Zen Old Mincho'; font-size: 10px; color: #888; }
+
+/* === STATUS BAR (Weather & Credit) === */
+.status-bar {
+    width: 100%; height: 30px;
+    background: #000;
+    border-top: 1px solid #333;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0 15px; box-sizing: border-box;
+    font-size: 10px; color: #aaa;
+    z-index: 20;
+}
+.status-item span { color: var(--neon-cyan); margin-left: 5px; }
+
+/* === MODAL OVERLAYS (The Apps) === */
+.modal {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.95);
+    backdrop-filter: blur(10px);
+    z-index: 200;
+    transform: translateY(110%);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex; flex-direction: column;
+}
+.modal.active { transform: translateY(0); }
+
+.modal-header {
+    padding: 20px;
+    border-bottom: 1px solid var(--neon-pink);
+    display: flex; justify-content: space-between; align-items: center;
+    background: linear-gradient(90deg, #110005, transparent);
+}
+.modal-title { font-size: 18px; color: var(--neon-pink); letter-spacing: 2px; }
+.close-btn { font-size: 24px; color: #fff; cursor: pointer; }
+
+.modal-content {
+    flex: 1; padding: 20px; overflow-y: auto;
+    display: flex; flex-direction: column; gap: 15px;
+}
+
+/* -- MODULE 1: QUEST BOARD -- */
+.quest-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px; border: 1px solid #333; border-radius: 4px;
+    background: rgba(255,255,255,0.02);
+}
+.quest-checkbox {
+    width: 20px; height: 20px; border: 2px solid var(--neon-cyan);
+    display: flex; justify-content: center; align-items: center;
     cursor: pointer;
-    text-decoration: none;
-    color: #fff;
-    transition: 0.2s;
 }
-.widget:active { background: rgba(255, 255, 255, 0.1); }
-.widget-label {
-    font-size: 10px;
-    color: var(--neon-cyan);
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    margin-bottom: 5px;
+.quest-checkbox.checked { background: var(--neon-cyan); box-shadow: 0 0 10px var(--neon-cyan); }
+.quest-text { flex: 1; font-family: 'Zen Old Mincho'; font-size: 14px; }
+.quest-rank { font-size: 10px; color: var(--neon-pink); border: 1px solid var(--neon-pink); padding: 2px 4px; }
+#add-quest-btn {
+    padding: 10px; background: transparent; border: 1px solid var(--neon-cyan);
+    color: var(--neon-cyan); font-family: 'Orbitron'; cursor: pointer;
 }
 
-/* 天気ウィジェット */
-.weather-main {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 0px;
+/* -- MODULE 2: TUNER -- */
+.tuner-control {
+    text-align: center; padding: 20px; border: 1px solid #444; border-radius: 8px;
 }
-.temp-big { font-size: 28px; font-weight: bold; text-shadow: 0 0 5px #fff; }
-.weather-icon { font-size: 26px; }
-.loc-small { font-size: 9px; color: #888; margin-top: 2px; }
+.tuner-btn {
+    width: 80px; height: 80px; border-radius: 50%;
+    border: 2px solid var(--silver-metal); background: #111;
+    color: #fff; font-size: 12px; margin: 20px auto;
+    display: flex; justify-content: center; align-items: center; flex-direction: column;
+    cursor: pointer; transition: 0.3s;
+    box-shadow: 0 0 10px rgba(255,255,255,0.1);
+}
+.tuner-btn.active { border-color: var(--neon-cyan); box-shadow: 0 0 20px var(--neon-cyan); color: var(--neon-cyan); }
+.freq-display { height: 40px; display: flex; align-items: flex-end; justify-content: center; gap: 3px; }
+.freq-bar { width: 4px; background: var(--neon-cyan); animation: freqAnim 0.5s infinite; }
+@keyframes freqAnim { 0%,100%{height:20%;} 50%{height:80%;} }
 
-/* タイマー（懐中時計デザイン） */
-.watch-face {
-    width: 50px; height: 50px;
-    border: 2px solid var(--silver-metal);
-    border-radius: 50%;
-    position: absolute;
-    bottom: 10px; right: 10px;
-    background: radial-gradient(#222, #000);
-    box-shadow: 0 0 5px var(--silver-metal);
+/* -- MODULE 3: VITAL -- */
+.vital-circle {
+    width: 200px; height: 200px; border-radius: 50%;
+    border: 4px solid #333; margin: 20px auto;
+    position: relative; display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
 }
-.watch-knob {
-    position: absolute;
-    top: -4px; left: 50%; transform: translateX(-50%);
-    width: 6px; height: 4px; background: var(--silver-metal);
+.vital-progress {
+    position: absolute; top: -4px; left: -4px;
+    width: 100%; height: 100%; border-radius: 50%;
+    border: 4px solid transparent; border-top-color: var(--neon-pink);
+    transform: rotate(45deg); transition: 1s linear;
 }
-.watch-hand {
-    position: absolute;
-    top: 50%; left: 50%; width: 45%; height: 2px;
-    background: var(--neon-pink);
-    transform-origin: 0 50%;
-    animation: tick 60s linear infinite;
-}
-@keyframes tick { from { transform: rotate(-90deg); } to { transform: rotate(270deg); } }
-
-/* システム負荷（バー） */
-.bar-container {
-    display: flex;
-    align-items: flex-end;
-    gap: 2px;
-    height: 40px;
-    margin-top: 10px;
-}
-.bar {
-    flex: 1;
-    background: var(--neon-purple);
-    opacity: 0.5;
-    transition: height 0.2s;
+.vital-time { font-size: 40px; font-weight: bold; text-shadow: 0 0 10px var(--neon-pink); }
+.vital-btn {
+    padding: 10px 30px; background: var(--neon-pink); border: none;
+    color: #fff; font-family: 'Orbitron'; font-weight: bold;
+    cursor: pointer; margin-top: 10px; box-shadow: 0 0 15px var(--neon-pink);
 }
 
-/* メモ帳 */
-#memo-area {
-    width: 100%;
-    height: 60px;
-    background: transparent;
-    border: none;
-    color: #aaa;
-    font-family: 'Zen Old Mincho', serif;
-    font-size: 11px;
-    resize: none;
-    outline: none;
-    line-height: 1.4;
+/* -- MODULE 4: ARCHIVE (Memo) -- */
+.memo-area {
+    width: 100%; height: 300px; background: #050505;
+    border: 1px solid #333; padding: 10px; color: #ddd;
+    font-family: 'Zen Old Mincho'; font-size: 13px; line-height: 1.6;
+    resize: none; outline: none; white-space: pre-wrap;
 }
-#memo-area::placeholder { color: #555; font-style: italic; }
+.memo-toolbar { display: flex; gap: 10px; margin-bottom: 5px; }
+.redact-btn { font-size: 10px; background: #333; border: none; color: #fff; padding: 5px; cursor: pointer; }
 
 </style>
 </head>
@@ -339,164 +262,274 @@ body {
 
     <div class="bg-layer">
         <div class="grid-bg"></div>
-        <svg class="gear-bg" viewBox="0 0 100 100">
-             <path d="M50 0 L56 10 L68 8 L72 20 L84 18 L88 30 L100 30 L94 40 L100 50 L94 60 L100 70 L88 70 L84 82 L72 80 L68 92 L56 90 L50 100 L44 90 L32 92 L28 80 L16 82 L12 70 L0 70 L6 60 L0 50 L6 40 L0 30 L12 30 L16 18 L28 20 L32 8 L44 10 Z" />
-        </svg>
+        <svg class="gear-bg" viewBox="0 0 100 100"><path d="M50 0 L56 10 L68 8 L72 20 L84 18 L88 30 L100 30 L94 40 L100 50 L94 60 L100 70 L88 70 L84 82 L72 80 L68 92 L56 90 L50 100 L44 90 L32 92 L28 80 L16 82 L12 70 L0 70 L6 60 L0 50 L6 40 L0 30 L12 30 L16 18 L28 20 L32 8 L44 10 Z" /></svg>
     </div>
 
     <div class="top-dock">
-        <a class="icon-btn" href="https://youtube.com">
-            <div class="icon-symbol">▶</div>
-            <div class="icon-label">YOUTUBE</div>
-        </a>
-        <a class="icon-btn" href="https://gemini.google.com">
-            <div class="icon-symbol">✦</div>
-            <div class="icon-label">GEMINI</div>
-        </a>
-        <a class="icon-btn" href="https://music.apple.com">
-            <div class="icon-symbol">♫</div>
-            <div class="icon-label">MUSIC</div>
-        </a>
-        <a class="icon-btn" href="https://maps.google.com">
-            <div class="icon-symbol">🗺</div>
-            <div class="icon-label">MAPS</div>
-        </a>
+        <a class="icon-btn" href="https://youtube.com"><div class="icon-symbol">▶</div><div class="icon-label">YOUTUBE</div></a>
+        <a class="icon-btn" href="https://gemini.google.com"><div class="icon-symbol">✦</div><div class="icon-label">GEMINI</div></a>
+        <a class="icon-btn" href="https://music.apple.com"><div class="icon-symbol">♫</div><div class="icon-label">MUSIC</div></a>
+        <a class="icon-btn" href="https://maps.google.com"><div class="icon-symbol">🗺</div><div class="icon-label">MAPS</div></a>
     </div>
 
     <div class="main-section">
         <div class="clock-circle">
             <div class="ring-outer"></div>
             <div class="ring-inner"></div>
-            
             <div class="time-box">
-                <div id="time-text" class="glitch-effect" data-text="00:00">00:00</div>
-                <div id="date-text">XXXX.XX.XX</div>
+                <div id="time-text" class="glitch-effect">00:00</div>
+                <div id="date-text">----.--.--</div>
             </div>
-        </div>
-
-        <div class="search-container">
-            <input type="text" id="search" placeholder=">> ENTER COMMAND...">
         </div>
     </div>
 
-    <div class="widget-deck">
-        <a class="widget" href="https://weather.yahoo.co.jp/weather/jp/22/5010.html" target="_blank">
-            <div class="widget-label">SHIZUOKA / WEATHER</div>
-            <div class="weather-main">
-                <div class="temp-big" id="temp">--°</div>
-                <div class="weather-icon" id="w-icon">☁</div>
-            </div>
-            <div class="loc-small">Live Update: Active</div>
-        </a>
-
-        <a class="widget" href="clock-timer://">
-            <div class="widget-label">TIMER APP</div>
-            <div class="watch-face">
-                <div class="watch-knob"></div>
-                <div class="watch-hand"></div>
-            </div>
-            <div style="margin-top:15px; font-size:10px; color:#aaa;">OPEN SYSTEM CLOCK</div>
-        </a>
-
-        <div class="widget">
-            <div class="widget-label">SYSTEM LOAD</div>
-            <div class="bar-container" id="load-bars">
-                </div>
+    <div class="launcher-grid">
+        <div class="app-card" onclick="openModal('modal-quest')">
+            <div class="app-title">QUEST BOARD</div>
+            <div class="app-status">Active Missions: <span id="mission-count">0</span></div>
+            <div class="app-icon-bg">⚔</div>
         </div>
+        <div class="app-card" onclick="openModal('modal-tuner')">
+            <div class="app-title">NOISE TUNER</div>
+            <div class="app-status">Frequency: Ready</div>
+            <div class="app-icon-bg">📡</div>
+        </div>
+        <div class="app-card" onclick="openModal('modal-vital')">
+            <div class="app-title">VITAL KEEPER</div>
+            <div class="app-status">Condition: Normal</div>
+            <div class="app-icon-bg">♥</div>
+        </div>
+        <div class="app-card" onclick="openModal('modal-archive')">
+            <div class="app-title">AKASHIC MEMO</div>
+            <div class="app-status">Access: Granted</div>
+            <div class="app-icon-bg">✒</div>
+        </div>
+    </div>
 
-        <div class="widget">
-            <div class="widget-label">MEMO LOG</div>
-            <textarea id="memo-area" placeholder="Write logs here..."></textarea>
+    <div class="status-bar">
+        <div class="status-item" id="weather-status" onclick="window.open('https://weather.yahoo.co.jp/weather/jp/22/5010.html')">SHIZUOKA: --°C</div>
+        <div class="status-item">CREDITS: <span id="credit-val">0</span> G</div>
+    </div>
+
+    <div id="modal-quest" class="modal">
+        <div class="modal-header"><span class="modal-title">QUEST BOARD</span><span class="close-btn" onclick="closeModal('modal-quest')">×</span></div>
+        <div class="modal-content">
+            <div style="font-size:12px; color:#aaa; margin-bottom:10px;">>> 任務を選択シテ実行セヨ</div>
+            <div id="quest-list"></div>
+            <button id="add-quest-btn" onclick="addQuest()">+ NEW MISSION</button>
+        </div>
+    </div>
+
+    <div id="modal-tuner" class="modal">
+        <div class="modal-header"><span class="modal-title">NOISE TUNER</span><span class="close-btn" onclick="closeModal('modal-tuner')">×</span></div>
+        <div class="modal-content" style="align-items:center;">
+            <div style="font-size:12px; color:#aaa;">>> 環境音響生成ユニット</div>
+            <div class="tuner-control">
+                <div class="freq-display" id="freq-viz">
+                    </div>
+                <div class="tuner-btn" id="noise-btn" onclick="toggleNoise()">
+                    <div>I/O</div>
+                    <div id="noise-status">OFF</div>
+                </div>
+                <div style="font-size:10px; margin-top:10px; color:#666;">TYPE: PINK NOISE (RAIN)</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-vital" class="modal">
+        <div class="modal-header"><span class="modal-title">VITAL KEEPER</span><span class="close-btn" onclick="closeModal('modal-vital')">×</span></div>
+        <div class="modal-content" style="align-items:center;">
+            <div class="vital-circle">
+                <div class="vital-progress" id="vital-ring"></div>
+                <div class="vital-time" id="timer-display">25:00</div>
+                <div style="font-size:10px; color:#aaa; margin-top:5px;">FOCUS CYCLE</div>
+            </div>
+            <button class="vital-btn" onclick="toggleTimer()" id="timer-btn">START LINK</button>
+        </div>
+    </div>
+
+    <div id="modal-archive" class="modal">
+        <div class="modal-header"><span class="modal-title">AKASHIC MEMO</span><span class="close-btn" onclick="closeModal('modal-archive')">×</span></div>
+        <div class="modal-content">
+            <div class="memo-toolbar">
+                <button class="redact-btn" onclick="insertRedact()">■ 黒塗り挿入</button>
+            </div>
+            <textarea class="memo-area" id="memo-field" placeholder="記録を開始..."></textarea>
+            <div style="font-size:10px; color:#555;">※内容はローカルストレージに暗号化（比喩）保存されます。</div>
         </div>
     </div>
 
     <script>
-        // === 1. 時計 & グリッチ ===
+        // === CORE: Clock & Weather ===
         function updateClock() {
             const now = new Date();
             const h = String(now.getHours()).padStart(2, '0');
             const m = String(now.getMinutes()).padStart(2, '0');
-            const timeStr = `${h}:${m}`;
-            
-            const timeEl = document.getElementById('time-text');
-            timeEl.innerText = timeStr;
-            timeEl.setAttribute('data-text', timeStr); // グリッチ用属性更新
-            
-            const days = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
-            document.getElementById('date-text').innerText = 
-                `${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')} [${days[now.getDay()]}]`;
+            document.getElementById('time-text').innerText = `${h}:${m}`;
+            document.getElementById('date-text').innerText = now.toLocaleDateString();
         }
-        setInterval(updateClock, 1000);
-        updateClock();
+        setInterval(updateClock, 1000); updateClock();
 
-        // === 2. 天気予報 (静岡市: 34.9756, 138.3828) ===
         async function fetchWeather() {
             try {
-                // 静岡市の座標固定
-                const lat = 34.9756;
-                const lon = 138.3828;
-                const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`;
-                
-                const res = await fetch(url);
+                const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=34.9756&longitude=138.3828&current_weather=true');
                 const data = await res.json();
-                
-                const temp = Math.round(data.current_weather.temperature);
-                const code = data.current_weather.weathercode;
-                
-                document.getElementById('temp').innerText = `${temp}°C`;
-                
-                let icon = "☁";
-                if(code === 0) icon = "☀";
-                else if(code <= 3) icon = "⛅";
-                else if(code <= 67) icon = "☂";
-                else if(code <= 86) icon = "❄";
-                else icon = "⛈";
-                document.getElementById('w-icon').innerText = icon;
+                document.getElementById('weather-status').innerText = `SHIZUOKA: ${data.current_weather.temperature}°C`;
+            } catch(e) {}
+        }
+        fetchWeather(); setInterval(fetchWeather, 600000);
 
-            } catch (e) {
-                document.getElementById('temp').innerText = "ERR";
+        // === MODAL SYSTEM ===
+        function openModal(id) { document.getElementById(id).classList.add('active'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+        // === M1: QUEST BOARD (Credits) ===
+        let credits = localStorage.getItem('credits') ? parseInt(localStorage.getItem('credits')) : 0;
+        let quests = JSON.parse(localStorage.getItem('quests')) || [];
+        updateCredits(); renderQuests();
+
+        function updateCredits() {
+            document.getElementById('credit-val').innerText = credits;
+            localStorage.setItem('credits', credits);
+        }
+        function addQuest() {
+            const txt = prompt("任務内容を入力 (例: 皿洗い討伐)");
+            if(txt) {
+                quests.push({ text: txt, done: false });
+                saveQuests(); renderQuests();
             }
         }
-        fetchWeather();
-        setInterval(fetchWeather, 600000); // 10分更新
-
-        // === 3. システム負荷（飾り） ===
-        const barContainer = document.getElementById('load-bars');
-        for(let i=0; i<10; i++) {
-            const bar = document.createElement('div');
-            bar.className = 'bar';
-            bar.style.height = Math.random() * 100 + "%";
-            barContainer.appendChild(bar);
+        function toggleQuest(index) {
+            quests[index].done = !quests[index].done;
+            if(quests[index].done) {
+                credits += 100; // 報酬
+                alert("報酬獲得: 100 G");
+            } else {
+                credits -= 100;
+            }
+            updateCredits(); saveQuests(); renderQuests();
         }
-        setInterval(() => {
-            const bars = document.querySelectorAll('.bar');
-            bars.forEach(b => {
-                b.style.height = Math.random() * 100 + "%";
-                b.style.background = Math.random() > 0.5 ? "var(--neon-cyan)" : "var(--neon-purple)";
+        function saveQuests() { localStorage.setItem('quests', JSON.stringify(quests)); }
+        function renderQuests() {
+            const list = document.getElementById('quest-list');
+            list.innerHTML = "";
+            let activeCount = 0;
+            quests.forEach((q, i) => {
+                if(!q.done) activeCount++;
+                const div = document.createElement('div');
+                div.className = 'quest-item';
+                div.innerHTML = `
+                    <div class="quest-checkbox ${q.done ? 'checked' : ''}" onclick="toggleQuest(${i})">✔</div>
+                    <div class="quest-text" style="${q.done ? 'text-decoration:line-through; opacity:0.5;' : ''}">${q.text}</div>
+                    <div class="quest-rank">B</div>
+                    <div style="font-size:10px; cursor:pointer;" onclick="deleteQuest(${i})">🗑</div>
+                `;
+                list.appendChild(div);
             });
-        }, 800);
-
-        // === 4. メモ帳（自動保存） ===
-        const memoArea = document.getElementById('memo-area');
-        // 読み込み
-        if(localStorage.getItem('myMemo')) {
-            memoArea.value = localStorage.getItem('myMemo');
+            document.getElementById('mission-count').innerText = activeCount;
         }
-        // 保存
-        memoArea.addEventListener('input', () => {
-            localStorage.setItem('myMemo', memoArea.value);
-        });
+        function deleteQuest(i) {
+            if(confirm("任務破棄？")) { quests.splice(i,1); saveQuests(); renderQuests(); }
+        }
 
-        // === 5. 検索機能 ===
-        const sBox = document.getElementById('search');
-        sBox.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                const q = sBox.value;
-                if(q) location.href = `https://www.google.com/search?q=${encodeURIComponent(q)}`;
+        // === M2: NOISE TUNER (Web Audio API) ===
+        let audioCtx, noiseNode, gainNode;
+        let isNoiseOn = false;
+
+        function initAudio() {
+            if(!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             }
-        });
+        }
+        function toggleNoise() {
+            initAudio();
+            if(isNoiseOn) {
+                // STOP
+                gainNode.disconnect();
+                isNoiseOn = false;
+                document.getElementById('noise-status').innerText = "OFF";
+                document.getElementById('noise-btn').classList.remove('active');
+            } else {
+                // START (Pink Noise Generator)
+                const bufferSize = 4096;
+                noiseNode = audioCtx.createScriptProcessor(bufferSize, 1, 1);
+                noiseNode.onaudioprocess = function(e) {
+                    const output = e.outputBuffer.getChannelData(0);
+                    for (let i = 0; i < bufferSize; i++) {
+                        const white = Math.random() * 2 - 1;
+                        output[i] = (lastOut + (0.02 * white)) / 1.02; // Simple Pink Noise approx
+                        lastOut = output[i];
+                        output[i] *= 3.5; 
+                    }
+                };
+                let lastOut = 0;
+                gainNode = audioCtx.createGain();
+                gainNode.gain.value = 0.1; // Volume
+                noiseNode.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                
+                isNoiseOn = true;
+                document.getElementById('noise-status').innerText = "ON";
+                document.getElementById('noise-btn').classList.add('active');
+            }
+        }
+        // Visualizer bar (Fake)
+        const viz = document.getElementById('freq-viz');
+        for(let i=0; i<10; i++) {
+            const b = document.createElement('div');
+            b.className = 'freq-bar';
+            b.style.height = Math.random()*100 + "%";
+            b.style.animationDuration = (0.2 + Math.random()*0.5) + "s";
+            viz.appendChild(b);
+        }
 
-        // PWA登録
+        // === M3: VITAL KEEPER (Timer) ===
+        let timerTime = 25 * 60;
+        let timerInterval = null;
+        function toggleTimer() {
+            const btn = document.getElementById('timer-btn');
+            if(timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+                btn.innerText = "RESUME LINK";
+            } else {
+                btn.innerText = "LINK ESTABLISHED";
+                timerInterval = setInterval(() => {
+                    timerTime--;
+                    if(timerTime <= 0) {
+                        clearInterval(timerInterval);
+                        alert("冷却完了 (休憩時間です)");
+                        timerTime = 5 * 60; // 休憩へ
+                    }
+                    updateTimerDisplay();
+                }, 1000);
+            }
+        }
+        function updateTimerDisplay() {
+            const m = Math.floor(timerTime / 60).toString().padStart(2,'0');
+            const s = (timerTime % 60).toString().padStart(2,'0');
+            document.getElementById('timer-display').innerText = `${m}:${s}`;
+        }
+
+        // === M4: ARCHIVE (Memo) ===
+        const memoField = document.getElementById('memo-field');
+        if(localStorage.getItem('archiveMemo')) {
+            memoField.value = localStorage.getItem('archiveMemo');
+        }
+        memoField.addEventListener('input', () => {
+            localStorage.setItem('archiveMemo', memoField.value);
+        });
+        function insertRedact() {
+            const start = memoField.selectionStart;
+            const end = memoField.selectionEnd;
+            const text = memoField.value;
+            const before = text.substring(0, start);
+            const after = text.substring(end, text.length);
+            memoField.value = before + " [REDACTED] " + after;
+            localStorage.setItem('archiveMemo', memoField.value);
+        }
+
+        // Service Worker
         if ("serviceWorker" in navigator) {
             navigator.serviceWorker.register("service-worker.js");
         }
