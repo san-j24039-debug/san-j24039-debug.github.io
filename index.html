@@ -15,12 +15,12 @@
 <style>
 /* === CORE VARIABLES === */
 :root {
-    --bg-void: #080808;
+    --bg-void: #050505;
     --neon-cyan: #00f3ff;
     --neon-pink: #ff0055;
     --neon-purple: #bc13fe;
+    --neon-gold: #ffcc00; /* Sランク用 */
     --silver-metal: #e0e5eb;
-    --glass: rgba(10, 10, 15, 0.85);
     --border: rgba(255, 255, 255, 0.15);
 }
 
@@ -29,232 +29,141 @@ body {
     background-color: var(--bg-void);
     color: #fff;
     font-family: 'Orbitron', sans-serif;
-    overflow: hidden; /* モーダル展開のためスクロール制御 */
+    overflow: hidden;
     height: 100vh;
     width: 100vw;
     -webkit-touch-callout: none;
     user-select: none;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    display: flex; flex-direction: column; align-items: center;
 }
 
-/* === BACKGROUND === */
-.bg-layer {
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%; z-index: -2;
-    background: radial-gradient(circle at center, #1a1a2e 0%, #000 90%);
-}
-.grid-bg {
-    position: absolute;
-    width: 200%; height: 200%;
-    background-image: 
-        linear-gradient(rgba(0, 243, 255, 0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
-    background-size: 40px 40px;
-    transform: perspective(500px) rotateX(60deg) translateY(-100px) translateZ(-200px);
-    animation: gridMove 20s linear infinite;
-}
+/* === BACKGROUND (Maintained) === */
+.bg-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; background: radial-gradient(circle at center, #1a1a2e 0%, #000 90%); }
+.grid-bg { position: absolute; width: 200%; height: 200%; background-image: linear-gradient(rgba(0, 243, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px); background-size: 40px 40px; transform: perspective(500px) rotateX(60deg) translateY(-100px) translateZ(-200px); animation: gridMove 20s linear infinite; }
 @keyframes gridMove { from { transform: perspective(500px) rotateX(60deg) translateY(0) translateZ(-200px); } to { transform: perspective(500px) rotateX(60deg) translateY(40px) translateZ(-200px); } }
-.gear-bg {
-    position: fixed; top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    width: 90vw; height: 90vw; opacity: 0.05;
-    fill: var(--silver-metal);
-    animation: rotateGear 60s linear infinite;
-    z-index: -1; pointer-events: none;
-}
+.gear-bg { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90vw; height: 90vw; opacity: 0.05; fill: var(--silver-metal); animation: rotateGear 60s linear infinite; z-index: -1; pointer-events: none; }
 @keyframes rotateGear { to { transform: translate(-50%, -50%) rotate(360deg); } }
 
-/* === 1. TOP SHORTCUTS (Maintained) === */
-.top-dock {
-    width: 100%; padding: 15px 0;
-    background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
-    display: flex; justify-content: center; gap: 12px;
-    z-index: 10;
-}
-.icon-btn {
-    width: 65px; height: 65px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    display: flex; flex-direction: column;
-    justify-content: center; align-items: center;
-    text-decoration: none; color: #fff;
-    backdrop-filter: blur(5px);
-    transition: 0.3s;
-}
+/* === TOP SHORTCUTS (Maintained) === */
+.top-dock { width: 100%; padding: 15px 0; background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent); display: flex; justify-content: center; gap: 12px; z-index: 10; }
+.icon-btn { width: 65px; height: 65px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border); border-radius: 14px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-decoration: none; color: #fff; backdrop-filter: blur(5px); transition: 0.3s; }
 .icon-btn:hover { border-color: var(--neon-cyan); box-shadow: 0 0 15px var(--neon-cyan); }
 .icon-symbol { font-size: 20px; margin-bottom: 4px; color: var(--silver-metal); }
 .icon-label { font-size: 9px; color: #aaa; letter-spacing: 0.5px; }
 
-/* === 2. CENTER CLOCK (Maintained) === */
-.main-section {
-    flex: 1; display: flex; flex-direction: column;
-    justify-content: center; align-items: center;
-    width: 100%; position: relative;
-    padding-bottom: 20px;
-}
-.clock-circle {
-    position: relative; width: 240px; height: 240px;
-    display: flex; justify-content: center; align-items: center;
-}
-.ring-outer {
-    position: absolute; width: 100%; height: 100%;
-    border: 1px dashed var(--neon-purple); border-radius: 50%;
-    animation: spin 30s linear infinite reverse; opacity: 0.5;
-}
-.ring-inner {
-    position: absolute; width: 80%; height: 80%;
-    border: 2px solid var(--neon-cyan); border-radius: 50%;
-    border-top-color: transparent; border-bottom-color: transparent;
-    animation: spin 10s linear infinite; box-shadow: 0 0 10px var(--neon-cyan);
-}
+/* === CENTER CLOCK (Maintained) === */
+.main-section { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; position: relative; padding-bottom: 20px; }
+.clock-circle { position: relative; width: 240px; height: 240px; display: flex; justify-content: center; align-items: center; }
+.ring-outer { position: absolute; width: 100%; height: 100%; border: 1px dashed var(--neon-purple); border-radius: 50%; animation: spin 30s linear infinite reverse; opacity: 0.5; }
+.ring-inner { position: absolute; width: 80%; height: 80%; border: 2px solid var(--neon-cyan); border-radius: 50%; border-top-color: transparent; border-bottom-color: transparent; animation: spin 10s linear infinite; box-shadow: 0 0 10px var(--neon-cyan); }
 @keyframes spin { to { transform: rotate(360deg); } }
-
 .time-box { text-align: center; z-index: 10; }
-#time-text {
-    font-size: 56px; font-weight: 900; color: #fff;
-    text-shadow: 2px 0 var(--neon-cyan), -2px 0 var(--neon-pink);
-    letter-spacing: 2px; line-height: 1;
-}
+#time-text { font-size: 56px; font-weight: 900; color: #fff; text-shadow: 2px 0 var(--neon-cyan), -2px 0 var(--neon-pink); letter-spacing: 2px; line-height: 1; }
 .glitch-effect { animation: glitch-skew 2s infinite linear alternate-reverse; }
-@keyframes glitch-skew {
-    0% { transform: skew(0deg); }
-    2% { transform: skew(-2deg); }
-    4% { transform: skew(2deg); }
-    6% { transform: skew(0deg); }
-}
+@keyframes glitch-skew { 0% { transform: skew(0deg); } 2% { transform: skew(-2deg); } 4% { transform: skew(2deg); } 6% { transform: skew(0deg); } }
 #date-text { font-family: 'Cinzel', serif; font-size: 13px; color: var(--neon-pink); letter-spacing: 3px; margin-top: 8px; }
 
-/* === 3. APP LAUNCHER (New Design) === */
-.launcher-grid {
-    width: 100%; max-width: 500px;
-    display: grid; grid-template-columns: repeat(2, 1fr);
-    gap: 12px; padding: 0 20px 20px 20px;
-    box-sizing: border-box;
-}
-.app-card {
-    height: 90px;
-    background: rgba(255,255,255,0.03);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 10px;
-    position: relative; overflow: hidden;
-    cursor: pointer; transition: 0.2s;
-    display: flex; flex-direction: column; justify-content: space-between;
-}
+/* === APP LAUNCHER === */
+.launcher-grid { width: 100%; max-width: 500px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 0 20px 20px 20px; box-sizing: border-box; }
+.app-card { height: 90px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 8px; padding: 10px; position: relative; overflow: hidden; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; justify-content: space-between; }
 .app-card:active { transform: scale(0.98); background: rgba(0, 243, 255, 0.1); }
 .app-title { font-size: 10px; color: var(--neon-cyan); letter-spacing: 1px; }
-.app-icon-bg {
-    position: absolute; right: 5px; bottom: 5px;
-    font-size: 40px; opacity: 0.2; color: #fff;
-}
+.app-icon-bg { position: absolute; right: 5px; bottom: 5px; font-size: 40px; opacity: 0.2; color: #fff; }
 .app-status { font-family: 'Zen Old Mincho'; font-size: 10px; color: #888; }
 
-/* === STATUS BAR (Weather & Credit) === */
-.status-bar {
-    width: 100%; height: 30px;
-    background: #000;
-    border-top: 1px solid #333;
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 0 15px; box-sizing: border-box;
-    font-size: 10px; color: #aaa;
-    z-index: 20;
-}
+/* === STATUS BAR === */
+.status-bar { width: 100%; height: 30px; background: #000; border-top: 1px solid #333; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; box-sizing: border-box; font-size: 10px; color: #aaa; z-index: 20; }
 .status-item span { color: var(--neon-cyan); margin-left: 5px; }
 
-/* === MODAL OVERLAYS (The Apps) === */
-.modal {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.95);
-    backdrop-filter: blur(10px);
-    z-index: 200;
-    transform: translateY(110%);
-    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    display: flex; flex-direction: column;
-}
+/* === MODAL SYSTEM === */
+.modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5,5,8,0.98); backdrop-filter: blur(15px); z-index: 200; transform: translateY(110%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); display: flex; flex-direction: column; }
 .modal.active { transform: translateY(0); }
-
-.modal-header {
-    padding: 20px;
-    border-bottom: 1px solid var(--neon-pink);
-    display: flex; justify-content: space-between; align-items: center;
-    background: linear-gradient(90deg, #110005, transparent);
-}
-.modal-title { font-size: 18px; color: var(--neon-pink); letter-spacing: 2px; }
+.modal-header { padding: 15px 20px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(90deg, #110005, transparent); }
+.modal-title { font-size: 16px; color: var(--neon-pink); letter-spacing: 2px; font-weight: bold; }
 .close-btn { font-size: 24px; color: #fff; cursor: pointer; }
+.modal-content { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; position: relative; }
 
-.modal-content {
-    flex: 1; padding: 20px; overflow-y: auto;
-    display: flex; flex-direction: column; gap: 15px;
-}
+/* --- QUEST BOARD PRO --- */
+.quest-input-area { display: flex; gap: 5px; margin-bottom: 15px; background: #111; padding: 10px; border-radius: 6px; border: 1px solid #333; }
+#quest-in-text { flex: 1; background: transparent; border: none; color: #fff; font-family: 'Orbitron'; font-size: 14px; outline: none; }
+#quest-in-rank { background: #222; color: #fff; border: 1px solid #444; border-radius: 4px; font-family: 'Orbitron'; }
+#quest-add-btn { background: var(--neon-cyan); border: none; color: #000; font-weight: bold; padding: 0 15px; border-radius: 4px; cursor: pointer; }
 
-/* -- MODULE 1: QUEST BOARD -- */
-.quest-item {
-    display: flex; align-items: center; gap: 10px;
-    padding: 10px; border: 1px solid #333; border-radius: 4px;
-    background: rgba(255,255,255,0.02);
+.quest-card {
+    display: flex; align-items: center; background: linear-gradient(90deg, rgba(255,255,255,0.05), transparent);
+    border-left: 4px solid #555; padding: 12px; margin-bottom: 8px; border-radius: 0 4px 4px 0; transition: 0.3s;
 }
-.quest-checkbox {
-    width: 20px; height: 20px; border: 2px solid var(--neon-cyan);
-    display: flex; justify-content: center; align-items: center;
-    cursor: pointer;
-}
-.quest-checkbox.checked { background: var(--neon-cyan); box-shadow: 0 0 10px var(--neon-cyan); }
-.quest-text { flex: 1; font-family: 'Zen Old Mincho'; font-size: 14px; }
-.quest-rank { font-size: 10px; color: var(--neon-pink); border: 1px solid var(--neon-pink); padding: 2px 4px; }
-#add-quest-btn {
-    padding: 10px; background: transparent; border: 1px solid var(--neon-cyan);
-    color: var(--neon-cyan); font-family: 'Orbitron'; cursor: pointer;
-}
+.quest-card.rank-s { border-left-color: var(--neon-gold); box-shadow: inset 0 0 10px rgba(255, 204, 0, 0.1); }
+.quest-card.rank-a { border-left-color: var(--neon-pink); }
+.quest-card.rank-b { border-left-color: var(--neon-purple); }
+.quest-card.rank-c { border-left-color: var(--neon-cyan); }
+.quest-card.done { opacity: 0.4; filter: grayscale(100%); }
 
-/* -- MODULE 2: TUNER -- */
-.tuner-control {
-    text-align: center; padding: 20px; border: 1px solid #444; border-radius: 8px;
-}
-.tuner-btn {
-    width: 80px; height: 80px; border-radius: 50%;
-    border: 2px solid var(--silver-metal); background: #111;
-    color: #fff; font-size: 12px; margin: 20px auto;
-    display: flex; justify-content: center; align-items: center; flex-direction: column;
-    cursor: pointer; transition: 0.3s;
-    box-shadow: 0 0 10px rgba(255,255,255,0.1);
-}
-.tuner-btn.active { border-color: var(--neon-cyan); box-shadow: 0 0 20px var(--neon-cyan); color: var(--neon-cyan); }
-.freq-display { height: 40px; display: flex; align-items: flex-end; justify-content: center; gap: 3px; }
-.freq-bar { width: 4px; background: var(--neon-cyan); animation: freqAnim 0.5s infinite; }
-@keyframes freqAnim { 0%,100%{height:20%;} 50%{height:80%;} }
+.q-rank { font-size: 18px; font-weight: bold; width: 30px; text-align: center; margin-right: 10px; font-family: 'Cinzel'; }
+.rank-s .q-rank { color: var(--neon-gold); text-shadow: 0 0 5px var(--neon-gold); }
+.rank-a .q-rank { color: var(--neon-pink); }
+.rank-b .q-rank { color: var(--neon-purple); }
+.rank-c .q-rank { color: var(--neon-cyan); }
 
-/* -- MODULE 3: VITAL -- */
-.vital-circle {
-    width: 200px; height: 200px; border-radius: 50%;
-    border: 4px solid #333; margin: 20px auto;
-    position: relative; display: flex; flex-direction: column;
-    justify-content: center; align-items: center;
-}
-.vital-progress {
-    position: absolute; top: -4px; left: -4px;
-    width: 100%; height: 100%; border-radius: 50%;
-    border: 4px solid transparent; border-top-color: var(--neon-pink);
-    transform: rotate(45deg); transition: 1s linear;
-}
-.vital-time { font-size: 40px; font-weight: bold; text-shadow: 0 0 10px var(--neon-pink); }
-.vital-btn {
-    padding: 10px 30px; background: var(--neon-pink); border: none;
-    color: #fff; font-family: 'Orbitron'; font-weight: bold;
-    cursor: pointer; margin-top: 10px; box-shadow: 0 0 15px var(--neon-pink);
-}
+.q-info { flex: 1; }
+.q-text { font-size: 14px; font-family: 'Zen Old Mincho'; }
+.q-reward { font-size: 9px; color: #888; margin-top: 2px; }
+.q-check { width: 24px; height: 24px; border: 1px solid #555; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; margin-left: 10px; }
+.q-check.checked { background: var(--neon-cyan); border-color: var(--neon-cyan); color: #000; }
 
-/* -- MODULE 4: ARCHIVE (Memo) -- */
-.memo-area {
-    width: 100%; height: 300px; background: #050505;
-    border: 1px solid #333; padding: 10px; color: #ddd;
-    font-family: 'Zen Old Mincho'; font-size: 13px; line-height: 1.6;
-    resize: none; outline: none; white-space: pre-wrap;
+/* --- NOISE TUNER PRO --- */
+.tuner-viz-container { width: 100%; height: 120px; background: #000; border: 1px solid #333; border-radius: 6px; position: relative; overflow: hidden; margin-bottom: 20px; }
+#viz-canvas { width: 100%; height: 100%; }
+
+.tuner-modules { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.module-box { border: 1px solid #333; padding: 10px; border-radius: 6px; text-align: center; }
+.knob-outer { width: 60px; height: 60px; border-radius: 50%; border: 2px solid #444; margin: 0 auto 10px; position: relative; display: flex; justify-content: center; align-items: center; cursor: pointer; }
+.knob-inner { width: 4px; height: 20px; background: var(--neon-cyan); position: absolute; top: 5px; transform-origin: 50% 25px; transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+.knob-active .knob-outer { border-color: var(--neon-cyan); box-shadow: 0 0 10px var(--neon-cyan); }
+.mod-label { font-size: 10px; color: #aaa; }
+
+/* --- VITAL KEEPER PRO --- */
+.vital-pod { position: relative; width: 220px; height: 220px; margin: 20px auto; }
+.vp-ring { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 1px solid #333; border-radius: 50%; }
+.vp-ring-1 { border-top: 2px solid var(--neon-pink); animation: spin 4s linear infinite; }
+.vp-ring-2 { width: 80%; height: 80%; top: 10%; left: 10%; border-bottom: 2px solid var(--neon-cyan); animation: spin 6s linear infinite reverse; }
+.vp-ring-3 { width: 60%; height: 60%; top: 20%; left: 20%; border: 1px dashed var(--silver-metal); animation: spin 10s linear infinite; }
+
+.vp-data { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
+#vp-timer { font-size: 42px; font-weight: bold; color: #fff; text-shadow: 0 0 10px var(--neon-pink); }
+#vp-label { font-size: 10px; color: var(--neon-pink); letter-spacing: 2px; }
+
+.heart-rate-canvas { width: 100%; height: 60px; margin-top: 20px; background: rgba(0,0,0,0.5); border-top: 1px solid var(--neon-pink); border-bottom: 1px solid var(--neon-pink); }
+
+.vp-controls { display: flex; justify-content: center; gap: 20px; margin-top: 10px; }
+.vp-btn { background: transparent; border: 1px solid var(--neon-pink); color: var(--neon-pink); padding: 8px 20px; cursor: pointer; font-family: 'Orbitron'; }
+.vp-btn:hover { background: var(--neon-pink); color: #fff; box-shadow: 0 0 10px var(--neon-pink); }
+
+/* --- AKASHIC MEMO PRO (Decrypt & Redact) --- */
+#decrypt-overlay {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background: #000; color: var(--neon-cyan);
+    display: flex; justify-content: center; align-items: center; font-size: 14px;
+    z-index: 10; pointer-events: none;
+    font-family: 'Orbitron';
 }
-.memo-toolbar { display: flex; gap: 10px; margin-bottom: 5px; }
-.redact-btn { font-size: 10px; background: #333; border: none; color: #fff; padding: 5px; cursor: pointer; }
+.hidden { display: none !important; }
+
+.editor-toolbar { display: flex; gap: 10px; margin-bottom: 10px; border-bottom: 1px solid #333; padding-bottom: 10px; }
+.tool-btn { background: #222; border: 1px solid #444; color: #fff; padding: 5px 10px; font-size: 10px; cursor: pointer; }
+.tool-btn:hover { border-color: #fff; }
+
+.akashic-editor {
+    flex: 1; background: rgba(0,0,0,0.5); border: 1px solid #333; padding: 15px;
+    color: #ddd; font-family: 'Zen Old Mincho'; font-size: 14px; line-height: 1.8;
+    overflow-y: auto; outline: none; white-space: pre-wrap;
+}
+/* 黒塗りスタイル */
+.redacted {
+    background: #000; color: #000; padding: 0 2px;
+    cursor: pointer; border: 1px solid #333;
+}
+.redacted:active { color: var(--neon-cyan); background: rgba(0, 243, 255, 0.1); } /* タップで見える */
 
 </style>
 </head>
@@ -286,22 +195,22 @@ body {
     <div class="launcher-grid">
         <div class="app-card" onclick="openModal('modal-quest')">
             <div class="app-title">QUEST BOARD</div>
-            <div class="app-status">Active Missions: <span id="mission-count">0</span></div>
+            <div class="app-status">Mission Control</div>
             <div class="app-icon-bg">⚔</div>
         </div>
         <div class="app-card" onclick="openModal('modal-tuner')">
             <div class="app-title">NOISE TUNER</div>
-            <div class="app-status">Frequency: Ready</div>
+            <div class="app-status">Freq: Standby</div>
             <div class="app-icon-bg">📡</div>
         </div>
         <div class="app-card" onclick="openModal('modal-vital')">
             <div class="app-title">VITAL KEEPER</div>
-            <div class="app-status">Condition: Normal</div>
+            <div class="app-status">Life Support</div>
             <div class="app-icon-bg">♥</div>
         </div>
         <div class="app-card" onclick="openModal('modal-archive')">
             <div class="app-title">AKASHIC MEMO</div>
-            <div class="app-status">Access: Granted</div>
+            <div class="app-status">Classified</div>
             <div class="app-icon-bg">✒</div>
         </div>
     </div>
@@ -314,57 +223,81 @@ body {
     <div id="modal-quest" class="modal">
         <div class="modal-header"><span class="modal-title">QUEST BOARD</span><span class="close-btn" onclick="closeModal('modal-quest')">×</span></div>
         <div class="modal-content">
-            <div style="font-size:12px; color:#aaa; margin-bottom:10px;">>> 任務を選択シテ実行セヨ</div>
-            <div id="quest-list"></div>
-            <button id="add-quest-btn" onclick="addQuest()">+ NEW MISSION</button>
+            <div class="quest-input-area">
+                <input type="text" id="quest-in-text" placeholder="NEW MISSION...">
+                <select id="quest-in-rank">
+                    <option value="S">S</option>
+                    <option value="A">A</option>
+                    <option value="B" selected>B</option>
+                    <option value="C">C</option>
+                    <option value="D">D</option>
+                </select>
+                <button id="quest-add-btn" onclick="addQuestPro()">+</button>
+            </div>
+            <div id="quest-list-pro"></div>
         </div>
     </div>
 
     <div id="modal-tuner" class="modal">
         <div class="modal-header"><span class="modal-title">NOISE TUNER</span><span class="close-btn" onclick="closeModal('modal-tuner')">×</span></div>
-        <div class="modal-content" style="align-items:center;">
-            <div style="font-size:12px; color:#aaa;">>> 環境音響生成ユニット</div>
-            <div class="tuner-control">
-                <div class="freq-display" id="freq-viz">
-                    </div>
-                <div class="tuner-btn" id="noise-btn" onclick="toggleNoise()">
-                    <div>I/O</div>
-                    <div id="noise-status">OFF</div>
+        <div class="modal-content">
+            <div class="tuner-viz-container">
+                <canvas id="viz-canvas"></canvas>
+            </div>
+            <div class="tuner-modules">
+                <div class="module-box" id="noise-mod-1" onclick="toggleNoisePro('pink')">
+                    <div class="knob-outer"><div class="knob-inner" style="transform: rotate(-135deg);"></div></div>
+                    <div class="mod-label">RAIN (PINK)</div>
                 </div>
-                <div style="font-size:10px; margin-top:10px; color:#666;">TYPE: PINK NOISE (RAIN)</div>
+                <div class="module-box" id="noise-mod-2" onclick="toggleNoisePro('brown')">
+                    <div class="knob-outer"><div class="knob-inner" style="transform: rotate(-135deg);"></div></div>
+                    <div class="mod-label">DEEP (BROWN)</div>
+                </div>
             </div>
         </div>
     </div>
 
     <div id="modal-vital" class="modal">
         <div class="modal-header"><span class="modal-title">VITAL KEEPER</span><span class="close-btn" onclick="closeModal('modal-vital')">×</span></div>
-        <div class="modal-content" style="align-items:center;">
-            <div class="vital-circle">
-                <div class="vital-progress" id="vital-ring"></div>
-                <div class="vital-time" id="timer-display">25:00</div>
-                <div style="font-size:10px; color:#aaa; margin-top:5px;">FOCUS CYCLE</div>
+        <div class="modal-content">
+            <div class="vital-pod">
+                <div class="vp-ring vp-ring-1"></div>
+                <div class="vp-ring vp-ring-2"></div>
+                <div class="vp-ring vp-ring-3"></div>
+                <div class="vp-data">
+                    <div id="vp-timer">25:00</div>
+                    <div id="vp-label">STABLE</div>
+                </div>
             </div>
-            <button class="vital-btn" onclick="toggleTimer()" id="timer-btn">START LINK</button>
+            <canvas id="heart-canvas" class="heart-rate-canvas"></canvas>
+            <div class="vp-controls">
+                <button class="vp-btn" onclick="toggleVitalPro()">INITIALIZE</button>
+                <button class="vp-btn" onclick="resetVitalPro()">ABORT</button>
+            </div>
         </div>
     </div>
 
     <div id="modal-archive" class="modal">
         <div class="modal-header"><span class="modal-title">AKASHIC MEMO</span><span class="close-btn" onclick="closeModal('modal-archive')">×</span></div>
-        <div class="modal-content">
-            <div class="memo-toolbar">
-                <button class="redact-btn" onclick="insertRedact()">■ 黒塗り挿入</button>
+        <div class="modal-content" style="position:relative;">
+            <div id="decrypt-overlay">
+                <div>>> DECRYPTING DATA... <span id="decrypt-progress">0%</span></div>
             </div>
-            <textarea class="memo-area" id="memo-field" placeholder="記録を開始..."></textarea>
-            <div style="font-size:10px; color:#555;">※内容はローカルストレージに暗号化（比喩）保存されます。</div>
+            
+            <div class="editor-toolbar">
+                <button class="tool-btn" onclick="execRedact()">■ BLACKOUT (黒塗り)</button>
+                <button class="tool-btn" onclick="clearMemo()">🗑 CLEAR</button>
+            </div>
+            <div id="akashic-editor" class="akashic-editor" contenteditable="true"></div>
         </div>
     </div>
 
     <script>
-        // === CORE: Clock & Weather ===
+        // === CORE CLOCK & WEATHER ===
         function updateClock() {
             const now = new Date();
-            const h = String(now.getHours()).padStart(2, '0');
-            const m = String(now.getMinutes()).padStart(2, '0');
+            const h = String(now.getHours()).padStart(2,'0');
+            const m = String(now.getMinutes()).padStart(2,'0');
             document.getElementById('time-text').innerText = `${h}:${m}`;
             document.getElementById('date-text').innerText = now.toLocaleDateString();
         }
@@ -379,157 +312,275 @@ body {
         }
         fetchWeather(); setInterval(fetchWeather, 600000);
 
-        // === MODAL SYSTEM ===
-        function openModal(id) { document.getElementById(id).classList.add('active'); }
+        // === MODAL CONTROLLER ===
+        function openModal(id) {
+            document.getElementById(id).classList.add('active');
+            if(id === 'modal-archive') playDecryptAnim();
+            if(id === 'modal-tuner') startVizLoop();
+            if(id === 'modal-vital') startHeartLoop();
+        }
         function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
-        // === M1: QUEST BOARD (Credits) ===
+        // === QUEST BOARD PRO ===
         let credits = localStorage.getItem('credits') ? parseInt(localStorage.getItem('credits')) : 0;
-        let quests = JSON.parse(localStorage.getItem('quests')) || [];
-        updateCredits(); renderQuests();
+        let quests = JSON.parse(localStorage.getItem('questsPro')) || [];
+        updateCredits(); renderQuestsPro();
 
-        function updateCredits() {
-            document.getElementById('credit-val').innerText = credits;
-            localStorage.setItem('credits', credits);
+        function updateCredits() { document.getElementById('credit-val').innerText = credits; localStorage.setItem('credits', credits); }
+        
+        function addQuestPro() {
+            const text = document.getElementById('quest-in-text').value;
+            const rank = document.getElementById('quest-in-rank').value;
+            if(!text) return;
+            let reward = 100;
+            if(rank === 'S') reward = 1000;
+            if(rank === 'A') reward = 500;
+            if(rank === 'B') reward = 300;
+            
+            quests.push({ text, rank, reward, done: false });
+            saveQuestsPro(); renderQuestsPro();
+            document.getElementById('quest-in-text').value = "";
         }
-        function addQuest() {
-            const txt = prompt("任務内容を入力 (例: 皿洗い討伐)");
-            if(txt) {
-                quests.push({ text: txt, done: false });
-                saveQuests(); renderQuests();
-            }
+
+        function toggleQuestPro(i) {
+            quests[i].done = !quests[i].done;
+            if(quests[i].done) credits += quests[i].reward;
+            else credits -= quests[i].reward;
+            updateCredits(); saveQuestsPro(); renderQuestsPro();
         }
-        function toggleQuest(index) {
-            quests[index].done = !quests[index].done;
-            if(quests[index].done) {
-                credits += 100; // 報酬
-                alert("報酬獲得: 100 G");
-            } else {
-                credits -= 100;
-            }
-            updateCredits(); saveQuests(); renderQuests();
+
+        function deleteQuestPro(i) {
+            if(confirm("破棄しますか？")) { quests.splice(i,1); saveQuestsPro(); renderQuestsPro(); }
         }
-        function saveQuests() { localStorage.setItem('quests', JSON.stringify(quests)); }
-        function renderQuests() {
-            const list = document.getElementById('quest-list');
+
+        function saveQuestsPro() { localStorage.setItem('questsPro', JSON.stringify(quests)); }
+
+        function renderQuestsPro() {
+            const list = document.getElementById('quest-list-pro');
             list.innerHTML = "";
-            let activeCount = 0;
             quests.forEach((q, i) => {
-                if(!q.done) activeCount++;
                 const div = document.createElement('div');
-                div.className = 'quest-item';
+                div.className = `quest-card rank-${q.rank.toLowerCase()} ${q.done ? 'done' : ''}`;
                 div.innerHTML = `
-                    <div class="quest-checkbox ${q.done ? 'checked' : ''}" onclick="toggleQuest(${i})">✔</div>
-                    <div class="quest-text" style="${q.done ? 'text-decoration:line-through; opacity:0.5;' : ''}">${q.text}</div>
-                    <div class="quest-rank">B</div>
-                    <div style="font-size:10px; cursor:pointer;" onclick="deleteQuest(${i})">🗑</div>
+                    <div class="q-rank">${q.rank}</div>
+                    <div class="q-info">
+                        <div class="q-text">${q.text}</div>
+                        <div class="q-reward">REWARD: ${q.reward} G</div>
+                    </div>
+                    <div style="font-size:12px; margin-right:10px; cursor:pointer;" onclick="deleteQuestPro(${i})">✖</div>
+                    <div class="q-check ${q.done ? 'checked' : ''}" onclick="toggleQuestPro(${i})">✔</div>
                 `;
                 list.appendChild(div);
             });
-            document.getElementById('mission-count').innerText = activeCount;
-        }
-        function deleteQuest(i) {
-            if(confirm("任務破棄？")) { quests.splice(i,1); saveQuests(); renderQuests(); }
         }
 
-        // === M2: NOISE TUNER (Web Audio API) ===
+        // === NOISE TUNER PRO (Visualizer) ===
         let audioCtx, noiseNode, gainNode;
-        let isNoiseOn = false;
-
-        function initAudio() {
-            if(!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
-        }
-        function toggleNoise() {
+        let isPlaying = false;
+        let activeType = null;
+        
+        function initAudio() { if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+        
+        function toggleNoisePro(type) {
             initAudio();
-            if(isNoiseOn) {
-                // STOP
+            const knob1 = document.querySelector('#noise-mod-1 .knob-inner');
+            const knob2 = document.querySelector('#noise-mod-2 .knob-inner');
+            const box1 = document.querySelector('#noise-mod-1');
+            const box2 = document.querySelector('#noise-mod-2');
+
+            // Reset UI
+            knob1.style.transform = "rotate(-135deg)";
+            knob2.style.transform = "rotate(-135deg)";
+            box1.classList.remove('knob-active');
+            box2.classList.remove('knob-active');
+
+            if(isPlaying && activeType === type) {
+                // Stop
                 gainNode.disconnect();
-                isNoiseOn = false;
-                document.getElementById('noise-status').innerText = "OFF";
-                document.getElementById('noise-btn').classList.remove('active');
-            } else {
-                // START (Pink Noise Generator)
-                const bufferSize = 4096;
-                noiseNode = audioCtx.createScriptProcessor(bufferSize, 1, 1);
-                noiseNode.onaudioprocess = function(e) {
-                    const output = e.outputBuffer.getChannelData(0);
-                    for (let i = 0; i < bufferSize; i++) {
-                        const white = Math.random() * 2 - 1;
-                        output[i] = (lastOut + (0.02 * white)) / 1.02; // Simple Pink Noise approx
+                isPlaying = false;
+                activeType = null;
+                return;
+            }
+
+            if(isPlaying) gainNode.disconnect(); // Switch
+
+            // Start Noise
+            const bufferSize = 4096;
+            noiseNode = audioCtx.createScriptProcessor(bufferSize, 1, 1);
+            noiseNode.onaudioprocess = function(e) {
+                const output = e.outputBuffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    const white = Math.random() * 2 - 1;
+                    if(type === 'pink') {
+                        output[i] = (lastOut + (0.02 * white)) / 1.02;
                         lastOut = output[i];
                         output[i] *= 3.5; 
+                    } else { // brown
+                        output[i] = (lastOut + (0.02 * white)) / 1.02;
+                        lastOut = output[i];
+                        output[i] *= 3.5; // Same simplistic approx for now
                     }
-                };
-                let lastOut = 0;
-                gainNode = audioCtx.createGain();
-                gainNode.gain.value = 0.1; // Volume
-                noiseNode.connect(gainNode);
-                gainNode.connect(audioCtx.destination);
-                
-                isNoiseOn = true;
-                document.getElementById('noise-status').innerText = "ON";
-                document.getElementById('noise-btn').classList.add('active');
-            }
-        }
-        // Visualizer bar (Fake)
-        const viz = document.getElementById('freq-viz');
-        for(let i=0; i<10; i++) {
-            const b = document.createElement('div');
-            b.className = 'freq-bar';
-            b.style.height = Math.random()*100 + "%";
-            b.style.animationDuration = (0.2 + Math.random()*0.5) + "s";
-            viz.appendChild(b);
-        }
+                }
+            };
+            let lastOut = 0;
+            gainNode = audioCtx.createGain();
+            gainNode.gain.value = 0.15;
+            noiseNode.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            isPlaying = true;
+            activeType = type;
 
-        // === M3: VITAL KEEPER (Timer) ===
-        let timerTime = 25 * 60;
-        let timerInterval = null;
-        function toggleTimer() {
-            const btn = document.getElementById('timer-btn');
-            if(timerInterval) {
-                clearInterval(timerInterval);
-                timerInterval = null;
-                btn.innerText = "RESUME LINK";
+            // Update UI
+            if(type === 'pink') {
+                knob1.style.transform = "rotate(45deg)";
+                box1.classList.add('knob-active');
             } else {
-                btn.innerText = "LINK ESTABLISHED";
-                timerInterval = setInterval(() => {
-                    timerTime--;
-                    if(timerTime <= 0) {
-                        clearInterval(timerInterval);
-                        alert("冷却完了 (休憩時間です)");
-                        timerTime = 5 * 60; // 休憩へ
-                    }
-                    updateTimerDisplay();
-                }, 1000);
+                knob2.style.transform = "rotate(45deg)";
+                box2.classList.add('knob-active');
             }
         }
-        function updateTimerDisplay() {
-            const m = Math.floor(timerTime / 60).toString().padStart(2,'0');
-            const s = (timerTime % 60).toString().padStart(2,'0');
-            document.getElementById('timer-display').innerText = `${m}:${s}`;
+
+        // Fake Visualizer Loop
+        function startVizLoop() {
+            const canvas = document.getElementById('viz-canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.clientWidth;
+            canvas.height = canvas.clientHeight;
+            
+            function draw() {
+                if(!document.getElementById('modal-tuner').classList.contains('active')) return;
+                requestAnimationFrame(draw);
+                ctx.fillStyle = "#000";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                if(!isPlaying) {
+                    ctx.beginPath();
+                    ctx.strokeStyle = "#333";
+                    ctx.moveTo(0, canvas.height/2);
+                    ctx.lineTo(canvas.width, canvas.height/2);
+                    ctx.stroke();
+                    return;
+                }
+
+                ctx.beginPath();
+                ctx.strokeStyle = activeType === 'pink' ? "#00f3ff" : "#bc13fe";
+                ctx.lineWidth = 2;
+                for(let x=0; x<canvas.width; x+=5) {
+                    const y = canvas.height/2 + Math.sin(x*0.05 + Date.now()*0.01) * Math.random() * 30;
+                    if(x===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+                }
+                ctx.stroke();
+            }
+            draw();
         }
 
-        // === M4: ARCHIVE (Memo) ===
-        const memoField = document.getElementById('memo-field');
-        if(localStorage.getItem('archiveMemo')) {
-            memoField.value = localStorage.getItem('archiveMemo');
+        // === VITAL KEEPER PRO ===
+        let vitalTime = 25*60;
+        let vitalInt = null;
+        function toggleVitalPro() {
+            if(vitalInt) return;
+            document.getElementById('vp-label').innerText = "MONITORING...";
+            document.getElementById('vp-label').style.color = "var(--neon-cyan)";
+            vitalInt = setInterval(() => {
+                vitalTime--;
+                if(vitalTime<=0) {
+                    clearInterval(vitalInt); vitalInt=null;
+                    alert("SEQUENCE COMPLETE");
+                    resetVitalPro();
+                }
+                const m = Math.floor(vitalTime/60).toString().padStart(2,'0');
+                const s = (vitalTime%60).toString().padStart(2,'0');
+                document.getElementById('vp-timer').innerText = `${m}:${s}`;
+            }, 1000);
         }
-        memoField.addEventListener('input', () => {
-            localStorage.setItem('archiveMemo', memoField.value);
+        function resetVitalPro() {
+            if(vitalInt) clearInterval(vitalInt);
+            vitalInt = null;
+            vitalTime = 25*60;
+            document.getElementById('vp-timer').innerText = "25:00";
+            document.getElementById('vp-label').innerText = "STABLE";
+            document.getElementById('vp-label').style.color = "var(--neon-pink)";
+        }
+
+        function startHeartLoop() {
+            const canvas = document.getElementById('heart-canvas');
+            const ctx = canvas.getContext('2d');
+            let x = 0;
+            canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
+            
+            function drawHeart() {
+                if(!document.getElementById('modal-vital').classList.contains('active')) return;
+                requestAnimationFrame(drawHeart);
+                
+                // Fade effect
+                ctx.fillStyle = "rgba(0,0,0,0.1)";
+                ctx.fillRect(0,0,canvas.width,canvas.height);
+
+                ctx.strokeStyle = vitalInt ? "#00f3ff" : "#ff0055";
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(x, canvas.height/2);
+                
+                x += 2;
+                let y = canvas.height/2;
+                
+                // Beat
+                if(x % 100 > 40 && x % 100 < 60) {
+                    y -= Math.random() * 40 - 20;
+                }
+                
+                ctx.lineTo(x, y);
+                ctx.stroke();
+                
+                if(x > canvas.width) x = 0;
+            }
+            drawHeart();
+        }
+
+        // === AKASHIC MEMO PRO (Editor) ===
+        const editor = document.getElementById('akashic-editor');
+        if(localStorage.getItem('akashicContent')) {
+            editor.innerHTML = localStorage.getItem('akashicContent');
+        }
+        editor.addEventListener('input', () => {
+            localStorage.setItem('akashicContent', editor.innerHTML);
         });
-        function insertRedact() {
-            const start = memoField.selectionStart;
-            const end = memoField.selectionEnd;
-            const text = memoField.value;
-            const before = text.substring(0, start);
-            const after = text.substring(end, text.length);
-            memoField.value = before + " [REDACTED] " + after;
-            localStorage.setItem('archiveMemo', memoField.value);
+
+        function execRedact() {
+            const selection = window.getSelection();
+            if (!selection.rangeCount) return;
+            const range = selection.getRangeAt(0);
+            const span = document.createElement("span");
+            span.className = "redacted";
+            span.textContent = range.toString();
+            range.deleteContents();
+            range.insertNode(span);
+            localStorage.setItem('akashicContent', editor.innerHTML);
         }
 
-        // Service Worker
+        function clearMemo() {
+            if(confirm("全消去しますか？")) {
+                editor.innerHTML = "";
+                localStorage.setItem('akashicContent', "");
+            }
+        }
+
+        function playDecryptAnim() {
+            const ov = document.getElementById('decrypt-overlay');
+            const prog = document.getElementById('decrypt-progress');
+            ov.classList.remove('hidden');
+            let p = 0;
+            const int = setInterval(() => {
+                p += Math.floor(Math.random() * 5) + 1;
+                if(p > 100) p = 100;
+                prog.innerText = p + "%";
+                if(p === 100) {
+                    clearInterval(int);
+                    setTimeout(() => { ov.classList.add('hidden'); }, 300);
+                }
+            }, 30);
+        }
+
         if ("serviceWorker" in navigator) {
             navigator.serviceWorker.register("service-worker.js");
         }
