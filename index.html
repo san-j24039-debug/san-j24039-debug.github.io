@@ -20,10 +20,15 @@
     --neon-pink: #ff0055;
     --neon-purple: #bc13fe;
     --neon-gold: #ffcc00;
-    --forbidden-red: #ff3333; /* 禁書庫用 */
+    --forbidden-red: #ff3333;
     --silver-metal: #e0e5eb;
-    --glass: rgba(20, 20, 30, 0.6);
     --border: rgba(255, 255, 255, 0.15);
+    
+    /* Rank Colors */
+    --rank-s: #ffd700;
+    --rank-a: #ff0055;
+    --rank-b: #00f3ff;
+    --rank-c: #888888;
 }
 
 body {
@@ -37,38 +42,67 @@ body {
     -webkit-touch-callout: none;
     user-select: none;
     display: flex; flex-direction: column; align-items: center;
+    transition: background 1s ease;
 }
 
-/* === BACKGROUND === */
-.bg-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; background: radial-gradient(circle at center, #111 0%, #000 90%); }
-.grid-bg { position: absolute; width: 200%; height: 200%; background-image: linear-gradient(rgba(0, 243, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px); background-size: 40px 40px; transform: perspective(500px) rotateX(60deg) translateY(-100px) translateZ(-200px); animation: gridMove 20s linear infinite; }
-@keyframes gridMove { from { transform: perspective(500px) rotateX(60deg) translateY(0) translateZ(-200px); } to { transform: perspective(500px) rotateX(60deg) translateY(40px) translateZ(-200px); } }
+/* === DYNAMIC BACKGROUNDS (Weather) === */
+.bg-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; transition: opacity 1s; opacity: 0; }
+.bg-layer.active { opacity: 1; }
+
+/* 1. Default/Cloudy (Cyber Mist) */
+#bg-cloudy { background: radial-gradient(circle at center, #1a2a33 0%, #000 90%); }
+#bg-cloudy::after { content:""; position:absolute; width:100%; height:100%; background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 243, 255, 0.05) 3px); }
+
+/* 2. Sunny (Steampunk Gold) */
+#bg-sunny { background: radial-gradient(circle at top, #332200 0%, #000 80%); }
+#bg-sunny::before { content:""; position:absolute; top:-50%; left:-50%; width:200%; height:200%; background: radial-gradient(circle, rgba(255, 204, 0, 0.1) 10%, transparent 10%); background-size: 30px 30px; transform: rotate(45deg); }
+
+/* 3. Rain (Cold Rain) */
+#bg-rain { background: linear-gradient(to bottom, #050510, #000); }
+.rain-drop { position: absolute; top:-10vh; background: rgba(0, 243, 255, 0.4); width: 1px; height: 50px; animation: rainFall linear infinite; }
+@keyframes rainFall { to { transform: translateY(110vh); } }
+
+/* 4. Thunder (Volt Flash) */
+#bg-thunder { background: radial-gradient(circle at 30% 30%, #220033 0%, #000 90%); }
+.flash-overlay { position: absolute; width:100%; height:100%; background: rgba(255, 255, 255, 0.2); opacity: 0; pointer-events: none; }
+@keyframes flashAnim { 0%,100%{opacity:0;} 5%,15%{opacity:0.3;} 10%{opacity:0;} }
+
+/* Grid Overlay (Always visible slightly) */
+.grid-floor { position: absolute; width: 200%; height: 200%; background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px); background-size: 40px 40px; transform: perspective(500px) rotateX(60deg) translateY(-100px) translateZ(-200px); bottom: -50%; left: -50%; z-index: -1; }
 
 /* === SHORTCUTS === */
 .top-dock { width: 100%; padding: 15px 0; display: flex; justify-content: center; gap: 12px; z-index: 10; }
 .icon-btn { width: 60px; height: 60px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border); border-radius: 12px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-decoration: none; color: #fff; backdrop-filter: blur(5px); transition: 0.3s; }
-.icon-btn:hover { border-color: var(--neon-cyan); box-shadow: 0 0 15px var(--neon-cyan); }
 .icon-symbol { font-size: 18px; margin-bottom: 4px; color: var(--silver-metal); }
 .icon-label { font-size: 8px; color: #aaa; letter-spacing: 0.5px; }
 
-/* === CLOCK === */
+/* === CLOCK (Glitch & Detail) === */
 .main-section { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; position: relative; }
-.clock-container { position: relative; width: 220px; height: 220px; display: flex; justify-content: center; align-items: center; }
+.clock-container { position: relative; width: 260px; height: 260px; display: flex; justify-content: center; align-items: center; }
 .c-ring { position: absolute; border-radius: 50%; border: 1px solid transparent; }
 .c-ring-1 { width: 100%; height: 100%; border-top-color: var(--neon-purple); border-bottom-color: var(--neon-purple); animation: spin 20s linear infinite; opacity: 0.6; }
 .c-ring-2 { width: 80%; height: 80%; border-left-color: var(--neon-cyan); border-right-color: var(--neon-cyan); animation: spin 10s linear infinite reverse; box-shadow: 0 0 10px rgba(0,243,255,0.2); }
 @keyframes spin { to { transform: rotate(360deg); } }
-#time-text { font-size: 52px; font-weight: 900; color: #fff; text-shadow: 0 0 15px var(--neon-cyan); letter-spacing: 2px; line-height: 1; z-index: 5; }
-#date-text { font-family: 'Cinzel', serif; font-size: 12px; color: var(--neon-pink); letter-spacing: 3px; margin-top: 5px; text-align: center; }
 
-/* === MODULE GRID === */
-.modules-container {
-    width: 100%; max-width: 450px; padding: 0 20px 30px 20px;
-    display: flex; flex-direction: column; gap: 12px; box-sizing: border-box;
-    z-index: 10;
+/* Glitch Effect Classes */
+.glitch-wrapper { position: relative; z-index: 5; text-align: center; }
+.time-main { font-size: 56px; font-weight: 900; color: #fff; text-shadow: 0 0 15px var(--neon-cyan); letter-spacing: 2px; line-height: 1; display: flex; justify-content: center; align-items: baseline; }
+.time-sec { font-size: 24px; color: var(--neon-cyan); margin-left: 5px; opacity: 0.8; }
+.date-row { font-family: 'Cinzel', serif; font-size: 12px; color: var(--neon-pink); letter-spacing: 3px; margin-top: 8px; display: flex; justify-content: center; gap: 10px; }
+
+.glitch-active { animation: glitch-anim 0.3s cubic-bezier(.25, .46, .45, .94) both infinite; color: var(--neon-pink); }
+@keyframes glitch-anim {
+    0% { transform: translate(0); }
+    20% { transform: translate(-2px, 2px); }
+    40% { transform: translate(-2px, -2px); }
+    60% { transform: translate(2px, 2px); }
+    80% { transform: translate(2px, -2px); }
+    100% { transform: translate(0); }
 }
 
-/* -- WEATHER WIDGET (New) -- */
+/* === MODULE GRID === */
+.modules-container { width: 100%; max-width: 450px; padding: 0 20px 30px 20px; display: flex; flex-direction: column; gap: 12px; box-sizing: border-box; z-index: 10; }
+
 .weather-card {
     width: 100%; height: 60px;
     background: linear-gradient(90deg, rgba(0, 243, 255, 0.05), rgba(0,0,0,0.8));
@@ -78,21 +112,13 @@ body {
     cursor: pointer; position: relative; overflow: hidden;
     box-shadow: 0 0 10px rgba(0, 243, 255, 0.1);
 }
-.weather-card::before {
-    content: "ATMOS SCAN"; position: absolute; top: 2px; left: 6px;
-    font-size: 8px; color: var(--neon-cyan); letter-spacing: 1px; opacity: 0.7;
-}
+.weather-card::before { content: "ATMOS SCAN"; position: absolute; top: 2px; left: 6px; font-size: 8px; color: var(--neon-cyan); letter-spacing: 1px; opacity: 0.7; }
 .w-temp { font-size: 24px; font-weight: bold; text-shadow: 0 0 5px var(--neon-cyan); }
 .w-loc { font-size: 10px; color: #aaa; margin-left: 10px; }
 .w-icon { font-size: 24px; }
-.w-scan-line {
-    position: absolute; top: 0; left: 0; width: 2px; height: 100%;
-    background: var(--neon-cyan); opacity: 0.5; box-shadow: 0 0 10px var(--neon-cyan);
-    animation: scan 4s ease-in-out infinite;
-}
+.w-scan-line { position: absolute; top: 0; left: 0; width: 2px; height: 100%; background: var(--neon-cyan); opacity: 0.5; box-shadow: 0 0 10px var(--neon-cyan); animation: scan 4s ease-in-out infinite; }
 @keyframes scan { 0%{left:0;} 50%{left:100%;} 100%{left:0;} }
 
-/* -- 2x2 GRID -- */
 .app-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; }
 .app-card {
     height: 90px; background: rgba(255,255,255,0.03);
@@ -105,84 +131,91 @@ body {
 .app-title { font-size: 10px; color: var(--neon-cyan); letter-spacing: 1px; }
 .app-icon-bg { position: absolute; right: 5px; bottom: 5px; font-size: 36px; opacity: 0.15; color: #fff; }
 .app-status { font-family: 'Zen Old Mincho'; font-size: 10px; color: #888; }
-
-/* Special Style for Forbidden Archive */
 .card-forbidden { border-color: rgba(255, 51, 51, 0.3); }
 .card-forbidden .app-title { color: var(--forbidden-red); }
-.card-forbidden:hover { box-shadow: 0 0 15px rgba(255, 51, 51, 0.2); }
 
-/* === FOOTER INFO === */
-.footer-info { font-size: 10px; color: #555; text-align: center; width: 100%; padding-bottom: 5px; }
-#credit-val { color: var(--neon-gold); font-weight: bold; }
-
-/* === MODALS === */
+/* === MODALS COMMON === */
 .modal {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     background: rgba(5, 5, 8, 0.98); backdrop-filter: blur(15px);
-    z-index: 200; transform: translateY(110%);
-    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 200; 
+    opacity: 0; pointer-events: none; transform: scale(0.95);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     display: flex; flex-direction: column;
 }
-.modal.active { transform: translateY(0); }
-.modal-header {
-    padding: 15px 20px; border-bottom: 1px solid #333;
-    display: flex; justify-content: space-between; align-items: center;
-}
-.modal-title { font-size: 16px; color: var(--neon-pink); letter-spacing: 2px; font-weight: bold; }
+.modal.active { opacity: 1; pointer-events: auto; transform: scale(1); }
+.modal-header { padding: 15px 20px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.5); }
+.modal-title { font-size: 16px; color: var(--neon-cyan); letter-spacing: 2px; font-weight: bold; }
 .close-btn { font-size: 24px; color: #fff; cursor: pointer; }
 .modal-content { flex: 1; padding: 20px; overflow-y: auto; position: relative; }
 
-/* -- FORBIDDEN ARCHIVE STYLES -- */
-#modal-archive { background: radial-gradient(circle, #1a0000 0%, #000000 90%); }
+/* === QUEST MODAL DETAILS === */
+#modal-quest .modal-content {
+    background-image: 
+        linear-gradient(30deg, #111 12%, transparent 12.5%, transparent 87%, #111 87.5%, #111),
+        linear-gradient(150deg, #111 12%, transparent 12.5%, transparent 87%, #111 87.5%, #111),
+        linear-gradient(30deg, #111 12%, transparent 12.5%, transparent 87%, #111 87.5%, #111),
+        linear-gradient(150deg, #111 12%, transparent 12.5%, transparent 87%, #111 87.5%, #111),
+        linear-gradient(60deg, #222 25%, transparent 25.5%, transparent 75%, #222 75%, #222),
+        linear-gradient(60deg, #222 25%, transparent 25.5%, transparent 75%, #222 75%, #222);
+    background-size: 40px 70px;
+    background-position: 0 0, 0 0, 20px 35px, 20px 35px, 0 0, 20px 35px;
+    opacity: 0.9;
+}
+.quest-input-area { display: flex; gap: 5px; margin-bottom: 15px; background: rgba(0,0,0,0.8); padding: 10px; border: 1px solid #444; }
+#quest-rank-sel { background: #000; color: #fff; border: 1px solid #444; font-family: 'Orbitron'; }
+#quest-in-text { flex: 1; background: #000; border: none; color: #fff; padding: 5px; outline: none; }
+#quest-add-btn { background: var(--neon-cyan); color: #000; border: none; padding: 0 15px; font-weight: bold; cursor: pointer; }
+.quest-card {
+    background: rgba(0, 0, 0, 0.9); border: 1px solid #333; margin-bottom: 8px; padding: 12px;
+    display: flex; justify-content: space-between; align-items: center;
+    box-shadow: 0 0 5px rgba(0,0,0,0.5); position: relative; overflow: hidden;
+}
+.rank-badge { font-size: 14px; font-weight: bold; width: 30px; text-align: center; margin-right: 10px; }
+.q-text { flex: 1; font-size: 14px; }
+.rank-S { color: var(--rank-s); text-shadow: 0 0 5px var(--rank-s); }
+.rank-A { color: var(--rank-a); text-shadow: 0 0 5px var(--rank-a); }
+.rank-B { color: var(--rank-b); text-shadow: 0 0 5px var(--rank-b); }
+.rank-C { color: var(--rank-c); }
+
+/* === TUNER MODAL DETAILS === */
+#modal-tuner .modal-content {
+    background: linear-gradient(rgba(0, 255, 0, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 255, 0, 0.05) 1px, transparent 1px);
+    background-size: 20px 20px;
+}
+.tuner-viz { width: 100%; height: 200px; background: #000; border: 1px solid #333; box-shadow: inset 0 0 20px rgba(0,255,0,0.1); }
+
+/* === VITAL MODAL DETAILS === */
+#modal-vital .modal-content { position: relative; overflow: hidden; }
+.vital-bg-line {
+    position: absolute; top: 50%; left: 0; width: 100%; height: 100px; transform: translateY(-50%);
+    background: linear-gradient(90deg, transparent 0%, rgba(0,255,0,0.2) 20%, rgba(0,255,0,0.8) 25%, rgba(0,255,0,0.2) 30%, transparent 100%);
+    opacity: 0.1; animation: vitalScan 2s linear infinite; pointer-events: none;
+}
+@keyframes vitalScan { 0%{left:-100%;} 100%{left:100%;} }
+.vital-pod { width: 200px; height: 200px; border-radius: 50%; border: 4px solid #222; margin: 40px auto; display: flex; justify-content: center; align-items: center; position: relative; box-shadow: 0 0 20px rgba(255,0,85,0.2); }
+.vital-ring { position: absolute; width: 100%; height: 100%; border-radius: 50%; border-top: 4px solid var(--neon-pink); border-right: 4px solid transparent; animation: spin 2s linear infinite; }
+#vital-timer { font-size: 42px; font-weight: bold; color: #fff; text-shadow: 0 0 10px var(--neon-pink); }
+
+/* === FORBIDDEN ARCHIVE === */
+#modal-archive { background: #000; }
 #modal-archive .modal-title { color: var(--forbidden-red); text-shadow: 0 0 10px var(--forbidden-red); }
-#modal-archive .modal-header { border-bottom: 1px solid var(--forbidden-red); }
+.archive-editor { flex: 1; background: rgba(20, 0, 0, 0.3); border: 1px solid #333; padding: 15px; color: #ccaaaa; font-family: 'Zen Old Mincho', serif; font-size: 14px; line-height: 1.8; outline: none; resize: none; width: 100%; box-sizing: border-box; }
+.encrypted-text { font-family: 'Orbitron', monospace; color: var(--forbidden-red); text-shadow: 0 0 3px var(--forbidden-red); pointer-events: none; }
+.arch-btn { background: transparent; border: 1px solid var(--forbidden-red); color: var(--forbidden-red); padding: 8px 12px; font-family: 'Orbitron'; font-size: 10px; cursor: pointer; flex: 1; margin: 0 2px; }
+.arch-btn:hover { background: var(--forbidden-red); color: #000; }
 
-.archive-container {
-    display: flex; flex-direction: column; height: 100%;
-}
-.archive-controls {
-    display: flex; gap: 10px; margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 10px;
-}
-.arch-btn {
-    background: transparent; border: 1px solid var(--forbidden-red); color: var(--forbidden-red);
-    padding: 8px 12px; font-family: 'Orbitron'; font-size: 10px; cursor: pointer;
-    transition: 0.3s; flex: 1;
-}
-.arch-btn:hover { background: var(--forbidden-red); color: #000; box-shadow: 0 0 10px var(--forbidden-red); }
-
-.archive-editor {
-    flex: 1; background: rgba(20, 0, 0, 0.3); border: 1px solid #333;
-    padding: 15px; color: #ccaaaa; font-family: 'Zen Old Mincho', serif;
-    font-size: 14px; line-height: 1.8; outline: none; resize: none;
-    white-space: pre-wrap; overflow-y: auto;
-    box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
-}
-.archive-editor::placeholder { color: #522; }
-
-/* Encryption Animation Class */
-.encrypted-text {
-    font-family: 'Orbitron', monospace; color: var(--forbidden-red);
-    text-shadow: 0 0 3px var(--forbidden-red); letter-spacing: 1px;
-    pointer-events: none; /* 暗号化中は編集不可 */
-}
-
-/* -- QUEST & OTHER STYLES (Simplified for space) -- */
-.quest-input-area { display: flex; gap: 5px; margin-bottom: 15px; }
-#quest-in-text { flex: 1; background: #111; border: 1px solid #333; color: #fff; padding: 8px; }
-#quest-add-btn { background: var(--neon-cyan); border: none; padding: 0 15px; font-weight: bold; cursor: pointer; }
-.quest-card { background: rgba(255,255,255,0.05); padding: 10px; margin-bottom: 5px; border-left: 3px solid #555; display: flex; justify-content: space-between; }
-.quest-card.rank-s { border-color: var(--neon-gold); }
-
-/* -- VITAL & TUNER (Simplified) -- */
-.vital-pod { width: 180px; height: 180px; border-radius: 50%; border: 2px solid #333; margin: 20px auto; display: flex; justify-content: center; align-items: center; position: relative; }
-.vital-ring { position: absolute; width: 100%; height: 100%; border-radius: 50%; border-top: 2px solid var(--neon-pink); animation: spin 4s linear infinite; }
-.tuner-viz { width: 100%; height: 100px; background: #000; border: 1px solid #333; }
+.footer-info { font-size: 10px; color: #555; text-align: center; width: 100%; padding-bottom: 5px; margin-top: 10px; }
 
 </style>
 </head>
 <body>
 
-    <div class="bg-layer"><div class="grid-bg"></div></div>
+    <div id="bg-sunny" class="bg-layer"></div>
+    <div id="bg-cloudy" class="bg-layer active"></div>
+    <div id="bg-rain" class="bg-layer"><div id="rain-container"></div></div>
+    <div id="bg-thunder" class="bg-layer"><div class="flash-overlay"></div></div>
+    <div class="grid-floor"></div>
 
     <div class="top-dock">
         <a class="icon-btn" href="https://youtube.com"><div class="icon-symbol">▶</div><div class="icon-label">YOUTUBE</div></a>
@@ -195,9 +228,15 @@ body {
         <div class="clock-container">
             <div class="c-ring c-ring-1"></div>
             <div class="c-ring c-ring-2"></div>
-            <div style="text-align:center; z-index:10;">
-                <div id="time-text">00:00</div>
-                <div id="date-text">--.--.--</div>
+            <div class="glitch-wrapper" id="clock-wrapper">
+                <div class="time-main">
+                    <span id="h-min">00:00</span>
+                    <span class="time-sec" id="sec">00</span>
+                </div>
+                <div class="date-row">
+                    <span id="date-text">--.--.--</span>
+                    <span id="day-text">[---]</span>
+                </div>
             </div>
         </div>
     </div>
@@ -222,7 +261,7 @@ body {
             </div>
             <div class="app-card" onclick="openModal('modal-tuner')">
                 <div class="app-title">NOISE TUNER</div>
-                <div class="app-status">Soundscape</div>
+                <div class="app-status">Frequency</div>
                 <div class="app-icon-bg">📡</div>
             </div>
             <div class="app-card" onclick="openModal('modal-vital')">
@@ -238,12 +277,18 @@ body {
         </div>
     </div>
 
-    <div class="footer-info">CREDITS ACQUIRED: <span id="credit-val">0</span> G</div>
+    <div class="footer-info">CREDITS ACQUIRED: <span id="credit-val" style="color:var(--neon-gold);">0</span> G</div>
 
     <div id="modal-quest" class="modal">
         <div class="modal-header"><span class="modal-title">QUEST BOARD</span><span class="close-btn" onclick="closeModal('modal-quest')">×</span></div>
         <div class="modal-content">
             <div class="quest-input-area">
+                <select id="quest-rank-sel">
+                    <option value="C">C</option>
+                    <option value="B">B</option>
+                    <option value="A">A</option>
+                    <option value="S">S</option>
+                </select>
                 <input type="text" id="quest-in-text" placeholder="Mission Name...">
                 <button id="quest-add-btn" onclick="addQuest()">ADD</button>
             </div>
@@ -255,8 +300,9 @@ body {
         <div class="modal-header"><span class="modal-title">NOISE TUNER</span><span class="close-btn" onclick="closeModal('modal-tuner')">×</span></div>
         <div class="modal-content">
             <canvas id="viz-canvas" class="tuner-viz"></canvas>
+            <div style="font-size:9px; color:#0f0; margin-bottom:5px; text-align:right;">INPUT: WHITE_NOISE_GEN</div>
             <div style="display:flex; justify-content:center; margin-top:20px;">
-                <button class="arch-btn" style="border-color:var(--neon-cyan); color:var(--neon-cyan);" onclick="toggleNoise()">I/O SWITCH</button>
+                <button class="arch-btn" style="border-color:var(--neon-cyan); color:var(--neon-cyan); max-width:200px;" onclick="toggleNoise()">I/O SWITCH</button>
             </div>
         </div>
     </div>
@@ -264,12 +310,13 @@ body {
     <div id="modal-vital" class="modal">
         <div class="modal-header"><span class="modal-title">VITAL KEEPER</span><span class="close-btn" onclick="closeModal('modal-vital')">×</span></div>
         <div class="modal-content">
+            <div class="vital-bg-line"></div>
             <div class="vital-pod">
                 <div class="vital-ring"></div>
-                <div id="vital-timer" style="font-size:32px; font-weight:bold;">25:00</div>
+                <div id="vital-timer">25:00</div>
             </div>
-            <div style="text-align:center;">
-                <button class="arch-btn" style="border-color:var(--neon-pink); color:var(--neon-pink);" onclick="startVital()">INITIATE LINK</button>
+            <div style="text-align:center; position:relative; z-index:2;">
+                <button class="arch-btn" style="border-color:var(--neon-pink); color:var(--neon-pink); max-width:200px;" onclick="startVital()">INITIATE LINK</button>
             </div>
         </div>
     </div>
@@ -279,32 +326,44 @@ body {
             <span class="modal-title">FORBIDDEN ARCHIVE</span>
             <span class="close-btn" onclick="closeModal('modal-archive')">×</span>
         </div>
-        <div class="modal-content">
-            <div class="archive-container">
-                <div class="archive-controls">
-                    <button class="arch-btn" onclick="sealArchive()">🔒 SEAL (ENCRYPT)</button>
-                    <button class="arch-btn" onclick="unsealArchive()">🔓 UNSEAL (DECRYPT)</button>
-                    <button class="arch-btn" onclick="clearArchive()">🗑 BURN</button>
-                </div>
-                <textarea id="archive-area" class="archive-editor" placeholder=">> 記録ハ ココデ 途絶エテイル..."></textarea>
-                <div style="font-size:10px; color:#522; margin-top:5px; text-align:right;">SYSTEM: RED_PROTOCOL_ACTIVE</div>
+        <div class="modal-content" style="display:flex; flex-direction:column; height:100%;">
+            <div style="display:flex; margin-bottom:10px;">
+                <button class="arch-btn" onclick="sealArchive()">🔒 SEAL</button>
+                <button class="arch-btn" onclick="unsealArchive()">🔓 UNSEAL</button>
+                <button class="arch-btn" onclick="clearArchive()">🗑 BURN</button>
             </div>
+            <textarea id="archive-area" class="archive-editor" placeholder=">> 記録ハ ココデ 途絶エテイル..."></textarea>
+            <div style="font-size:10px; color:#522; margin-top:5px; text-align:right;">SYSTEM: RED_PROTOCOL_ACTIVE</div>
         </div>
     </div>
 
     <script>
-        // === CLOCK ===
+        // === CLOCK & GLITCH ===
+        const days = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
         function updateClock() {
             const now = new Date();
-            document.getElementById('time-text').innerText = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+            const h = String(now.getHours()).padStart(2,'0');
+            const m = String(now.getMinutes()).padStart(2,'0');
+            const s = String(now.getSeconds()).padStart(2,'0');
+            
+            document.getElementById('h-min').innerText = `${h}:${m}`;
+            document.getElementById('sec').innerText = s;
             document.getElementById('date-text').innerText = now.toLocaleDateString();
+            document.getElementById('day-text').innerText = `[${days[now.getDay()]}]`;
+
+            // Random Glitch
+            if(Math.random() < 0.05) { // 5% chance per second
+                const cw = document.getElementById('clock-wrapper');
+                cw.classList.add('glitch-active');
+                setTimeout(()=> cw.classList.remove('glitch-active'), 300);
+            }
         }
         setInterval(updateClock, 1000); updateClock();
 
-        // === WEATHER (ATMOS SCAN) ===
+        // === WEATHER & BG ===
         async function fetchWeather() {
             try {
-                // 静岡市の座標
+                // Shizuoka Coordinates
                 const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=34.9756&longitude=138.3828&current_weather=true');
                 const data = await res.json();
                 const temp = data.current_weather.temperature;
@@ -312,51 +371,224 @@ body {
                 
                 document.getElementById('w-temp').innerText = `${temp}°C`;
                 
-                // 天気コード簡易変換
                 let icon = "☁";
-                if(code <= 1) icon = "☀";
-                else if(code <= 3) icon = "⛅";
-                else if(code <= 60) icon = "☁";
-                else icon = "☂";
+                let type = "cloudy"; // sunny, cloudy, rain, thunder
+                
+                if(code <= 1) { icon="☀"; type="sunny"; }
+                else if(code <= 3) { icon="⛅"; type="cloudy"; }
+                else if(code <= 48) { icon="🌫"; type="cloudy"; }
+                else if(code <= 67) { icon="☂"; type="rain"; }
+                else if(code <= 99) { icon="⚡"; type="thunder"; }
+                
                 document.getElementById('w-icon').innerText = icon;
+                setBg(type);
 
             } catch(e) {
-                document.getElementById('w-temp').innerText = "ERR";
+                console.log(e);
             }
         }
-        fetchWeather();
-        setInterval(fetchWeather, 600000); // 10分更新
+        function setBg(type) {
+            document.querySelectorAll('.bg-layer').forEach(el => el.classList.remove('active'));
+            document.getElementById('bg-'+type).classList.add('active');
+            
+            // Rain Logic
+            const rc = document.getElementById('rain-container');
+            rc.innerHTML = "";
+            if(type === 'rain' || type === 'thunder') {
+                for(let i=0; i<20; i++){
+                    let d = document.createElement('div');
+                    d.className='rain-drop';
+                    d.style.left = Math.random()*100+'vw';
+                    d.style.animationDuration = (0.5+Math.random()*0.5)+'s';
+                    d.style.animationDelay = Math.random()+'s';
+                    rc.appendChild(d);
+                }
+            }
+            // Thunder Logic
+            if(type === 'thunder') {
+                const flash = document.querySelector('.flash-overlay');
+                flash.style.animation = "flashAnim 5s infinite";
+            } else {
+                document.querySelector('.flash-overlay').style.animation = "none";
+            }
+        }
+        fetchWeather(); setInterval(fetchWeather, 600000);
 
         // === MODALS ===
-        function openModal(id) { document.getElementById(id).classList.add('active'); if(id==='modal-tuner') startViz(); }
-        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+        function openModal(id) { 
+            document.getElementById(id).classList.add('active'); 
+            if(id==='modal-tuner') startVizLoop();
+        }
+        function closeModal(id) { 
+            document.getElementById(id).classList.remove('active'); 
+            if(id==='modal-tuner') stopVizLoop();
+        }
 
-        // === ARCHIVE (Forbidden System) ===
+        // === QUEST BOARD (Rank System) ===
+        let quests = JSON.parse(localStorage.getItem('quests_v2')) || [];
+        let credits = parseInt(localStorage.getItem('credits')) || 0;
+        document.getElementById('credit-val').innerText = credits;
+        renderQuests();
+
+        function addQuest() {
+            const t = document.getElementById('quest-in-text').value;
+            const r = document.getElementById('quest-rank-sel').value;
+            if(t) {
+                quests.push({t:t, r:r}); // r = rank
+                saveQuests();
+                renderQuests();
+                document.getElementById('quest-in-text').value = "";
+            }
+        }
+        function renderQuests() {
+            const el = document.getElementById('quest-list');
+            el.innerHTML = "";
+            let cnt = 0;
+            quests.forEach((q,i) => {
+                cnt++;
+                const div = document.createElement('div');
+                div.className = "quest-card";
+                div.innerHTML = `
+                    <div class="rank-badge rank-${q.r}">${q.r}</div>
+                    <div class="q-text">${q.t}</div>
+                    <span style="color:#0f0; cursor:pointer;" onclick="delQuest(${i})">✔</span>
+                `;
+                el.appendChild(div);
+            });
+            document.getElementById('m-count').innerText = cnt;
+        }
+        function delQuest(i) {
+            // Reward based on rank
+            let reward = 100;
+            const r = quests[i].r;
+            if(r==='S') reward=500; else if(r==='A') reward=300; else if(r==='B') reward=150;
+            
+            quests.splice(i,1);
+            credits += reward;
+            localStorage.setItem('credits', credits);
+            document.getElementById('credit-val').innerText = credits;
+            saveQuests();
+            renderQuests();
+        }
+        function saveQuests() { localStorage.setItem('quests_v2', JSON.stringify(quests)); }
+
+        // === NOISE TUNER (Real Audio) ===
+        let audioCtx, noiseNode, gainNode, analyser, vizReq;
+        let isPlaying = false;
+
+        function toggleNoise() {
+            if(!isPlaying) {
+                // Init Audio Context
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContext();
+                
+                // Create White Noise Buffer
+                const bufferSize = 2 * audioCtx.sampleRate;
+                const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    data[i] = Math.random() * 2 - 1;
+                }
+
+                noiseNode = audioCtx.createBufferSource();
+                noiseNode.buffer = buffer;
+                noiseNode.loop = true;
+                
+                gainNode = audioCtx.createGain();
+                gainNode.gain.value = 0.05; // Volume low
+
+                analyser = audioCtx.createAnalyser();
+                analyser.fftSize = 256;
+
+                noiseNode.connect(gainNode);
+                gainNode.connect(analyser);
+                analyser.connect(audioCtx.destination);
+
+                noiseNode.start();
+                isPlaying = true;
+            } else {
+                if(noiseNode) noiseNode.stop();
+                if(audioCtx) audioCtx.close();
+                isPlaying = false;
+            }
+        }
+
+        function startVizLoop() {
+            const cvs = document.getElementById('viz-canvas');
+            const ctx = cvs.getContext('2d');
+            cvs.width = cvs.clientWidth; cvs.height = cvs.clientHeight;
+
+            function draw() {
+                vizReq = requestAnimationFrame(draw);
+                
+                ctx.fillStyle = "#000";
+                ctx.fillRect(0, 0, cvs.width, cvs.height);
+
+                if(!isPlaying || !analyser) {
+                    // Flat line
+                    ctx.strokeStyle = "#005500";
+                    ctx.beginPath();
+                    ctx.moveTo(0, cvs.height/2);
+                    ctx.lineTo(cvs.width, cvs.height/2);
+                    ctx.stroke();
+                    return;
+                }
+
+                const bufferLength = analyser.frequencyBinCount;
+                const dataArray = new Uint8Array(bufferLength);
+                analyser.getByteTimeDomainData(dataArray);
+
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = "#00ff00";
+                ctx.beginPath();
+
+                const sliceWidth = cvs.width * 1.0 / bufferLength;
+                let x = 0;
+
+                for(let i = 0; i < bufferLength; i++) {
+                    const v = dataArray[i] / 128.0;
+                    const y = v * cvs.height/2;
+
+                    if(i === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+
+                    x += sliceWidth;
+                }
+                ctx.lineTo(cvs.width, cvs.height/2);
+                ctx.stroke();
+            }
+            draw();
+        }
+        function stopVizLoop() { cancelAnimationFrame(vizReq); }
+
+
+        // === VITAL ===
+        function startVital() {
+            let t = 25*60;
+            const el = document.getElementById('vital-timer');
+            const int = setInterval(()=>{
+                t--;
+                el.innerText = `${Math.floor(t/60)}:${String(t%60).padStart(2,'0')}`;
+                if(t<=0) clearInterval(int);
+            }, 1000);
+        }
+
+        // === FORBIDDEN ARCHIVE ===
         const archiveArea = document.getElementById('archive-area');
         let rawText = localStorage.getItem('forbiddenText') || "";
         let isSealed = false;
-
-        // 初期ロード時は平文を表示（お好みでロード時も暗号化可）
         archiveArea.value = rawText;
 
-        function saveArchive() {
-            if(!isSealed) {
-                rawText = archiveArea.value;
-                localStorage.setItem('forbiddenText', rawText);
-            }
-        }
-        archiveArea.addEventListener('input', saveArchive);
+        archiveArea.addEventListener('input', () => {
+            if(!isSealed) { rawText = archiveArea.value; localStorage.setItem('forbiddenText', rawText); }
+        });
 
         function sealArchive() {
             if(isSealed) return;
             isSealed = true;
-            const len = rawText.length;
             let scrambled = "";
             const chars = "†‡§¶#@&%£¢¥€ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-            for(let i=0; i<len; i++) {
-                if(rawText[i] === '\n') scrambled += '\n';
-                else scrambled += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
+            for(let i=0; i<rawText.length; i++) scrambled += (rawText[i]==='\n')?'\n':chars.charAt(Math.floor(Math.random() * chars.length));
             archiveArea.value = scrambled;
             archiveArea.classList.add('encrypted-text');
             archiveArea.setAttribute('readonly', true);
@@ -364,15 +596,11 @@ body {
 
         function unsealArchive() {
             if(!isSealed) return;
-            // デコード演出
             let counter = 0;
             const interval = setInterval(() => {
                 let temp = "";
                 const chars = "0101010101";
-                for(let i=0; i<rawText.length; i++) {
-                    if(Math.random() > 0.5) temp += rawText[i];
-                    else temp += chars.charAt(Math.floor(Math.random() * chars.length));
-                }
+                for(let i=0; i<rawText.length; i++) temp += (Math.random()>0.5)?rawText[i]:chars.charAt(Math.floor(Math.random()*chars.length));
                 archiveArea.value = temp;
                 counter++;
                 if(counter > 10) {
@@ -384,96 +612,13 @@ body {
                 }
             }, 50);
         }
-
         function clearArchive() {
-            if(confirm("完全消去シマスカ？")) {
-                rawText = "";
-                archiveArea.value = "";
-                isSealed = false;
+            if(confirm("BURN DATA?")) {
+                rawText = ""; archiveArea.value = ""; isSealed = false;
                 archiveArea.classList.remove('encrypted-text');
                 archiveArea.removeAttribute('readonly');
                 localStorage.setItem('forbiddenText', "");
             }
-        }
-
-        // === QUEST (Simple Logic) ===
-        let quests = JSON.parse(localStorage.getItem('quests')) || [];
-        let credits = parseInt(localStorage.getItem('credits')) || 0;
-        document.getElementById('credit-val').innerText = credits;
-        renderQuests();
-
-        function addQuest() {
-            const t = document.getElementById('quest-in-text').value;
-            if(t) {
-                quests.push({t:t, d:false});
-                localStorage.setItem('quests', JSON.stringify(quests));
-                renderQuests();
-                document.getElementById('quest-in-text').value = "";
-            }
-        }
-        function renderQuests() {
-            const el = document.getElementById('quest-list');
-            el.innerHTML = "";
-            let cnt = 0;
-            quests.forEach((q,i) => {
-                if(!q.d) cnt++;
-                const div = document.createElement('div');
-                div.className = "quest-card";
-                div.innerHTML = `<span>${q.t}</span><span onclick="delQuest(${i})">✔</span>`;
-                el.appendChild(div);
-            });
-            document.getElementById('m-count').innerText = cnt;
-        }
-        function delQuest(i) {
-            quests.splice(i,1);
-            credits += 150;
-            localStorage.setItem('credits', credits);
-            localStorage.setItem('quests', JSON.stringify(quests));
-            document.getElementById('credit-val').innerText = credits;
-            renderQuests();
-        }
-
-        // === VITAL & TUNER (Minimal) ===
-        function startVital() {
-            let t = 25*60;
-            const el = document.getElementById('vital-timer');
-            const int = setInterval(()=>{
-                t--;
-                el.innerText = `${Math.floor(t/60)}:${String(t%60).padStart(2,'0')}`;
-                if(t<=0) clearInterval(int);
-            }, 1000);
-        }
-
-        let audioCtx;
-        function toggleNoise() {
-            if(!audioCtx) {
-                audioCtx = new (window.AudioContext||window.webkitAudioContext)();
-                // 簡易ノイズ生成
-                const size = 4096;
-                const node = audioCtx.createScriptProcessor(size, 1, 1);
-                node.onaudioprocess = e => {
-                    const out = e.outputBuffer.getChannelData(0);
-                    for(let i=0; i<size; i++) out[i] = (Math.random()*2-1)*0.1;
-                };
-                node.connect(audioCtx.destination);
-            } else {
-                audioCtx.close();
-                audioCtx = null;
-            }
-        }
-        function startViz() {
-            const cvs = document.getElementById('viz-canvas');
-            const ctx = cvs.getContext('2d');
-            cvs.width = cvs.clientWidth; cvs.height = cvs.clientHeight;
-            function draw() {
-                if(document.getElementById('modal-tuner').classList.contains('active')) requestAnimationFrame(draw);
-                ctx.fillStyle="#000"; ctx.fillRect(0,0,cvs.width,cvs.height);
-                ctx.strokeStyle="#0ff"; ctx.beginPath();
-                ctx.moveTo(0,50);
-                for(let i=0;i<cvs.width;i+=10) ctx.lineTo(i, 50+Math.sin(i*0.1+Date.now()*0.01)*20);
-                ctx.stroke();
-            }
-            draw();
         }
     </script>
 </body>
