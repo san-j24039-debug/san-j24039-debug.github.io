@@ -10,10 +10,10 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="apple-touch-icon" href="icon.png">
 
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Orbitron:wght@500;900&family=Zen+Old+Mincho&family=Noto+Sans+JP:wght@100;400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Orbitron:wght@500;900&family=Zen+Old+Mincho&display=swap" rel="stylesheet">
 
 <style>
-/* === デザイン変数 (茶色は廃止) === */
+/* === デザイン変数 === */
 :root {
     --bg-void: #080808;
     --neon-cyan: #00f3ff;
@@ -58,7 +58,7 @@ body {
 }
 @keyframes gridMove { from { transform: perspective(500px) rotateX(60deg) translateY(0) translateZ(-200px); } to { transform: perspective(500px) rotateX(60deg) translateY(40px) translateZ(-200px); } }
 
-/* 背景の歯車（シルエットのみ） */
+/* 背景の歯車（シルエット） */
 .gear-bg {
     position: fixed;
     top: 50%; left: 50%;
@@ -79,16 +79,16 @@ body {
     background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
     display: flex;
     justify-content: center;
-    gap: 15px;
+    gap: 12px;
     z-index: 100;
 }
 
 .icon-btn {
     position: relative;
-    width: 65px; height: 65px;
+    width: 70px; height: 70px;
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 12px;
+    border-radius: 14px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -97,14 +97,16 @@ body {
     backdrop-filter: blur(5px);
     transition: 0.3s;
     overflow: hidden;
+    text-decoration: none;
+    color: #fff;
 }
+.icon-btn:active { transform: scale(0.95); }
 .icon-btn:hover {
     border-color: var(--neon-cyan);
     box-shadow: 0 0 15px var(--neon-cyan);
-    transform: translateY(5px);
 }
-.icon-btn i { font-size: 20px; margin-bottom: 5px; color: var(--silver-metal); }
-.icon-label { font-size: 9px; color: #aaa; letter-spacing: 1px; }
+.icon-symbol { font-size: 22px; margin-bottom: 4px; color: var(--silver-metal); }
+.icon-label { font-size: 9px; color: #aaa; letter-spacing: 0.5px; }
 
 /* === 2. 中央：時計 (Chrono Core) === */
 .main-section {
@@ -125,7 +127,6 @@ body {
     justify-content: center;
     align-items: center;
 }
-/* 外周リング */
 .ring-outer {
     position: absolute;
     width: 100%; height: 100%;
@@ -146,32 +147,63 @@ body {
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* 時刻表示 */
-.time-box {
-    text-align: center;
-    z-index: 10;
-}
+/* 時刻表示（グリッチエフェクト強化） */
+.time-box { text-align: center; z-index: 10; }
 #time-text {
-    font-size: 56px;
+    font-size: 60px;
     font-weight: 900;
     color: #fff;
-    text-shadow: 0 0 10px var(--neon-cyan), 0 0 30px var(--neon-cyan);
+    text-shadow: 2px 0 var(--neon-cyan), -2px 0 var(--neon-pink);
     letter-spacing: 2px;
     line-height: 1;
+    position: relative;
+    display: inline-block;
 }
+/* 強烈なグリッチ */
+.glitch-effect {
+    animation: glitch-skew 1s infinite linear alternate-reverse;
+}
+.glitch-effect::before, .glitch-effect::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: var(--bg-void);
+}
+.glitch-effect::before {
+    left: 2px;
+    text-shadow: -1px 0 #ff00c1;
+    clip: rect(44px, 450px, 56px, 0);
+    animation: glitch-anim 5s infinite linear alternate-reverse;
+}
+.glitch-effect::after {
+    left: -2px;
+    text-shadow: -1px 0 #00fff9;
+    clip: rect(44px, 450px, 56px, 0);
+    animation: glitch-anim2 5s infinite linear alternate-reverse;
+}
+@keyframes glitch-anim {
+    0% { clip: rect(2px, 9999px, 5px, 0); }
+    20% { clip: rect(30px, 9999px, 60px, 0); }
+    40% { clip: rect(10px, 9999px, 85px, 0); }
+    60% { clip: rect(50px, 9999px, 20px, 0); }
+    80% { clip: rect(15px, 9999px, 40px, 0); }
+    100% { clip: rect(60px, 9999px, 70px, 0); }
+}
+@keyframes glitch-anim2 {
+    0% { clip: rect(60px, 9999px, 10px, 0); }
+    20% { clip: rect(10px, 9999px, 40px, 0); }
+    40% { clip: rect(50px, 9999px, 20px, 0); }
+    60% { clip: rect(15px, 9999px, 60px, 0); }
+    80% { clip: rect(70px, 9999px, 30px, 0); }
+    100% { clip: rect(30px, 9999px, 80px, 0); }
+}
+
 #date-text {
     font-family: 'Cinzel', serif;
     font-size: 14px;
     color: var(--neon-pink);
     letter-spacing: 4px;
-    margin-top: 5px;
-}
-#sub-text {
-    font-family: 'Zen Old Mincho', serif;
-    font-size: 11px;
-    color: #aaa;
-    margin-top: 5px;
-    opacity: 0.8;
+    margin-top: 10px;
 }
 
 /* 検索バー */
@@ -198,9 +230,8 @@ body {
     border-color: var(--neon-pink);
     box-shadow: 0 4px 10px -2px rgba(255, 0, 85, 0.5);
 }
-#search::placeholder { color: rgba(255,255,255,0.3); font-size: 14px; }
 
-/* === 3. 下部：ウィジェットグリッド (Widget Deck) === */
+/* === 3. 下部：ウィジェットデッキ === */
 .widget-deck {
     width: 100%;
     max-width: 500px;
@@ -220,15 +251,21 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    height: 90px;
+    height: 100px;
     position: relative;
     overflow: hidden;
+    cursor: pointer;
+    text-decoration: none;
+    color: #fff;
+    transition: 0.2s;
 }
+.widget:active { background: rgba(255, 255, 255, 0.1); }
 .widget-label {
     font-size: 10px;
     color: var(--neon-cyan);
     letter-spacing: 1px;
     text-transform: uppercase;
+    margin-bottom: 5px;
 }
 
 /* 天気ウィジェット */
@@ -236,33 +273,37 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 5px;
+    margin-top: 0px;
 }
 .temp-big { font-size: 28px; font-weight: bold; text-shadow: 0 0 5px #fff; }
-.weather-icon { font-size: 24px; }
-.loc-small { font-size: 9px; color: #888; margin-top: 5px; }
+.weather-icon { font-size: 26px; }
+.loc-small { font-size: 9px; color: #888; margin-top: 2px; }
 
-/* コンパス（レーダー風） */
-.radar-circle {
+/* タイマー（懐中時計デザイン） */
+.watch-face {
     width: 50px; height: 50px;
-    border: 1px solid #444;
+    border: 2px solid var(--silver-metal);
     border-radius: 50%;
     position: absolute;
     bottom: 10px; right: 10px;
-    background: radial-gradient(circle, transparent 20%, rgba(0, 243, 255, 0.1));
+    background: radial-gradient(#222, #000);
+    box-shadow: 0 0 5px var(--silver-metal);
 }
-.radar-line {
+.watch-knob {
     position: absolute;
-    top: 50%; left: 50%;
-    width: 50%; height: 1px;
-    background: var(--neon-pink);
-    transform-origin: 0 0;
-    transform: rotate(-90deg); /* JSで制御 */
-    box-shadow: 0 0 5px var(--neon-pink);
-    transition: transform 0.5s ease;
+    top: -4px; left: 50%; transform: translateX(-50%);
+    width: 6px; height: 4px; background: var(--silver-metal);
 }
+.watch-hand {
+    position: absolute;
+    top: 50%; left: 50%; width: 45%; height: 2px;
+    background: var(--neon-pink);
+    transform-origin: 0 50%;
+    animation: tick 60s linear infinite;
+}
+@keyframes tick { from { transform: rotate(-90deg); } to { transform: rotate(270deg); } }
 
-/* システム負荷（蒸気メーター改めCPUグラフ） */
+/* システム負荷（バー） */
 .bar-container {
     display: flex;
     align-items: flex-end;
@@ -277,24 +318,20 @@ body {
     transition: height 0.2s;
 }
 
-/* サブカルログ */
-.log-stream {
-    font-family: 'Zen Old Mincho', serif;
-    font-size: 10px;
+/* メモ帳 */
+#memo-area {
+    width: 100%;
+    height: 60px;
+    background: transparent;
+    border: none;
     color: #aaa;
+    font-family: 'Zen Old Mincho', serif;
+    font-size: 11px;
+    resize: none;
+    outline: none;
     line-height: 1.4;
-    white-space: pre-wrap;
-    opacity: 0.7;
 }
-
-/* === アニメーション＆エフェクト === */
-.glitch { animation: glitch-anim 3s infinite; }
-@keyframes glitch-anim {
-    0% { transform: translate(0); }
-    2% { transform: translate(-2px, 2px); }
-    4% { transform: translate(2px, -2px); }
-    6% { transform: translate(0); }
-}
+#memo-area::placeholder { color: #555; font-style: italic; }
 
 </style>
 </head>
@@ -308,22 +345,22 @@ body {
     </div>
 
     <div class="top-dock">
-        <div class="icon-btn" onclick="openLink('https://youtube.com')">
-            <div style="font-size:24px; color:#f00;">▶</div>
+        <a class="icon-btn" href="https://youtube.com">
+            <div class="icon-symbol">▶</div>
             <div class="icon-label">YOUTUBE</div>
-        </div>
-        <div class="icon-btn" onclick="openLink('https://google.com')">
-            <div style="font-size:24px; color:#4285F4;">G</div>
-            <div class="icon-label">GOOGLE</div>
-        </div>
-        <div class="icon-btn" onclick="openLink('https://x.com')">
-            <div style="font-size:24px; color:#fff;">X</div>
-            <div class="icon-label">NETWORK</div>
-        </div>
-        <div class="icon-btn" onclick="openLink('https://chatgpt.com')">
-            <div style="font-size:24px; color:#10a37f;">✦</div>
-            <div class="icon-label">AI CORE</div>
-        </div>
+        </a>
+        <a class="icon-btn" href="https://gemini.google.com">
+            <div class="icon-symbol">✦</div>
+            <div class="icon-label">GEMINI</div>
+        </a>
+        <a class="icon-btn" href="https://music.apple.com">
+            <div class="icon-symbol">♫</div>
+            <div class="icon-label">MUSIC</div>
+        </a>
+        <a class="icon-btn" href="https://maps.google.com">
+            <div class="icon-symbol">🗺</div>
+            <div class="icon-label">MAPS</div>
+        </a>
     </div>
 
     <div class="main-section">
@@ -332,34 +369,34 @@ body {
             <div class="ring-inner"></div>
             
             <div class="time-box">
-                <div id="time-text" class="glitch">00:00</div>
+                <div id="time-text" class="glitch-effect" data-text="00:00">00:00</div>
                 <div id="date-text">XXXX.XX.XX</div>
-                <div id="sub-text">世界線変動率 0.000%</div>
             </div>
         </div>
 
         <div class="search-container">
-            <input type="text" id="search" placeholder=">> ENTER COMMAND CODE...">
+            <input type="text" id="search" placeholder=">> ENTER COMMAND...">
         </div>
     </div>
 
     <div class="widget-deck">
-        <div class="widget" onclick="initWeather()">
-            <div class="widget-label">ATMOSPHERE</div>
+        <a class="widget" href="https://weather.yahoo.co.jp/weather/jp/22/5010.html" target="_blank">
+            <div class="widget-label">SHIZUOKA / WEATHER</div>
             <div class="weather-main">
                 <div class="temp-big" id="temp">--°</div>
                 <div class="weather-icon" id="w-icon">☁</div>
             </div>
-            <div class="loc-small" id="loc">SCANNING...</div>
-        </div>
+            <div class="loc-small">Live Update: Active</div>
+        </a>
 
-        <div class="widget">
-            <div class="widget-label">COMPASS / RADAR</div>
-            <div class="radar-circle">
-                <div class="radar-line" id="compass-line"></div>
+        <a class="widget" href="clock-timer://">
+            <div class="widget-label">TIMER APP</div>
+            <div class="watch-face">
+                <div class="watch-knob"></div>
+                <div class="watch-hand"></div>
             </div>
-            <div style="margin-top:15px; font-size:12px;" id="compass-text">N</div>
-        </div>
+            <div style="margin-top:15px; font-size:10px; color:#aaa;">OPEN SYSTEM CLOCK</div>
+        </a>
 
         <div class="widget">
             <div class="widget-label">SYSTEM LOAD</div>
@@ -368,39 +405,38 @@ body {
         </div>
 
         <div class="widget">
-            <div class="widget-label">SYSTEM LOG</div>
-            <div class="log-stream" id="log-text">
-                Connection established.<br>Waiting for input...
-            </div>
+            <div class="widget-label">MEMO LOG</div>
+            <textarea id="memo-area" placeholder="Write logs here..."></textarea>
         </div>
     </div>
 
     <script>
-        // === 1. 時計 & サブカル演出 ===
+        // === 1. 時計 & グリッチ ===
         function updateClock() {
             const now = new Date();
             const h = String(now.getHours()).padStart(2, '0');
             const m = String(now.getMinutes()).padStart(2, '0');
+            const timeStr = `${h}:${m}`;
             
-            document.getElementById('time-text').innerText = `${h}:${m}`;
+            const timeEl = document.getElementById('time-text');
+            timeEl.innerText = timeStr;
+            timeEl.setAttribute('data-text', timeStr); // グリッチ用属性更新
             
             const days = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
             document.getElementById('date-text').innerText = 
                 `${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')} [${days[now.getDay()]}]`;
-
-            // たまに「世界線変動率」を変える（中二病演出）
-            if (Math.random() > 0.95) {
-                const rate = (Math.random() * 2 + 0.5).toFixed(6);
-                document.getElementById('sub-text').innerText = `世界線変動率 ${rate}%`;
-            }
         }
         setInterval(updateClock, 1000);
         updateClock();
 
-        // === 2. 天気予報 (Open-Meteo) ===
-        async function fetchWeather(lat, lon) {
+        // === 2. 天気予報 (静岡市: 34.9756, 138.3828) ===
+        async function fetchWeather() {
             try {
+                // 静岡市の座標固定
+                const lat = 34.9756;
+                const lon = 138.3828;
                 const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`;
+                
                 const res = await fetch(url);
                 const data = await res.json();
                 
@@ -408,7 +444,6 @@ body {
                 const code = data.current_weather.weathercode;
                 
                 document.getElementById('temp').innerText = `${temp}°C`;
-                document.getElementById('loc').innerText = `LAT:${lat.toFixed(2)} LON:${lon.toFixed(2)}`;
                 
                 let icon = "☁";
                 if(code === 0) icon = "☀";
@@ -419,36 +454,13 @@ body {
                 document.getElementById('w-icon').innerText = icon;
 
             } catch (e) {
-                document.getElementById('loc').innerText = "OFFLINE";
+                document.getElementById('temp').innerText = "ERR";
             }
         }
+        fetchWeather();
+        setInterval(fetchWeather, 600000); // 10分更新
 
-        function initWeather() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    (pos) => fetchWeather(pos.coords.latitude, pos.coords.longitude),
-                    (err) => fetchWeather(35.6895, 139.6917) // デフォルト東京
-                );
-            } else {
-                fetchWeather(35.6895, 139.6917);
-            }
-        }
-        initWeather();
-        setInterval(initWeather, 600000); // 10分更新
-
-        // === 3. コンパス (スマホ対応) ===
-        if (window.DeviceOrientationEvent) {
-            window.addEventListener('deviceorientation', (event) => {
-                if(event.alpha) {
-                    // 北を0度としてレーダーを回転
-                    const deg = event.alpha; 
-                    document.getElementById('compass-line').style.transform = `rotate(${deg - 90}deg)`;
-                    document.getElementById('compass-text').innerText = Math.round(deg) + "°";
-                }
-            });
-        }
-
-        // === 4. システム負荷バー生成 ===
+        // === 3. システム負荷（飾り） ===
         const barContainer = document.getElementById('load-bars');
         for(let i=0; i<10; i++) {
             const bar = document.createElement('div');
@@ -460,30 +472,22 @@ body {
             const bars = document.querySelectorAll('.bar');
             bars.forEach(b => {
                 b.style.height = Math.random() * 100 + "%";
-                // 色をランダムで変化（シアンorピンク）
-                b.style.background = Math.random() > 0.5 ? "var(--neon-cyan)" : "var(--neon-pink)";
+                b.style.background = Math.random() > 0.5 ? "var(--neon-cyan)" : "var(--neon-purple)";
             });
         }, 800);
 
-        // === 5. ランダムログ生成（サブカル/ダーク） ===
-        const logs = [
-            "境界線上のノイズを検知",
-            "エーテル圧力が上昇中...",
-            "観測者：UNKNOWN",
-            "記憶領域の断片化を確認",
-            "第三次プロトコル始動",
-            "シュレディンガーの猫を捜索中",
-            "Void Engine: STABLE"
-        ];
-        setInterval(() => {
-            const randLog = logs[Math.floor(Math.random() * logs.length)];
-            const time = new Date().toLocaleTimeString();
-            document.getElementById('log-text').innerHTML = `[${time}]<br>${randLog}`;
-        }, 4000);
+        // === 4. メモ帳（自動保存） ===
+        const memoArea = document.getElementById('memo-area');
+        // 読み込み
+        if(localStorage.getItem('myMemo')) {
+            memoArea.value = localStorage.getItem('myMemo');
+        }
+        // 保存
+        memoArea.addEventListener('input', () => {
+            localStorage.setItem('myMemo', memoArea.value);
+        });
 
-        // === 6. リンク & 検索 ===
-        function openLink(url) { window.location.href = url; }
-        
+        // === 5. 検索機能 ===
         const sBox = document.getElementById('search');
         sBox.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
@@ -492,7 +496,7 @@ body {
             }
         });
 
-        // PWA
+        // PWA登録
         if ("serviceWorker" in navigator) {
             navigator.serviceWorker.register("service-worker.js");
         }
