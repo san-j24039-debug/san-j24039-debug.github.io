@@ -4,8 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>AETHER CHRONICLE</title>
+
+<link rel="manifest" href="manifest.json" />
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="icon.png">
 
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Orbitron:wght@500;900&family=Zen+Old+Mincho&display=swap" rel="stylesheet">
 
@@ -31,7 +34,7 @@ body {
     transition: background 1s ease;
 }
 
-/* === TRANSITION LAYER (Black Screen Intro) === */
+/* === TRANSITION LAYER === */
 #transition-layer {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     background: #000; z-index: 9999;
@@ -62,17 +65,29 @@ body {
     background: rgba(255, 204, 0, 0.1); transform: rotate(-5deg);
 }
 
-/* === BACKGROUND LAYERS === */
+/* === BACKGROUND LAYERS (Weather) === */
 .bg-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; opacity: 0; transition: opacity 1s; }
 .bg-layer.active { opacity: 1; }
-#bg-sunny { background: radial-gradient(circle at top, #221800 0%, #000 90%); }
+
+/* Sunny: Steampunk Gold */
+#bg-sunny { background: radial-gradient(circle at top, #332200 0%, #000 90%); }
+#bg-sunny::after { content:""; position:absolute; width:100%; height:100%; background: radial-gradient(circle, rgba(255,170,0,0.1) 10%, transparent 50%); animation: pulseLight 5s infinite alternate; }
+@keyframes pulseLight { 0%{opacity:0.5;} 100%{opacity:1;} }
+
+/* Cloudy: Cyber Mist */
 #bg-cloudy { background: radial-gradient(circle, #1a2a33 0%, #000 90%); }
+#bg-cloudy::before { content:""; position:absolute; width:100%; height:100%; background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 243, 255, 0.03) 3px); }
+
+/* Rain: Cold Rain */
 #bg-rain { background: linear-gradient(to bottom, #050510, #000); }
-.rain-drop { position: absolute; top:-10vh; background: rgba(0, 243, 255, 0.4); width: 1px; height: 60px; animation: rainFall linear infinite; }
+.rain-drop { position: absolute; top:-10vh; background: rgba(0, 243, 255, 0.5); width: 1px; height: 60px; animation: rainFall linear infinite; }
 @keyframes rainFall { to { transform: translateY(110vh); } }
+
+/* Thunder: Volt Flash */
 #bg-thunder { background: radial-gradient(circle at 30% 30%, #220033 0%, #000 90%); }
-.flash-overlay { position: absolute; width:100%; height:100%; background: rgba(255,255,255,0.1); opacity:0; pointer-events:none; }
-@keyframes flashAnim { 0%,100%{opacity:0;} 5%{opacity:0.3;} 10%{opacity:0;} }
+.flash-overlay { position: absolute; width:100%; height:100%; background: rgba(255,255,255,0.15); opacity:0; pointer-events:none; }
+@keyframes flashAnim { 0%,100%{opacity:0;} 2%{opacity:0.4;} 4%{opacity:0;} }
+
 .grid-floor { position: absolute; width: 200%; height: 200%; background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px); background-size: 40px 40px; transform: perspective(500px) rotateX(60deg) translateY(-100px) translateZ(-200px); bottom: -50%; left: -50%; z-index: -1; }
 
 /* === SHORTCUTS === */
@@ -84,36 +99,59 @@ body {
     text-decoration: none; color: #fff; backdrop-filter: blur(5px);
     transition: all 0.3s ease; position: relative; overflow: visible;
 }
-.icon-btn:hover {
-    border-color: var(--neon-cyan); background: rgba(0, 243, 255, 0.1);
-    box-shadow: 0 0 15px var(--neon-cyan), 0 0 30px rgba(0, 243, 255, 0.4); transform: scale(1.05);
-}
-.icon-symbol { font-size: 18px; margin-bottom: 4px; color: var(--silver-metal); }
+.icon-btn::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 12px; box-shadow: 0 0 0 transparent; transition: 0.3s; }
+.icon-btn:hover { border-color: var(--neon-cyan); background: rgba(0, 243, 255, 0.1); box-shadow: 0 0 15px var(--neon-cyan), 0 0 30px rgba(0, 243, 255, 0.4); transform: scale(1.05); }
+.icon-symbol { font-size: 18px; margin-bottom: 4px; color: var(--silver-metal); transition: 0.3s; }
+.icon-btn:hover .icon-symbol { color: #fff; text-shadow: 0 0 10px #fff; }
 .icon-label { font-size: 8px; color: #aaa; letter-spacing: 0.5px; }
 
-/* === CLOCK (Fixed overlap) === */
+/* === CLOCK (Fixed & Glitch) === */
 .main-section { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; position: relative; }
 .clock-container { position: relative; width: 300px; height: 300px; display: flex; justify-content: center; align-items: center; }
 
-/* Rings */
 .c-ring { position: absolute; border-radius: 50%; border: 1px solid transparent; }
 .c-ring-1 { width: 100%; height: 100%; border-top-color: var(--neon-purple); border-bottom-color: var(--neon-purple); animation: spin 20s linear infinite; opacity: 0.6; }
 .c-ring-2 { width: 85%; height: 85%; border-left-color: var(--neon-cyan); border-right-color: var(--neon-cyan); animation: spin 10s linear infinite reverse; box-shadow: 0 0 10px rgba(0,243,255,0.2); }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* Time Text */
+/* Time Display */
+.glitch-wrapper { position: relative; z-index: 10; text-align: center; }
 .time-display {
-    display: flex; align-items: baseline; justify-content: center;
-    font-family: 'Orbitron', monospace; font-variant-numeric: tabular-nums;
-    color: #fff; text-shadow: 0 0 15px var(--neon-cyan); z-index: 10;
-    gap: 8px; /* Ensure space between parts */
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Orbitron', monospace; color: #fff;
+    text-shadow: 0 0 15px var(--neon-cyan); gap: 5px;
+    font-size: 52px; font-weight: 900; letter-spacing: 2px;
 }
-.time-part { font-size: 52px; font-weight: 900; letter-spacing: 2px; }
-.time-colon { font-size: 52px; font-weight: 900; animation: blink 1s infinite; }
-.time-sec { font-size: 32px; font-weight: 900; color: #fff; text-shadow: 0 0 15px var(--neon-cyan); opacity: 0.9; }
+.time-colon { animation: blink 1s infinite; margin-bottom: 5px; }
 @keyframes blink { 50% { opacity: 0; } }
 
-.date-row { font-family: 'Cinzel', serif; font-size: 12px; color: var(--neon-pink); letter-spacing: 3px; margin-top: 10px; display: flex; justify-content: center; gap: 10px; }
+/* GLITCH EFFECT (ZAZA!!) */
+.glitch-active .time-display {
+    animation: glitch-skew 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both infinite;
+    color: var(--neon-pink);
+    text-shadow: 2px 0 var(--neon-cyan), -2px 0 var(--neon-gold);
+}
+.glitch-active .time-display::before,
+.glitch-active .time-display::after {
+    content: attr(data-time);
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background: var(--bg-void); overflow: hidden;
+}
+.glitch-active .time-display::before {
+    left: 2px; text-shadow: -1px 0 #ff00c1;
+    clip-path: inset(20% 0 30% 0);
+    animation: glitch-anim-1 0.5s infinite linear alternate-reverse;
+}
+.glitch-active .time-display::after {
+    left: -2px; text-shadow: -1px 0 #00fff9;
+    clip-path: inset(60% 0 10% 0);
+    animation: glitch-anim-2 0.5s infinite linear alternate-reverse;
+}
+@keyframes glitch-skew { 0%{transform:skew(0deg);} 20%{transform:skew(-10deg);} 40%{transform:skew(10deg);} 60%{transform:skew(-5deg);} 80%{transform:skew(5deg);} 100%{transform:skew(0deg);} }
+@keyframes glitch-anim-1 { 0%{clip-path:inset(20% 0 80% 0);} 100%{clip-path:inset(80% 0 20% 0);} }
+@keyframes glitch-anim-2 { 0%{clip-path:inset(10% 0 60% 0);} 100%{clip-path:inset(60% 0 10% 0);} }
+
+.date-row { font-family: 'Cinzel', serif; font-size: 12px; color: var(--neon-pink); letter-spacing: 3px; margin-top: 15px; display: flex; justify-content: center; gap: 10px; }
 
 /* === MODULE GRID === */
 .modules-container { width: 100%; max-width: 450px; padding: 0 20px 30px 20px; display: flex; flex-direction: column; gap: 12px; box-sizing: border-box; z-index: 10; }
@@ -196,6 +234,7 @@ body {
 /* === M4: FORBIDDEN ARCHIVE === */
 #modal-archive.active { animation: archiveFlash 0.3s; }
 @keyframes archiveFlash { 0% { background: #500; } 100% { background: #000; } }
+#modal-archive { background: #000; }
 #modal-archive .modal-title { color: var(--forbidden-red); text-shadow: 0 0 10px var(--forbidden-red); }
 .archive-editor { flex: 1; background: rgba(20, 0, 0, 0.3); border: 1px solid var(--forbidden-red); padding: 15px; color: #ccaaaa; font-family: 'Zen Old Mincho', serif; font-size: 14px; line-height: 1.8; outline: none; resize: none; width: 100%; box-sizing: border-box; }
 .encrypted-text { font-family: 'Orbitron', monospace; color: var(--forbidden-red); text-shadow: 0 0 5px var(--forbidden-red); pointer-events: none; }
@@ -233,9 +272,8 @@ body {
             <div class="c-ring c-ring-1"></div>
             <div class="c-ring c-ring-2"></div>
             <div class="glitch-wrapper" id="clock-wrapper">
-                <div class="time-display">
-                    <span id="h-min">00:00</span>
-                    <span id="sec-text" class="time-sec">00</span>
+                <div class="time-display" id="time-container">
+                    <span id="h-min">00:00</span><span class="time-colon">:</span><span id="sec-text">00</span>
                 </div>
                 <div class="date-row">
                     <span id="date-text">--.--.--</span>
@@ -345,7 +383,7 @@ body {
     </div>
 
     <script>
-        // === CLOCK ===
+        // === CLOCK & GLITCH ===
         const days = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
         function updateClock() {
             const now = new Date();
@@ -357,32 +395,63 @@ body {
             document.getElementById('sec-text').innerText = `${s}`;
             document.getElementById('date-text').innerText = now.toLocaleDateString();
             document.getElementById('day-text').innerText = `[${days[now.getDay()]}]`;
+
+            // Random Glitch
+            if(Math.random() < 0.03) { 
+                const cw = document.getElementById('clock-wrapper');
+                cw.classList.add('glitch-active');
+                
+                // Add data-time for glitch pseudo-element
+                document.getElementById('time-container').setAttribute('data-time', `${h}:${m}:${s}`);
+                
+                setTimeout(()=> cw.classList.remove('glitch-active'), 300);
+            }
         }
         setInterval(updateClock, 1000); updateClock();
 
         // === WEATHER & BG ===
         async function fetchWeather() {
             try {
+                // 静岡市
                 const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=34.9756&longitude=138.3828&current_weather=true');
                 const data = await res.json();
                 const temp = data.current_weather.temperature;
                 const code = data.current_weather.weathercode;
                 document.getElementById('w-temp').innerText = `${temp}°C`;
+                
                 let icon = "☁"; let type = "cloudy";
                 if(code <= 1) { icon="☀"; type="sunny"; }
                 else if(code <= 3) { icon="⛅"; type="cloudy"; }
                 else if(code <= 48) { icon="🌫"; type="cloudy"; }
                 else if(code <= 67) { icon="☂"; type="rain"; }
                 else if(code <= 99) { icon="⚡"; type="thunder"; }
+                
                 document.getElementById('w-icon').innerText = icon;
                 setBg(type);
             } catch(e) { console.log(e); }
         }
         function setBg(type) {
             document.querySelectorAll('.bg-layer').forEach(el => el.classList.remove('active'));
-            document.getElementById('bg-'+type).classList.add('active');
-            if(type === 'thunder') document.querySelector('.flash-overlay').style.animation = "flashAnim 5s infinite";
-            else document.querySelector('.flash-overlay').style.animation = "none";
+            const target = document.getElementById('bg-'+type);
+            if(target) target.classList.add('active');
+            
+            const rc = document.getElementById('rain-container');
+            rc.innerHTML = "";
+            if(type === 'rain' || type === 'thunder') {
+                for(let i=0; i<30; i++){
+                    let d = document.createElement('div');
+                    d.className='rain-drop';
+                    d.style.left = Math.random()*100+'vw';
+                    d.style.animationDuration = (0.3+Math.random()*0.4)+'s';
+                    d.style.animationDelay = Math.random()+'s';
+                    rc.appendChild(d);
+                }
+            }
+            if(type === 'thunder') {
+                document.querySelector('.flash-overlay').style.animation = "flashAnim 5s infinite";
+            } else {
+                document.querySelector('.flash-overlay').style.animation = "none";
+            }
         }
         fetchWeather(); setInterval(fetchWeather, 600000);
 
@@ -390,32 +459,24 @@ body {
         function triggerTransition(modalId, text) {
             const overlay = document.getElementById('transition-layer');
             const tText = document.getElementById('transition-text');
-            
             tText.innerHTML = text + '<span class="blink-caret">_</span>';
             overlay.classList.add('active');
-
-            // Wait 1.5s then open modal
             setTimeout(() => {
                 overlay.classList.remove('active');
                 openModal(modalId);
-            }, 1500);
+            }, 1200);
         }
 
         function openModal(id) { 
-            const m = document.getElementById(id);
-            m.classList.add('active'); 
-            
-            // Special initialization for Tuner (Fix for missing lines)
-            if(id === 'modal-tuner') {
-                setTimeout(startVizLoop, 100); // Small delay to ensure layout is ready
-            }
+            document.getElementById(id).classList.add('active'); 
+            if(id==='modal-tuner') startVizLoop();
         }
         function closeModal(id) { 
             document.getElementById(id).classList.remove('active'); 
             if(id==='modal-tuner') stopVizLoop();
         }
 
-        // === QUEST BOARD (Effect added) ===
+        // === QUEST BOARD ===
         let quests = JSON.parse(localStorage.getItem('quests_v3')) || [];
         let credits = parseInt(localStorage.getItem('credits')) || 0;
         document.getElementById('credit-val').innerText = credits;
@@ -438,7 +499,7 @@ body {
                 const div = document.createElement('div');
                 div.className = `quest-card qc-${q.r.toLowerCase()}`;
                 div.innerHTML = `
-                    <div class="rank-badge rank-${q.r}" style="color:var(--neon-cyan)">${q.r}</div>
+                    <div class="rank-badge rank-${q.r}">${q.r}</div>
                     <div class="q-text">${q.t}</div>
                     <span class="check-btn" onclick="completeQuest(${i})">✔</span>
                 `;
@@ -447,10 +508,8 @@ body {
             document.getElementById('m-count').innerText = cnt;
         }
         function completeQuest(i) {
-            // SHOW OVERLAY
             const overlay = document.getElementById('quest-clear-overlay');
             overlay.classList.add('active');
-
             let reward = 100;
             const r = quests[i].r;
             if(r==='S') reward=500; else if(r==='A') reward=300; else if(r==='B') reward=150;
@@ -459,15 +518,11 @@ body {
             localStorage.setItem('credits', credits);
             document.getElementById('credit-val').innerText = credits;
             saveQuests(); renderQuests();
-
-            // Hide overlay after 2s
-            setTimeout(() => {
-                overlay.classList.remove('active');
-            }, 2000);
+            setTimeout(() => { overlay.classList.remove('active'); }, 1500);
         }
         function saveQuests() { localStorage.setItem('quests_v3', JSON.stringify(quests)); }
 
-        // === NOISE TUNER (Line Fix) ===
+        // === NOISE TUNER (Active Viz) ===
         let audioCtx, noiseNode, gainNode, analyser, vizReq;
         let isPlaying = false;
 
@@ -496,10 +551,8 @@ body {
         function startVizLoop() {
             const cvs = document.getElementById('viz-canvas');
             const container = cvs.parentElement;
-            // Force reset dimensions to match container (Fix for invisible line)
             cvs.width = container.clientWidth;
             cvs.height = 200; 
-
             const ctx = cvs.getContext('2d');
             
             function draw() {
@@ -507,7 +560,6 @@ body {
                 ctx.fillStyle = "#000"; ctx.fillRect(0, 0, cvs.width, cvs.height);
 
                 if(!isPlaying || !analyser) {
-                    // Flat line
                     ctx.strokeStyle = "#003300"; ctx.lineWidth=1;
                     ctx.beginPath(); ctx.moveTo(0, cvs.height/2); ctx.lineTo(cvs.width, cvs.height/2); ctx.stroke();
                     return;
@@ -524,7 +576,7 @@ body {
                 for(let i = 0; i < bufferLength; i++) {
                     const v = dataArray[i] / 128.0;
                     const y = v * cvs.height/2;
-                    const jitter = (Math.random()-0.5)*15; // Jitter effect
+                    const jitter = (Math.random()-0.5)*15;
                     if(i===0) ctx.moveTo(x, y+jitter); else ctx.lineTo(x, y+jitter);
                     x += sliceWidth;
                 }
@@ -532,9 +584,7 @@ body {
             }
             if(!vizReq) draw();
         }
-        function stopVizLoop() { 
-            cancelAnimationFrame(vizReq); vizReq=null; 
-        }
+        function stopVizLoop() { cancelAnimationFrame(vizReq); vizReq=null; }
 
         // === VITAL KEEPER (Stop Added) ===
         let vitalTime = 25*60;
@@ -552,14 +602,8 @@ body {
                 }
             }, 1000);
         }
-        function pauseVital() {
-            if(vitalInt) { clearInterval(vitalInt); vitalInt = null; }
-        }
-        function resetVital() {
-            pauseVital();
-            vitalTime = 25*60;
-            updateVitalDisplay();
-        }
+        function pauseVital() { if(vitalInt) { clearInterval(vitalInt); vitalInt = null; } }
+        function resetVital() { pauseVital(); vitalTime = 25*60; updateVitalDisplay(); }
         function updateVitalDisplay() {
             const m = Math.floor(vitalTime/60).toString().padStart(2,'0');
             const s = (vitalTime%60).toString().padStart(2,'0');
