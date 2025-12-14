@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>CHRONICLE ARCHIVE</title>
+<title>CHRONEX</title>
 
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -25,6 +25,7 @@
     --forbidden-red: #ff3333;
     --safe-green: #33ff33;
     --silver-metal: #e0e5eb;
+    --moon-pale: #eef2f5; /* 追加: 月の色 */
     --border: rgba(255, 255, 255, 0.15);
     --border-strong: rgba(255, 255, 255, 0.35);
 }
@@ -124,10 +125,10 @@ body {
     display: flex; align-items: center; justify-content: center;
     font-family: 'Orbitron', monospace; color: #fff;
     text-shadow: 0 0 15px var(--neon-cyan);
-    font-size: 46px; /* 少し縮小して被りを防止 */
+    font-size: 46px; 
     font-weight: 900; letter-spacing: 2px;
-    width: 350px; /* 全体の幅を確保 */
-    font-variant-numeric: tabular-nums; /* 数字の幅を揃える */
+    width: 350px; 
+    font-variant-numeric: tabular-nums;
 }
 /* 各パーツに固定幅を与えて左右ズレを防止 */
 #h-min {
@@ -224,8 +225,25 @@ body {
 #quest-rank-sel { background: #000; color: #fff; border: 1px solid var(--neon-cyan); font-family: 'Orbitron'; }
 #quest-add-btn { background: var(--neon-cyan); color: #000; border: none; padding: 0 15px; font-weight: bold; cursor: pointer; }
 
-/* TUNER */
-.tuner-viz { width: 100%; height: 200px; background: #000; border: 1px solid #333; border-radius: 4px; margin-bottom: 20px; box-sizing: border-box; }
+/* === MOON (LUNAR PHASE) STYLES === */
+.moon-container {
+    width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 20px 0; position: relative;
+}
+.moon-viz { width: 200px; height: 200px; position: relative; margin-bottom: 20px; }
+#moon-canvas { width: 100%; height: 100%; }
+.moon-info {
+    text-align: center; color: #fff; font-family: 'Orbitron'; width: 100%;
+}
+.moon-phase-name {
+    color: var(--silver-metal); font-family: 'Zen Old Mincho', serif; font-size: 20px;
+    margin-bottom: 5px; letter-spacing: 2px; text-shadow: 0 0 10px rgba(255,255,255,0.3);
+}
+.moon-data-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; max-width: 300px; margin: 10px auto;
+}
+.md-item { background: rgba(255,255,255,0.05); padding: 8px; border: 1px solid #333; font-size: 10px; color: #aaa; }
+.md-val { color: var(--neon-cyan); font-size: 14px; font-weight: bold; display: block; margin-top: 3px; }
 
 /* VITAL */
 .vital-pod { width: 220px; height: 220px; border-radius: 50%; border: 4px solid #222; margin: 20px auto; display: flex; justify-content: center; align-items: center; position: relative; background: #000; }
@@ -395,8 +413,8 @@ body {
             <div class="app-card" onclick="triggerTransition('modal-quest', '>> 因果律構造、解析中...')">
                 <div class="app-title">QUEST BOARD</div><div class="app-status">Active: <span id="m-count">0</span></div><div class="app-icon-bg">⚔</div>
             </div>
-            <div class="app-card" onclick="triggerTransition('modal-tuner', '>> 虚数空間ヘ潜行...')">
-                <div class="app-title">NOISE TUNER</div><div class="app-status">Signal Wave</div><div class="app-icon-bg">📡</div>
+            <div class="app-card" onclick="triggerTransition('modal-moon', '>> 衛星軌道、捕捉...')">
+                <div class="app-title">LUNAR PHASE</div><div class="app-status">Moon: <span id="idx-moon-age">--</span></div><div class="app-icon-bg">☾</div>
             </div>
             <div class="app-card" onclick="triggerTransition('modal-vital', '>> 生命鼓動、同調...')">
                 <div class="app-title">VITAL KEEPER</div><div class="app-status">Life Support</div><div class="app-icon-bg">♥</div>
@@ -421,11 +439,23 @@ body {
         </div>
     </div>
 
-    <div id="modal-tuner" class="modal">
-        <div class="modal-header"><span class="modal-title">NOISE TUNER</span><span class="close-btn" onclick="closeModal('modal-tuner')">×</span></div>
-        <div class="modal-content" style="display:flex; flex-direction:column;">
-            <div style="width:100%; display:flex; justify-content:center;"><canvas id="viz-canvas" class="tuner-viz"></canvas></div>
-            <div class="tuner-ctrl"><button class="arch-btn" style="border-color:var(--neon-cyan); color:var(--neon-cyan); width:150px; height:50px;" onclick="toggleNoise()">I/O SWITCH</button></div>
+    <div id="modal-moon" class="modal">
+        <div class="modal-header"><span class="modal-title">LUNAR OBSERVATORY</span><span class="close-btn" onclick="closeModal('modal-moon')">×</span></div>
+        <div class="modal-content">
+            <div class="moon-container">
+                <div class="moon-viz">
+                    <canvas id="moon-canvas" width="200" height="200"></canvas>
+                </div>
+                <div class="moon-info">
+                    <div class="moon-phase-name" id="moon-phase-name">Analyzing...</div>
+                    <div class="moon-data-grid">
+                        <div class="md-item">MOON AGE<span class="md-val" id="md-age">--</span></div>
+                        <div class="md-item">ILLUMINATION<span class="md-val" id="md-illum">--%</span></div>
+                        <div class="md-item">DISTANCE<span class="md-val">384,400km</span></div>
+                        <div class="md-item">CYCLE<span class="md-val">29.53 Days</span></div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -484,8 +514,8 @@ body {
             <div id="security-overlay" style="display:flex;">
                 <div class="overlay-top-left">禁忌ノ書庫</div>
 
-                <div id="sec-title" style="color:var(--forbidden-red); font-size:24px; font-weight:bold; letter-spacing:5px; margin-bottom:20px; text-align:center;">[[ 警告：接近権限・拒絶 ]]</div>
-                <div id="sec-sub" style="color:#fff; font-size:12px; margin-bottom:10px; font-family:'Orbitron';">>> 暗号鍵（コード）ノ提示ヲ求ム</div>
+                <div id="sec-title" style="color:var(--forbidden-red); font-size:24px; font-weight:bold; letter-spacing:5px; margin-bottom:20px; text-align:center;">[[ 警告：接近権限：拒絶 ]]</div>
+                <div id="sec-sub" style="color:#fff; font-size:12px; margin-bottom:10px; font-family:'Orbitron';">>> 暗号コードノ提示ヲ求ム</div>
                 <input type="tel" id="passcode-input" maxlength="4" style="background:transparent; border:2px solid var(--forbidden-red); color:var(--forbidden-red); font-family:'Orbitron'; font-size:32px; width:150px; text-align:center; outline:none; letter-spacing:10px; margin-bottom:20px;">
                 <button id="sec-btn" onclick="handleSecurityInput()" style="background:var(--forbidden-red); color:#000; border:none; padding:10px 40px; font-family:'Orbitron'; font-weight:bold; cursor:pointer; clip-path: polygon(10% 0, 100% 0, 100% 70%, 90% 100%, 0 100%, 0 30%);">UNLOCK</button>
                 
@@ -494,13 +524,13 @@ body {
                 <div id="pass-reveal"></div>
 
                 <div id="hint-modal">
-                    <div class="hint-text">真実ハ<br>視界ノ隅（ミギシタ）ニ<br>潜ム...</div>
+                    <div class="hint-text">真実ハ<br>視界ノ右隅ニ<br>潜ム...</div>
                     <button class="arch-btn" style="font-size:10px;" onclick="closeHintModal()">CLOSE</button>
                 </div>
             </div>
 
             <div id="undo-toast" class="undo-toast">
-                <span>データ消去... 復元シマスワ？</span>
+                <span>データヲ消去... 復元シマスカ？</span>
                 <span class="undo-action" onclick="undoDelete()">UNDO</span>
             </div>
 
@@ -516,6 +546,12 @@ body {
             document.getElementById('sec-text').innerText = String(now.getSeconds()).padStart(2,'0');
             document.getElementById('date-text').innerText = now.toLocaleDateString();
             document.getElementById('day-text').innerText = `[${days[now.getDay()]}]`;
+            
+            // Update Mini Moon Age on Home
+            const age = getMoonAge(now);
+            const el = document.getElementById('idx-moon-age');
+            if(el) el.innerText = age.toFixed(1);
+
             if(Math.random() < 0.20) { 
                 const cw = document.getElementById('clock-wrapper'); cw.classList.add('glitch-active');
                 setTimeout(()=> cw.classList.remove('glitch-active'), 300);
@@ -560,7 +596,7 @@ body {
         }
         function openModal(id) { 
             document.getElementById(id).classList.add('active'); 
-            if(id==='modal-tuner') startVizLoop();
+            if(id==='modal-moon') initMoonView();
             if(id==='modal-archive') { 
                 initArchiveSecurity(); 
                 renderArchiveList();   
@@ -568,7 +604,7 @@ body {
         }
         function closeModal(id) { 
             document.getElementById(id).classList.remove('active'); 
-            if(id==='modal-tuner') stopVizLoop();
+            if(id==='modal-moon') stopMoonAnim();
             if(id==='modal-archive') document.getElementById('passcode-input').value = "";
         }
 
@@ -594,61 +630,111 @@ body {
             setTimeout(()=>document.getElementById('quest-clear-overlay').classList.remove('active'), 1500);
         }
 
-        // === NOISE TUNER ===
-        let audioCtx, noiseNode, vizReq;
-        function toggleNoise(forceStart = false, forceStop = false) {
-            if(!audioCtx) { 
-                const AudioContext = window.AudioContext || window.webkitAudioContext;
-                audioCtx = new AudioContext(); 
-            }
-            if(audioCtx.state === 'suspended') audioCtx.resume();
-
-            if(forceStop) {
-                if(noiseNode) { try{noiseNode.stop();}catch(e){} noiseNode=null; }
-                return;
-            }
-
-            if(noiseNode && !forceStart) { 
-                try{noiseNode.stop();}catch(e){} noiseNode=null;
-                return; 
-            }
-            
-            if(noiseNode) return; 
-
-            const b = audioCtx.createBuffer(1, audioCtx.sampleRate*2, audioCtx.sampleRate);
-            const d = b.getChannelData(0); for(let i=0; i<d.length; i++) d[i]=Math.random()*2-1;
-            noiseNode = audioCtx.createBufferSource(); noiseNode.buffer = b; noiseNode.loop = true;
-            const g = audioCtx.createGain(); g.gain.value = 0.15;
-            noiseNode.connect(g); g.connect(audioCtx.destination); noiseNode.start();
+        // === LUNAR PHASE (NEW) ===
+        let moonReq;
+        function getMoonAge(date) {
+            const base = new Date(2000, 0, 6);
+            const diff = date - base;
+            const days = diff / (1000*60*60*24);
+            return Math.abs(days % 29.53058867);
         }
-        function startVizLoop() {
-            const cvs = document.getElementById('viz-canvas'); const ctx = cvs.getContext('2d');
-            cvs.width = cvs.parentElement.clientWidth; cvs.height = 200;
+        function initMoonView() {
+            const cvs = document.getElementById('moon-canvas');
+            const ctx = cvs.getContext('2d');
+            const now = new Date();
+            const age = getMoonAge(now);
+            const phase = age / 29.53058867; // 0.0 - 1.0
+
+            document.getElementById('md-age').innerText = age.toFixed(2);
+            let pName = "";
+            if(age < 1.8) pName="New Moon (新月)";
+            else if(age < 5.5) pName="Waxing Crescent (三日月)";
+            else if(age < 9.2) pName="First Quarter (上弦)";
+            else if(age < 12.9) pName="Waxing Gibbous (十三夜)";
+            else if(age < 16.6) pName="Full Moon (満月)";
+            else if(age < 20.3) pName="Waning Gibbous (寝待月)";
+            else if(age < 24.0) pName="Last Quarter (下弦)";
+            else pName="Waning Crescent (有明月)";
+            
+            document.getElementById('moon-phase-name').innerText = pName;
+            
+            // Illumination approx
+            const illum = (1 - Math.cos(phase * 2 * Math.PI)) / 2 * 100;
+            document.getElementById('md-illum').innerText = illum.toFixed(1) + "%";
+
+            // Anim Loop
+            let starOff = 0;
             function draw() {
-                vizReq = requestAnimationFrame(draw); ctx.fillStyle="#000"; ctx.fillRect(0,0,cvs.width,cvs.height);
-                ctx.strokeStyle = noiseNode ? "#00ff00" : "#003300"; ctx.lineWidth=2; ctx.beginPath();
-                for(let i=0; i<cvs.width; i+=5) {
-                    const y = cvs.height/2 + (noiseNode ? (Math.random()-0.5)*30 : 0);
-                    if(i===0) ctx.moveTo(i,y); else ctx.lineTo(i,y);
+                moonReq = requestAnimationFrame(draw);
+                ctx.clearRect(0,0,200,200);
+                
+                // Stars
+                ctx.fillStyle = "#fff";
+                starOff += 0.2;
+                for(let i=0; i<30; i++) {
+                    const x = (Math.sin(i*13 + starOff*0.05) * 100 + 100) % 200;
+                    const y = (Math.cos(i*29 + starOff*0.02) * 100 + 100) % 200;
+                    const s = Math.random() * 1.5;
+                    ctx.globalAlpha = Math.random() * 0.8;
+                    ctx.fillRect(x,y,s,s);
                 }
-                ctx.stroke();
+                ctx.globalAlpha = 1.0;
+
+                // Moon Base
+                const cx = 100, cy = 100, r = 80;
+                ctx.beginPath(); arc(ctx, cx, cy, r);
+                ctx.fillStyle = "#111"; ctx.fill(); 
+
+                // Moon Lit part
+                ctx.save();
+                ctx.beginPath(); arc(ctx, cx, cy, r);
+                ctx.fillStyle = "#eef2f5";
+                ctx.shadowBlur = 20; ctx.shadowColor = "#eef2f5";
+                ctx.fill();
+                ctx.restore();
+
+                // Shadow logic
+                ctx.fillStyle = "rgba(10,14,20,0.95)";
+                let p = phase; 
+                if(p <= 0.5) {
+                    const w = r * Math.cos(p * 2 * Math.PI); 
+                    ctx.beginPath();
+                    if(p < 0.25) {
+                        ctx.arc(cx, cy, r, -Math.PI/2, Math.PI/2, true); 
+                        ctx.ellipse(cx, cy, Math.abs(w), r, 0, Math.PI/2, -Math.PI/2, true);
+                    } else {
+                        ctx.arc(cx, cy, r, -Math.PI/2, Math.PI/2, true); 
+                        ctx.ellipse(cx, cy, Math.abs(w), r, 0, -Math.PI/2, Math.PI/2, false); 
+                    }
+                    ctx.fill();
+                } else {
+                    const w = r * Math.cos(p * 2 * Math.PI);
+                    ctx.beginPath();
+                    if(p < 0.75) {
+                        ctx.arc(cx, cy, r, -Math.PI/2, Math.PI/2, false); 
+                        ctx.ellipse(cx, cy, Math.abs(w), r, 0, Math.PI/2, -Math.PI/2, false); 
+                    } else {
+                        ctx.arc(cx, cy, r, -Math.PI/2, Math.PI/2, false); 
+                        ctx.ellipse(cx, cy, Math.abs(w), r, 0, -Math.PI/2, Math.PI/2, true);
+                    }
+                    ctx.fill();
+                }
             }
             draw();
         }
-        function stopVizLoop() { cancelAnimationFrame(vizReq); }
+        function arc(ctx,x,y,r){ctx.arc(x,y,r,0,Math.PI*2);}
+        function stopMoonAnim() { cancelAnimationFrame(moonReq); }
+
 
         // === VITAL KEEPER ===
         let vitalInt, vitalTime=25*60;
         function startVital(){ 
             if(!vitalInt) {
-                const useNoise = document.getElementById('vital-noise-toggle').checked;
-                if(useNoise) toggleNoise(true);
                 vitalInt=setInterval(()=>{ vitalTime--; updateVital(); if(vitalTime<=0)resetVital(); },1000); 
             }
         }
         function pauseVital(){ 
             clearInterval(vitalInt); vitalInt=null; 
-            toggleNoise(false, true); 
         }
         function resetVital(){ 
             pauseVital(); vitalTime=25*60; updateVital(); 
@@ -661,7 +747,6 @@ body {
         let currentEditId = null;
         let isSetupMode = false;
         
-        // Undo Variables
         let lastDeletedItem = null;
         let undoTimeout = null;
 
@@ -952,6 +1037,3 @@ body {
     </script>
 </body>
 </html>
-
-
-
