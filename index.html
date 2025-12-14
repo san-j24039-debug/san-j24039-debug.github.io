@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>AETHER CHRONICLE v4.0</title>
+<title>AETHER CHRONICLE v4.1</title>
 
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -23,6 +23,8 @@
     --safe-green: #33ff33;
     --silver-metal: #e0e5eb;
     --border: rgba(255, 255, 255, 0.15);
+    /* 修正: 枠線を少し明るく太くするための変数 */
+    --border-strong: rgba(255, 255, 255, 0.35);
 }
 
 body {
@@ -118,17 +120,38 @@ body {
 @keyframes spin { to { transform: rotate(360deg); } }
 
 .glitch-wrapper { position: relative; z-index: 10; text-align: center; }
+
+/* 修正: 時間表示の固定化（左右ブレ防止） */
 .time-display {
     display: flex; align-items: center; justify-content: center;
     font-family: 'Orbitron', monospace; color: #fff;
-    text-shadow: 0 0 15px var(--neon-cyan); gap: 5px;
+    text-shadow: 0 0 15px var(--neon-cyan);
     font-size: 52px; font-weight: 900; letter-spacing: 2px;
-    font-variant-numeric: tabular-nums;
-    font-feature-settings: "tnum";
     width: 320px;
-    text-align: center;
+    /* 子要素で幅を固定するため、ここはflexコンテナとして機能させる */
 }
-.time-colon { animation: blink 1s infinite; margin-bottom: 5px; }
+
+/* 時間（時:分）を右寄せ固定幅に */
+#h-min {
+    width: 170px;
+    text-align: right;
+    display: inline-block;
+}
+/* コロンを中央固定幅に */
+.time-colon { 
+    width: 20px; 
+    text-align: center; 
+    display: inline-block;
+    animation: blink 1s infinite;
+    margin-bottom: 5px;
+}
+/* 秒を左寄せ固定幅に */
+#sec-text {
+    width: 80px;
+    text-align: left;
+    display: inline-block;
+}
+
 @keyframes blink { 50% { opacity: 0; } }
 
 /* Glitch Animation */
@@ -163,17 +186,20 @@ body {
 .w-icon { font-size: 24px; }
 
 .app-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; }
+
+/* 修正: 枠線を太く(2px)、色を明るく */
 .app-card {
     height: 90px; background: rgba(255,255,255,0.03);
-    border: 1px solid var(--border); border-radius: 8px;
+    border: 2px solid var(--border-strong); border-radius: 8px;
     padding: 10px; position: relative; overflow: hidden;
     cursor: pointer; transition: 0.2s;
     display: flex; flex-direction: column; justify-content: space-between;
 }
+.app-card:hover { border-color: var(--neon-cyan); box-shadow: 0 0 10px rgba(0, 243, 255, 0.2); }
 .app-card:active { transform: scale(0.98); }
 .app-title { font-size: 10px; color: var(--neon-cyan); letter-spacing: 1px; }
 .app-icon-bg { position: absolute; right: 5px; bottom: 5px; font-size: 36px; opacity: 0.15; color: #fff; }
-.card-forbidden { border-color: rgba(255, 51, 51, 0.3); }
+.card-forbidden { border-color: rgba(255, 51, 51, 0.5); }
 .card-forbidden .app-title { color: var(--forbidden-red); }
 
 /* === MODAL SYSTEM === */
@@ -359,7 +385,9 @@ body {
             document.getElementById('sec-text').innerText = String(now.getSeconds()).padStart(2,'0');
             document.getElementById('date-text').innerText = now.toLocaleDateString();
             document.getElementById('day-text').innerText = `[${days[now.getDay()]}]`;
-            if(Math.random() < 0.03) { 
+            
+            // 修正: ノイズ頻度を増加 (0.03 -> 0.20)
+            if(Math.random() < 0.20) { 
                 const cw = document.getElementById('clock-wrapper'); cw.classList.add('glitch-active');
                 setTimeout(()=> cw.classList.remove('glitch-active'), 300);
             }
