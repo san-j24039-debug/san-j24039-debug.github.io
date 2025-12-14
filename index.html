@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>AETHER CHRONICLE v5.4 (Restore Fix)</title>
+<title>AETHER CHRONICLE v5.5 (List Lock)</title>
 
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -232,7 +232,7 @@ body {
 }
 .archive-editor { flex: 1; background: rgba(20, 0, 0, 0.3); border: 1px solid var(--forbidden-red); padding: 15px; color: #ccaaaa; font-family: 'Zen Old Mincho', serif; font-size: 14px; line-height: 1.8; outline: none; resize: none; width: 100%; box-sizing: border-box; }
 
-.lock-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 0 20px; margin-top: 10px; }
+.lock-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; margin-top: 10px; background:rgba(255,255,255,0.05); padding:10px; border:1px solid #444; }
 .lock-status { font-size: 10px; font-family: 'Orbitron'; letter-spacing: 1px; }
 .status-locked { color: var(--forbidden-red); text-shadow: 0 0 5px var(--forbidden-red); }
 .status-open { color: var(--safe-green); text-shadow: 0 0 5px var(--safe-green); }
@@ -355,17 +355,17 @@ body {
     <div id="modal-archive" class="modal">
         <div class="modal-header"><span class="modal-title">FORBIDDEN ARCHIVE</span><span class="close-btn" onclick="closeModal('modal-archive')">×</span></div>
         
-        <div class="lock-controls">
-            <div id="lock-indicator" class="lock-status status-open">STATUS: UNLOCKED</div>
-            <div style="display:flex; gap:5px;">
-                <button class="arch-btn btn-lock" onclick="setLock()">🔒 LOCK</button>
-                <button class="arch-btn btn-unlock" onclick="removeLock()">🔓 UNLOCK</button>
-            </div>
-        </div>
-
         <div class="modal-content" style="position:relative; padding:0; height:100%; display:flex; flex-direction:column;">
             
             <div id="archive-list-view" style="padding:20px;">
+                <div class="lock-controls">
+                    <div id="lock-indicator" class="lock-status status-open">STATUS: UNLOCKED</div>
+                    <div style="display:flex; gap:5px;">
+                        <button class="arch-btn btn-lock" onclick="setLock()">🔒 LOCK</button>
+                        <button class="arch-btn btn-unlock" onclick="removeLock()">🔓 UNLOCK</button>
+                    </div>
+                </div>
+
                 <button class="arch-btn btn-new" onclick="createNewMemo()">+ INITIATE NEW FILE</button>
                 <div id="archive-list-container"></div>
             </div>
@@ -601,6 +601,7 @@ body {
             }
             localStorage.setItem('chronex_archives', JSON.stringify(archives));
             alert("DATA SAVED.");
+            closeEditor(); // Return to list after save
         }
 
         function deleteCurrentMemo() {
@@ -674,10 +675,8 @@ body {
         }
 
         function runDecryptAnim(realText) {
-            // Safety: if realText is null or undefined (e.g. new file), treat as empty
             if(realText === null || realText === undefined) realText = "";
-            
-            const len = realText.length || 50; // default length for empty new files
+            const len = realText.length || 50; 
             let step = 0; const stepsTotal = 30;
             archiveEditor.readOnly = true;
             
@@ -690,7 +689,7 @@ body {
                 archiveEditor.value = display;
                 if(step >= stepsTotal) { 
                     clearInterval(timer); 
-                    archiveEditor.value = realText; // Force exact final value
+                    archiveEditor.value = realText; 
                     toggleEditorButtons(true); 
                 }
             }, 30);
@@ -716,23 +715,19 @@ body {
             if(passIn.value === localStorage.getItem('chronex_passcode')) {
                 overlay.style.display = 'none';
                 
-                // === FIX CORE RESTORE LOGIC ===
                 if(editorView.style.display === 'flex') {
-                    // 既存ファイルを開いていた場合
                     if(currentEditId) {
                         const item = archives.find(a => a.id === currentEditId);
                         if(item) {
-                            runDecryptAnim(item.content); // メモリから正しいデータを復元
+                            runDecryptAnim(item.content); 
                         } else {
-                            runDecryptAnim(""); // データが見つからない場合の安全策
+                            runDecryptAnim(""); 
                         }
                     } else {
-                        // 新規作成中だった場合 (IDなし) -> 空にして編集許可
                         toggleEditorButtons(true);
                         archiveEditor.value = "";
                     }
                 }
-                // === END FIX ===
 
             } else {
                 passIn.style.borderColor = "#fff"; setTimeout(()=>passIn.style.borderColor="var(--forbidden-red)", 200);
@@ -747,7 +742,6 @@ body {
                 localStorage.removeItem('chronex_passcode');
                 updateLockStatusUI();
                 
-                // === FIX CORE RESTORE LOGIC ===
                 if(editorView.style.display === 'flex') {
                      if(currentEditId) {
                         const item = archives.find(a => a.id === currentEditId);
@@ -761,7 +755,6 @@ body {
                         archiveEditor.value = "";
                     }
                 }
-                // === END FIX ===
 
                 alert("SYSTEM UNLOCKED.");
             } else if(p!==null) alert("WRONG PASSCODE.");
