@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>AETHER CHRONICLE</title>
+<title>AETHER CHRONICLE v2.1</title>
 
 <link rel="manifest" href="manifest.json" />
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -21,6 +21,7 @@
     --neon-purple: #bc13fe;
     --neon-gold: #ffcc00;
     --forbidden-red: #ff3333;
+    --safe-green: #33ff33;
     --silver-metal: #e0e5eb;
     --border: rgba(255, 255, 255, 0.15);
 }
@@ -65,18 +66,38 @@ body {
     background: rgba(255, 204, 0, 0.1); transform: rotate(-5deg);
 }
 
-/* === BACKGROUND LAYERS (Weather) === */
-.bg-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; opacity: 0; transition: opacity 1s; }
+/* === BACKGROUND LAYERS (Weather Enhanced) === */
+.bg-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; opacity: 0; transition: opacity 1.5s; pointer-events: none; }
 .bg-layer.active { opacity: 1; }
 
-/* Sunny: Steampunk Gold */
-#bg-sunny { background: radial-gradient(circle at top, #332200 0%, #000 90%); }
-#bg-sunny::after { content:""; position:absolute; width:100%; height:100%; background: radial-gradient(circle, rgba(255,170,0,0.1) 10%, transparent 50%); animation: pulseLight 5s infinite alternate; }
-@keyframes pulseLight { 0%{opacity:0.5;} 100%{opacity:1;} }
+/* Sunny: Steampunk Gold (TOKUMORI) */
+#bg-sunny { background: radial-gradient(circle at center, #553300 0%, #000 80%); }
+#bg-sunny::before {
+    content: ""; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+    background: conic-gradient(from 0deg, transparent 0deg, rgba(255, 200, 0, 0.1) 20deg, transparent 40deg, rgba(255, 200, 0, 0.1) 60deg, transparent 80deg, rgba(255, 200, 0, 0.1) 100deg, transparent 120deg, rgba(255, 200, 0, 0.1) 140deg, transparent 160deg);
+    animation: sunRotate 60s linear infinite;
+}
+#bg-sunny::after {
+    content: ""; position: absolute; width: 100%; height: 100%;
+    background: radial-gradient(circle at 50% 30%, rgba(255, 220, 100, 0.2) 0%, transparent 60%);
+    animation: sunPulse 4s ease-in-out infinite alternate;
+}
+@keyframes sunRotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes sunPulse { 0% { opacity: 0.5; transform: scale(1); } 100% { opacity: 1; transform: scale(1.1); } }
 
-/* Cloudy: Cyber Mist */
-#bg-cloudy { background: radial-gradient(circle, #1a2a33 0%, #000 90%); }
-#bg-cloudy::before { content:""; position:absolute; width:100%; height:100%; background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 243, 255, 0.03) 3px); }
+/* Cloudy: Deep Fog (Enhanced) */
+#bg-cloudy { background: #0a1116; }
+#bg-cloudy::before {
+    content: ""; position: absolute; top: 0; left: 0; width: 200%; height: 100%;
+    background: repeating-linear-gradient(90deg, transparent 0%, rgba(0, 243, 255, 0.05) 20%, transparent 40%);
+    background-size: 50% 100%;
+    animation: fogFlow 20s linear infinite;
+}
+#bg-cloudy::after {
+    content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background: radial-gradient(circle at bottom, rgba(200, 200, 210, 0.15) 0%, transparent 70%);
+}
+@keyframes fogFlow { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 
 /* Rain: Cold Rain */
 #bg-rain { background: linear-gradient(to bottom, #050510, #000); }
@@ -114,14 +135,13 @@ body {
 .c-ring-2 { width: 85%; height: 85%; border-left-color: var(--neon-cyan); border-right-color: var(--neon-cyan); animation: spin 10s linear infinite reverse; box-shadow: 0 0 10px rgba(0,243,255,0.2); }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* Time Display - FIXED FOR JITTER */
+/* Time Display */
 .glitch-wrapper { position: relative; z-index: 10; text-align: center; }
 .time-display {
     display: flex; align-items: center; justify-content: center;
     font-family: 'Orbitron', monospace; color: #fff;
     text-shadow: 0 0 15px var(--neon-cyan); gap: 5px;
     font-size: 52px; font-weight: 900; letter-spacing: 2px;
-    /* ↓数字の幅を固定して揺れ防止 */
     font-variant-numeric: tabular-nums;
     font-feature-settings: "tnum";
     width: 320px;
@@ -130,7 +150,7 @@ body {
 .time-colon { animation: blink 1s infinite; margin-bottom: 5px; }
 @keyframes blink { 50% { opacity: 0; } }
 
-/* GLITCH EFFECT (ZAZA!!) */
+/* GLITCH EFFECT */
 .glitch-active .time-display {
     animation: glitch-skew 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both infinite;
     color: var(--neon-pink);
@@ -241,10 +261,21 @@ body {
 @keyframes archiveFlash { 0% { background: #500; } 100% { background: #000; } }
 #modal-archive { background: #000; }
 #modal-archive .modal-title { color: var(--forbidden-red); text-shadow: 0 0 10px var(--forbidden-red); }
-/* 禁書庫のレイアウト変更 */
+
 .archive-editor { flex: 1; background: rgba(20, 0, 0, 0.3); border: 1px solid var(--forbidden-red); padding: 15px; color: #ccaaaa; font-family: 'Zen Old Mincho', serif; font-size: 14px; line-height: 1.8; outline: none; resize: none; width: 100%; box-sizing: border-box; }
-.arch-btn { background: transparent; border: 1px solid var(--forbidden-red); color: var(--forbidden-red); padding: 8px 12px; font-family: 'Orbitron'; font-size: 10px; cursor: pointer; margin: 0 2px; }
-.arch-btn:hover { background: var(--forbidden-red); color: #000; }
+
+/* Lock Buttons & Status */
+.lock-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.lock-status { font-size: 10px; font-family: 'Orbitron'; letter-spacing: 1px; }
+.status-locked { color: var(--forbidden-red); text-shadow: 0 0 5px var(--forbidden-red); }
+.status-open { color: var(--safe-green); text-shadow: 0 0 5px var(--safe-green); }
+
+.arch-btn { background: transparent; border: 1px solid #555; color: #aaa; padding: 6px 10px; font-family: 'Orbitron'; font-size: 10px; cursor: pointer; transition: 0.2s; }
+.arch-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+.btn-lock { border-color: var(--forbidden-red); color: var(--forbidden-red); }
+.btn-lock:hover { background: var(--forbidden-red); color: #000; }
+.btn-unlock { border-color: var(--safe-green); color: var(--safe-green); }
+.btn-unlock:hover { background: var(--safe-green); color: #000; }
 
 .footer-info { font-size: 10px; color: #555; text-align: center; width: 100%; padding-bottom: 5px; margin-top: 10px; }
 </style>
@@ -390,19 +421,27 @@ body {
         <div class="modal-content" style="position:relative; padding:0; height:100%; display:flex; flex-direction:column;">
             
             <div style="padding:20px; flex:1; display:flex; flex-direction:column;">
-                <div style="display:flex; margin-bottom:10px; gap:5px;">
-                    <button class="arch-btn" onclick="enableLock()">🔒 LOCK SET</button>
-                    <button class="arch-btn" onclick="clearArchive()">🗑 BURN</button>
+                <div class="lock-controls">
+                    <div id="lock-indicator" class="lock-status status-open">STATUS: UNLOCKED</div>
+                    <div style="display:flex; gap:5px;">
+                        <button class="arch-btn btn-lock" onclick="setLock()">🔒 LOCK</button>
+                        <button class="arch-btn btn-unlock" onclick="removeLock()">🔓 UNLOCK</button>
+                    </div>
                 </div>
+
                 <textarea id="archive-area" class="archive-editor" placeholder=">> 記録ハ ココデ 途絶エテイル..."></textarea>
+                
+                <div style="display:flex; justify-content:flex-end; margin-top:5px;">
+                     <button class="arch-btn" onclick="clearArchive()">🗑 BURN</button>
+                </div>
                 <div style="font-size:10px; color:#522; margin-top:5px; text-align:right;">SYSTEM: RED_PROTOCOL_ACTIVE</div>
             </div>
 
-            <div id="security-overlay" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:10; flex-direction:column; justify-content:center; align-items:center; backdrop-filter:blur(5px);">
-                <div style="color:var(--forbidden-red); font-size:24px; font-weight:bold; letter-spacing:5px; margin-bottom:20px; text-shadow:0 0 10px var(--forbidden-red);">RESTRICTED</div>
+            <div id="security-overlay" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.98); z-index:10; flex-direction:column; justify-content:center; align-items:center; backdrop-filter:blur(5px);">
+                <div style="color:var(--forbidden-red); font-size:24px; font-weight:bold; letter-spacing:5px; margin-bottom:20px; text-shadow:0 0 10px var(--forbidden-red);">ACCESS DENIED</div>
                 <div style="color:#fff; font-size:12px; margin-bottom:10px;">ENTER PASSCODE</div>
                 <input type="tel" id="passcode-input" maxlength="4" style="background:transparent; border:2px solid var(--forbidden-red); color:var(--forbidden-red); font-family:'Orbitron'; font-size:32px; width:120px; text-align:center; outline:none; letter-spacing:10px;">
-                <button onclick="unlockArchive()" style="margin-top:20px; background:var(--forbidden-red); color:#000; border:none; padding:10px 30px; font-family:'Orbitron'; font-weight:bold; cursor:pointer;">UNLOCK</button>
+                <button onclick="unlockOverlay()" style="margin-top:20px; background:var(--forbidden-red); color:#000; border:none; padding:10px 30px; font-family:'Orbitron'; font-weight:bold; cursor:pointer;">UNLOCK</button>
             </div>
         </div>
     </div>
@@ -421,14 +460,10 @@ body {
             document.getElementById('date-text').innerText = now.toLocaleDateString();
             document.getElementById('day-text').innerText = `[${days[now.getDay()]}]`;
 
-            // Random Glitch
             if(Math.random() < 0.03) { 
                 const cw = document.getElementById('clock-wrapper');
                 cw.classList.add('glitch-active');
-                
-                // Add data-time for glitch pseudo-element
                 document.getElementById('time-container').setAttribute('data-time', `${h}:${m}:${s}`);
-                
                 setTimeout(()=> cw.classList.remove('glitch-active'), 300);
             }
         }
@@ -437,7 +472,7 @@ body {
         // === WEATHER & BG ===
         async function fetchWeather() {
             try {
-                // 静岡市
+                // Shizuoka Coordinates
                 const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=34.9756&longitude=138.3828&current_weather=true');
                 const data = await res.json();
                 const temp = data.current_weather.temperature;
@@ -495,10 +530,9 @@ body {
         function openModal(id) { 
             document.getElementById(id).classList.add('active'); 
             if(id==='modal-tuner') startVizLoop();
-            
-            // ★禁書庫を開くときのロックチェック
             if(id==='modal-archive') {
-                checkArchiveLock();
+                updateLockStatusUI();
+                checkOverlayRequirement();
             }
         }
         function closeModal(id) { 
@@ -552,7 +586,7 @@ body {
         }
         function saveQuests() { localStorage.setItem('quests_v3', JSON.stringify(quests)); }
 
-        // === NOISE TUNER (Active Viz) ===
+        // === NOISE TUNER ===
         let audioCtx, noiseNode, gainNode, analyser, vizReq;
         let isPlaying = false;
 
@@ -640,10 +674,11 @@ body {
             elTimer.innerText = `${m}:${s}`;
         }
 
-        // === ARCHIVE & LOCK SYSTEM ===
+        // === ARCHIVE & SECURITY SYSTEM (REVISED) ===
         const archiveArea = document.getElementById('archive-area');
         const securityOverlay = document.getElementById('security-overlay');
         const passInput = document.getElementById('passcode-input');
+        const lockStatusText = document.getElementById('lock-indicator');
 
         // Load Memo
         let savedMemo = localStorage.getItem('chronex_memo_v2');
@@ -654,8 +689,20 @@ body {
             localStorage.setItem('chronex_memo_v2', archiveArea.value);
         });
 
-        // Check Lock on Open
-        function checkArchiveLock() {
+        // Update Status Text (Green/Red)
+        function updateLockStatusUI() {
+            const isLocked = localStorage.getItem('chronex_passcode');
+            if(isLocked) {
+                lockStatusText.innerText = "STATUS: LOCKED [SECURE]";
+                lockStatusText.className = "lock-status status-locked";
+            } else {
+                lockStatusText.innerText = "STATUS: UNLOCKED [OPEN]";
+                lockStatusText.className = "lock-status status-open";
+            }
+        }
+
+        // Open Modal Check: Show overlay if locked
+        function checkOverlayRequirement() {
             const savedPass = localStorage.getItem('chronex_passcode');
             if(savedPass) {
                 securityOverlay.style.display = 'flex';
@@ -666,24 +713,8 @@ body {
             }
         }
 
-        // Enable Lock
-        function enableLock() {
-            if(localStorage.getItem('chronex_passcode')) {
-                alert("SECURITY ALREADY ACTIVE.");
-                return;
-            }
-            const newPass = prompt("【SECURITY SETTING】\n4桁の数字を入力してください:");
-            if(newPass && newPass.length === 4 && !isNaN(newPass)) {
-                localStorage.setItem('chronex_passcode', newPass);
-                alert("LOCK SEQUENCE INITIATED.");
-                checkArchiveLock();
-            } else {
-                alert("ERROR: INVALID FORMAT.");
-            }
-        }
-
-        // Unlock
-        function unlockArchive() {
+        // Overlay Unlock (Session Access)
+        function unlockOverlay() {
             const input = passInput.value;
             const stored = localStorage.getItem('chronex_passcode');
             if(input === stored) {
@@ -694,14 +725,43 @@ body {
             }
         }
 
-        // Delete All
+        // Action: Set Lock (Button)
+        function setLock() {
+            if(localStorage.getItem('chronex_passcode')) {
+                alert("ALREADY LOCKED.");
+                return;
+            }
+            const newPass = prompt("【LOCK SETUP】\n設定する4桁の数字を入力してください:");
+            if(newPass && newPass.length === 4 && !isNaN(newPass)) {
+                localStorage.setItem('chronex_passcode', newPass);
+                alert("LOCK ENABLED.");
+                updateLockStatusUI();
+            } else if(newPass !== null) {
+                alert("ERROR: INVALID FORMAT (4 DIGITS REQUIRED).");
+            }
+        }
+
+        // Action: Remove Lock (Button)
+        function removeLock() {
+            const stored = localStorage.getItem('chronex_passcode');
+            if(!stored) {
+                alert("ALREADY UNLOCKED.");
+                return;
+            }
+            const input = prompt("【SECURITY CLEARANCE】\n解除のため現在のパスワードを入力してください:");
+            if(input === stored) {
+                localStorage.removeItem('chronex_passcode');
+                alert("LOCK DISABLED.");
+                updateLockStatusUI();
+            } else if (input !== null) {
+                alert("ACCESS DENIED: WRONG PASSCODE.");
+            }
+        }
+
         function clearArchive() {
-            if(confirm("WARNING: ALL DATA WILL BE LOST.\n(メモとロック設定を破棄しますか？)")) {
+            if(confirm("WARNING: BURN ALL DATA?\n(メモを完全に消去します)")) {
                 archiveArea.value = "";
                 localStorage.removeItem('chronex_memo_v2');
-                localStorage.removeItem('chronex_passcode');
-                securityOverlay.style.display = 'none';
-                alert("DATA PURGED.");
             }
         }
     </script>
