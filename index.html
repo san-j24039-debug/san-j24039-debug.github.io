@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>AETHER CHRONICLE v5.0</title>
+<title>AETHER CHRONICLE v5.1</title>
 
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -203,6 +203,14 @@ body {
 .vital-ring { position: absolute; width: 100%; height: 100%; border-radius: 50%; border-top: 4px solid var(--neon-pink); border-right: 4px solid transparent; animation: spin 2s linear infinite; }
 #vital-timer { font-size: 48px; font-weight: bold; color: #fff; text-shadow: 0 0 10px var(--neon-pink); z-index: 10; font-family: 'Orbitron'; }
 
+/* NOISE TOGGLE (New) */
+.switch-box { display: flex; align-items: center; gap: 10px; margin-top: 15px; background: rgba(255,255,255,0.05); padding: 5px 15px; border-radius: 20px; border: 1px solid #333; }
+.switch-label { font-size: 10px; font-family: 'Orbitron'; color: #aaa; }
+.toggle-chk { appearance: none; width: 30px; height: 15px; background: #333; border-radius: 15px; position: relative; outline: none; cursor: pointer; transition: 0.3s; }
+.toggle-chk::after { content: ""; position: absolute; top: 2px; left: 2px; width: 11px; height: 11px; background: #888; border-radius: 50%; transition: 0.3s; }
+.toggle-chk:checked { background: var(--neon-cyan); box-shadow: 0 0 10px var(--neon-cyan); }
+.toggle-chk:checked::after { transform: translateX(15px); background: #000; }
+
 /* ARCHIVE (Expanded) */
 #modal-archive.active { animation: archiveFlash 0.3s; }
 @keyframes archiveFlash { 0% { background: #500; } 100% { background: #000; } }
@@ -238,6 +246,9 @@ body {
 .btn-unlock:hover { background: var(--safe-green); color: #000; }
 .btn-new { border-color: var(--neon-cyan); color: var(--neon-cyan); width: 100%; margin-bottom: 10px; padding: 10px; font-weight: bold; }
 .btn-new:hover { background: rgba(0,243,255,0.1); color: #fff; }
+
+/* Disabled state */
+.btn-disabled { opacity: 0.3; cursor: not-allowed; border-color: #333 !important; color: #333 !important; pointer-events: none; }
 </style>
 </head>
 <body>
@@ -335,7 +346,10 @@ body {
                 <button class="arch-btn" style="border-color:#fff; color:#fff;" onclick="pauseVital()">STOP</button>
                 <button class="arch-btn" onclick="resetVital()">RESET</button>
             </div>
-            <div style="margin-top:10px; font-size:10px; color:#666;">AUTO-NOISE: ON</div>
+            <div class="switch-box">
+                <input type="checkbox" id="vital-noise-toggle" class="toggle-chk" checked>
+                <span class="switch-label">NOISE LINK</span>
+            </div>
         </div>
     </div>
 
@@ -363,13 +377,13 @@ body {
                 <div style="display:flex; justify-content:space-between; margin-top:10px;">
                     <button class="arch-btn" onclick="closeEditor()">← BACK</button>
                     <div style="display:flex; gap:10px;">
-                        <button class="arch-btn" style="color:var(--forbidden-red); border-color:var(--forbidden-red);" onclick="deleteCurrentMemo()">DELETE</button>
-                        <button class="arch-btn" style="color:var(--neon-cyan); border-color:var(--neon-cyan);" onclick="saveCurrentMemo()">SAVE DATA</button>
+                        <button id="btn-delete" class="arch-btn" style="color:var(--forbidden-red); border-color:var(--forbidden-red);" onclick="deleteCurrentMemo()">DELETE</button>
+                        <button id="btn-save" class="arch-btn" style="color:var(--neon-cyan); border-color:var(--neon-cyan);" onclick="saveCurrentMemo()">SAVE DATA</button>
                     </div>
                 </div>
             </div>
 
-            <div id="security-overlay" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.98); z-index:10; flex-direction:column; justify-content:center; align-items:center; backdrop-filter:blur(5px);">
+            <div id="security-overlay" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.98); z-index:20; flex-direction:column; justify-content:center; align-items:center; backdrop-filter:blur(5px);">
                 <div style="color:var(--forbidden-red); font-size:24px; font-weight:bold; letter-spacing:5px; margin-bottom:20px;">ACCESS DENIED</div>
                 <div style="color:#fff; font-size:12px; margin-bottom:10px;">ENTER PASSCODE</div>
                 <input type="tel" id="passcode-input" maxlength="4" style="background:transparent; border:2px solid var(--forbidden-red); color:var(--forbidden-red); font-family:'Orbitron'; font-size:32px; width:120px; text-align:center; outline:none; letter-spacing:10px;">
@@ -439,7 +453,7 @@ body {
             if(id==='modal-tuner') stopVizLoop();
         }
 
-        // === QUEST BOARD (No Credits) ===
+        // === QUEST BOARD ===
         let quests = JSON.parse(localStorage.getItem('quests_v3')) || [];
         renderQuests();
         function addQuest() {
@@ -461,7 +475,7 @@ body {
             setTimeout(()=>document.getElementById('quest-clear-overlay').classList.remove('active'), 1500);
         }
 
-        // === NOISE TUNER (Enhanced) ===
+        // === NOISE TUNER ===
         let audioCtx, noiseNode, vizReq;
         function toggleNoise(forceStart = false, forceStop = false) {
             if(!audioCtx) { 
@@ -504,11 +518,14 @@ body {
         }
         function stopVizLoop() { cancelAnimationFrame(vizReq); }
 
-        // === VITAL KEEPER (Linked to Noise) ===
+        // === VITAL KEEPER (Fixed Noise Toggle) ===
         let vitalInt, vitalTime=25*60;
         function startVital(){ 
             if(!vitalInt) {
-                toggleNoise(true); // Force Start Noise
+                // Check if switch is ON
+                const useNoise = document.getElementById('vital-noise-toggle').checked;
+                if(useNoise) toggleNoise(true);
+                
                 vitalInt=setInterval(()=>{ vitalTime--; updateVital(); if(vitalTime<=0)resetVital(); },1000); 
             }
         }
@@ -521,7 +538,7 @@ body {
         }
         function updateVital(){ document.getElementById('vital-timer').innerText = `${Math.floor(vitalTime/60).toString().padStart(2,'0')}:${(vitalTime%60).toString().padStart(2,'0')}`; }
 
-        // === ARCHIVE SYSTEM (List & Save) ===
+        // === ARCHIVE SYSTEM (Bug Fixes) ===
         let archives = JSON.parse(localStorage.getItem('chronex_archives')) || [];
         let currentEditId = null;
         const archiveEditor = document.getElementById('archive-editor-area');
@@ -531,6 +548,8 @@ body {
         const overlay = document.getElementById('security-overlay');
         const passIn = document.getElementById('passcode-input');
         const glChars = "ﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ0123456789XKZW@#&";
+        const btnSave = document.getElementById('btn-save');
+        const btnDel = document.getElementById('btn-delete');
 
         // Migration for old single memo
         const oldMemo = localStorage.getItem('chronex_memo_v2');
@@ -557,6 +576,7 @@ body {
             titleInput.value = "";
             archiveEditor.value = "";
             switchView('editor');
+            toggleEditorButtons(true);
         }
 
         function openEditor(id) {
@@ -564,18 +584,23 @@ body {
             if(item) {
                 currentEditId = id;
                 titleInput.value = item.title;
-                // If unlocked, run decrypt anim on load
-                if(!localStorage.getItem('chronex_passcode')) {
-                    runDecryptAnim(item.content); 
-                } else {
-                    // This case shouldn't be reached if overlay works, but safety fallback
-                    archiveEditor.value = item.content;
-                }
+                archiveEditor.value = item.content; // Load Clean Data
                 switchView('editor');
+                
+                // If system is currently locked, we play encrypt effect immediately and disable saving
+                if(localStorage.getItem('chronex_passcode')) {
+                    toggleEditorButtons(false);
+                    runEncryptAnim(null); 
+                } else {
+                    toggleEditorButtons(true);
+                }
             }
         }
 
         function saveCurrentMemo() {
+            // Safety: Do not save if locked (content is garbage)
+            if(localStorage.getItem('chronex_passcode')) return;
+
             const title = titleInput.value || "UNTITLED_FILE";
             const content = archiveEditor.value;
             const date = new Date().toLocaleDateString();
@@ -584,14 +609,16 @@ body {
                 const idx = archives.findIndex(a => a.id === currentEditId);
                 if(idx !== -1) { archives[idx] = { id: currentEditId, title, content, date }; }
             } else {
-                archives.push({ id: Date.now(), title, content, date });
+                const newId = Date.now();
+                archives.push({ id: newId, title, content, date });
+                currentEditId = newId; // Update ID so next save overwrites
             }
             localStorage.setItem('chronex_archives', JSON.stringify(archives));
             alert("DATA SAVED.");
-            closeEditor();
         }
 
         function deleteCurrentMemo() {
+            if(localStorage.getItem('chronex_passcode')) return; // Safety
             if(currentEditId && confirm("PERMANENTLY DELETE?")) {
                 archives = archives.filter(a => a.id !== currentEditId);
                 localStorage.setItem('chronex_archives', JSON.stringify(archives));
@@ -613,6 +640,18 @@ body {
                 editorView.style.display = 'flex';
             }
         }
+        
+        function toggleEditorButtons(enable) {
+            if(enable) {
+                btnSave.classList.remove('btn-disabled');
+                btnDel.classList.remove('btn-disabled');
+                archiveEditor.readOnly = false;
+            } else {
+                btnSave.classList.add('btn-disabled');
+                btnDel.classList.add('btn-disabled');
+                archiveEditor.readOnly = true;
+            }
+        }
 
         // Security Logic
         function updateLockStatusUI() {
@@ -623,13 +662,14 @@ body {
         }
 
         function checkOverlayRequirement() {
+            // Always show overlay if locked and not authenticated in this session
+            // But for simplicity in this app, we just check localstorage
             if(localStorage.getItem('chronex_passcode')) {
                 overlay.style.display = 'flex'; passIn.value = "";
-                // If locked, we can't see list, but if we forced visual glitch on editor
-                archiveEditor.value = generateGlitch(200); 
+                // Do NOT generate random glitch here for editor, handled by openEditor logic if needed
             } else {
                 overlay.style.display = 'none';
-                renderArchiveList(); // Show list when unlocked
+                renderArchiveList();
             }
         }
         function generateGlitch(len) { let s=""; for(let i=0;i<len;i++) s+=glChars.charAt(Math.floor(Math.random()*glChars.length)); return s; }
@@ -638,7 +678,7 @@ body {
         function runEncryptAnim(callback) {
             const original = archiveEditor.value;
             const len = original.length || 100;
-            let step = 0; const stepsTotal = 30;
+            let step = 0; const stepsTotal = 20;
             archiveEditor.readOnly = true;
             const timer = setInterval(() => {
                 step++; let display = "";
@@ -653,7 +693,8 @@ body {
 
         function runDecryptAnim(realText) {
             const len = realText.length || 100;
-            let step = 0; const stepsTotal = 40;
+            let step = 0; const stepsTotal = 30;
+            archiveEditor.readOnly = true;
             const timer = setInterval(() => {
                 step++; let display = "";
                 for(let i=0; i<len; i++) {
@@ -661,7 +702,11 @@ body {
                     else display += glChars.charAt(Math.floor(Math.random()*glChars.length));
                 }
                 archiveEditor.value = display;
-                if(step >= stepsTotal) { clearInterval(timer); archiveEditor.value = realText; archiveEditor.readOnly = false; }
+                if(step >= stepsTotal) { 
+                    clearInterval(timer); 
+                    archiveEditor.value = realText; 
+                    toggleEditorButtons(true); // Re-enable editing
+                }
             }, 30);
         }
 
@@ -670,16 +715,14 @@ body {
             if(localStorage.getItem('chronex_passcode')) return alert("ALREADY LOCKED.");
             const p = prompt("【LOCK SETUP】\n設定するパスワード(4桁)を入力:");
             if(p && p.length===4 && !isNaN(p)) {
-                // If in editor, encrypt visual. If in list, just lock overlay.
+                localStorage.setItem('chronex_passcode', p);
+                updateLockStatusUI();
+                
+                // If we are in the editor, encrypt visibly and disable saving
                 if(editorView.style.display === 'flex') {
-                    runEncryptAnim(() => {
-                        localStorage.setItem('chronex_passcode', p);
-                        updateLockStatusUI();
-                        // closeEditor(); // Optional: force back to list? No, keep confusing visual.
-                    });
+                    toggleEditorButtons(false);
+                    runEncryptAnim(null);
                 } else {
-                    localStorage.setItem('chronex_passcode', p);
-                    updateLockStatusUI();
                     checkOverlayRequirement();
                 }
             } else if(p!==null) alert("INVALID PASSCODE.");
@@ -688,7 +731,9 @@ body {
         function unlockOverlay() {
             if(passIn.value === localStorage.getItem('chronex_passcode')) {
                 overlay.style.display = 'none';
-                renderArchiveList(); // Load data
+                // If we are unlocked via overlay, it means we probably were just opening the app or list
+                // Just render list
+                renderArchiveList();
             } else {
                 passIn.style.borderColor = "#fff"; setTimeout(()=>passIn.style.borderColor="var(--forbidden-red)", 200);
             }
@@ -701,6 +746,17 @@ body {
             if(p === stored) {
                 localStorage.removeItem('chronex_passcode');
                 updateLockStatusUI();
+                
+                // If in editor, restore original text from memory
+                if(editorView.style.display === 'flex' && currentEditId) {
+                    const item = archives.find(a => a.id === currentEditId);
+                    if(item) runDecryptAnim(item.content);
+                } else if (editorView.style.display === 'flex') {
+                    // New unsaved file
+                    toggleEditorButtons(true);
+                    archiveEditor.value = "";
+                }
+                
                 alert("SYSTEM UNLOCKED.");
             } else if(p!==null) alert("WRONG PASSCODE.");
         }
