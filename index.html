@@ -114,13 +114,18 @@ body {
 .c-ring-2 { width: 85%; height: 85%; border-left-color: var(--neon-cyan); border-right-color: var(--neon-cyan); animation: spin 10s linear infinite reverse; box-shadow: 0 0 10px rgba(0,243,255,0.2); }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* Time Display */
+/* Time Display - FIXED FOR JITTER */
 .glitch-wrapper { position: relative; z-index: 10; text-align: center; }
 .time-display {
     display: flex; align-items: center; justify-content: center;
     font-family: 'Orbitron', monospace; color: #fff;
     text-shadow: 0 0 15px var(--neon-cyan); gap: 5px;
     font-size: 52px; font-weight: 900; letter-spacing: 2px;
+    /* ↓数字の幅を固定して揺れ防止 */
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum";
+    width: 320px;
+    text-align: center;
 }
 .time-colon { animation: blink 1s infinite; margin-bottom: 5px; }
 @keyframes blink { 50% { opacity: 0; } }
@@ -236,9 +241,9 @@ body {
 @keyframes archiveFlash { 0% { background: #500; } 100% { background: #000; } }
 #modal-archive { background: #000; }
 #modal-archive .modal-title { color: var(--forbidden-red); text-shadow: 0 0 10px var(--forbidden-red); }
+/* 禁書庫のレイアウト変更 */
 .archive-editor { flex: 1; background: rgba(20, 0, 0, 0.3); border: 1px solid var(--forbidden-red); padding: 15px; color: #ccaaaa; font-family: 'Zen Old Mincho', serif; font-size: 14px; line-height: 1.8; outline: none; resize: none; width: 100%; box-sizing: border-box; }
-.encrypted-text { font-family: 'Orbitron', monospace; color: var(--forbidden-red); text-shadow: 0 0 5px var(--forbidden-red); pointer-events: none; }
-.arch-btn { background: transparent; border: 1px solid var(--forbidden-red); color: var(--forbidden-red); padding: 8px 12px; font-family: 'Orbitron'; font-size: 10px; cursor: pointer; flex: 1; margin: 0 2px; }
+.arch-btn { background: transparent; border: 1px solid var(--forbidden-red); color: var(--forbidden-red); padding: 8px 12px; font-family: 'Orbitron'; font-size: 10px; cursor: pointer; margin: 0 2px; }
 .arch-btn:hover { background: var(--forbidden-red); color: #000; }
 
 .footer-info { font-size: 10px; color: #555; text-align: center; width: 100%; padding-bottom: 5px; margin-top: 10px; }
@@ -264,7 +269,17 @@ body {
         <a class="icon-btn" href="https://youtube.com"><div class="icon-symbol">▶</div><div class="icon-label">YOUTUBE</div></a>
         <a class="icon-btn" href="https://gemini.google.com"><div class="icon-symbol">✦</div><div class="icon-label">GEMINI</div></a>
         <a class="icon-btn" href="https://music.apple.com"><div class="icon-symbol">♫</div><div class="icon-label">MUSIC</div></a>
-        <a class="icon-btn" href="https://maps.google.com"><div class="icon-symbol">🗺</div><div class="icon-label">MAPS</div></a>
+        
+        <a class="icon-btn" href="https://maps.google.com">
+            <div class="icon-symbol" style="display:flex; justify-content:center; align-items:center;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
+                    <line x1="8" y1="2" x2="8" y2="18"></line>
+                    <line x1="16" y1="6" x2="16" y2="22"></line>
+                </svg>
+            </div>
+            <div class="icon-label">MAPS</div>
+        </a>
     </div>
 
     <div class="main-section">
@@ -371,14 +386,24 @@ body {
             <span class="modal-title">FORBIDDEN ARCHIVE</span>
             <span class="close-btn" onclick="closeModal('modal-archive')">×</span>
         </div>
-        <div class="modal-content" style="display:flex; flex-direction:column; height:100%;">
-            <div style="display:flex; margin-bottom:10px;">
-                <button class="arch-btn" onclick="sealArchive()">🔒 SEAL</button>
-                <button class="arch-btn" onclick="unsealArchive()">🔓 UNSEAL</button>
-                <button class="arch-btn" onclick="clearArchive()">🗑 BURN</button>
+        
+        <div class="modal-content" style="position:relative; padding:0; height:100%; display:flex; flex-direction:column;">
+            
+            <div style="padding:20px; flex:1; display:flex; flex-direction:column;">
+                <div style="display:flex; margin-bottom:10px; gap:5px;">
+                    <button class="arch-btn" onclick="enableLock()">🔒 LOCK SET</button>
+                    <button class="arch-btn" onclick="clearArchive()">🗑 BURN</button>
+                </div>
+                <textarea id="archive-area" class="archive-editor" placeholder=">> 記録ハ ココデ 途絶エテイル..."></textarea>
+                <div style="font-size:10px; color:#522; margin-top:5px; text-align:right;">SYSTEM: RED_PROTOCOL_ACTIVE</div>
             </div>
-            <textarea id="archive-area" class="archive-editor" placeholder=">> 記録ハ ココデ 途絶エテイル..."></textarea>
-            <div style="font-size:10px; color:#522; margin-top:5px; text-align:right;">SYSTEM: RED_PROTOCOL_ACTIVE</div>
+
+            <div id="security-overlay" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:10; flex-direction:column; justify-content:center; align-items:center; backdrop-filter:blur(5px);">
+                <div style="color:var(--forbidden-red); font-size:24px; font-weight:bold; letter-spacing:5px; margin-bottom:20px; text-shadow:0 0 10px var(--forbidden-red);">RESTRICTED</div>
+                <div style="color:#fff; font-size:12px; margin-bottom:10px;">ENTER PASSCODE</div>
+                <input type="tel" id="passcode-input" maxlength="4" style="background:transparent; border:2px solid var(--forbidden-red); color:var(--forbidden-red); font-family:'Orbitron'; font-size:32px; width:120px; text-align:center; outline:none; letter-spacing:10px;">
+                <button onclick="unlockArchive()" style="margin-top:20px; background:var(--forbidden-red); color:#000; border:none; padding:10px 30px; font-family:'Orbitron'; font-weight:bold; cursor:pointer;">UNLOCK</button>
+            </div>
         </div>
     </div>
 
@@ -470,6 +495,11 @@ body {
         function openModal(id) { 
             document.getElementById(id).classList.add('active'); 
             if(id==='modal-tuner') startVizLoop();
+            
+            // ★禁書庫を開くときのロックチェック
+            if(id==='modal-archive') {
+                checkArchiveLock();
+            }
         }
         function closeModal(id) { 
             document.getElementById(id).classList.remove('active'); 
@@ -586,7 +616,7 @@ body {
         }
         function stopVizLoop() { cancelAnimationFrame(vizReq); vizReq=null; }
 
-        // === VITAL KEEPER (Stop Added) ===
+        // === VITAL KEEPER ===
         let vitalTime = 25*60;
         let vitalInt = null;
         const elTimer = document.getElementById('vital-timer');
@@ -610,41 +640,68 @@ body {
             elTimer.innerText = `${m}:${s}`;
         }
 
-        // === ARCHIVE ===
+        // === ARCHIVE & LOCK SYSTEM ===
         const archiveArea = document.getElementById('archive-area');
-        let rawText = localStorage.getItem('forbiddenText') || "";
-        let isSealed = false;
-        archiveArea.value = rawText;
-        archiveArea.addEventListener('input', () => { if(!isSealed) { rawText = archiveArea.value; localStorage.setItem('forbiddenText', rawText); } });
-        function sealArchive() {
-            if(isSealed) return;
-            isSealed = true;
-            let scrambled = "";
-            const chars = "†‡§¶#@&%£¢¥€ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-            for(let i=0; i<rawText.length; i++) scrambled += (rawText[i]==='\n')?'\n':chars.charAt(Math.floor(Math.random() * chars.length));
-            archiveArea.value = scrambled;
-            archiveArea.classList.add('encrypted-text'); archiveArea.setAttribute('readonly', true);
+        const securityOverlay = document.getElementById('security-overlay');
+        const passInput = document.getElementById('passcode-input');
+
+        // Load Memo
+        let savedMemo = localStorage.getItem('chronex_memo_v2');
+        if(savedMemo) archiveArea.value = savedMemo;
+
+        // Auto Save
+        archiveArea.addEventListener('input', () => {
+            localStorage.setItem('chronex_memo_v2', archiveArea.value);
+        });
+
+        // Check Lock on Open
+        function checkArchiveLock() {
+            const savedPass = localStorage.getItem('chronex_passcode');
+            if(savedPass) {
+                securityOverlay.style.display = 'flex';
+                passInput.value = "";
+                passInput.focus();
+            } else {
+                securityOverlay.style.display = 'none';
+            }
         }
-        function unsealArchive() {
-            if(!isSealed) return;
-            let counter = 0;
-            const interval = setInterval(() => {
-                let temp = ""; const chars = "0101010101";
-                for(let i=0; i<rawText.length; i++) temp += (Math.random()>0.5)?rawText[i]:chars.charAt(Math.floor(Math.random()*chars.length));
-                archiveArea.value = temp; counter++;
-                if(counter > 10) {
-                    clearInterval(interval);
-                    archiveArea.value = rawText;
-                    archiveArea.classList.remove('encrypted-text'); archiveArea.removeAttribute('readonly');
-                    isSealed = false;
-                }
-            }, 50);
+
+        // Enable Lock
+        function enableLock() {
+            if(localStorage.getItem('chronex_passcode')) {
+                alert("SECURITY ALREADY ACTIVE.");
+                return;
+            }
+            const newPass = prompt("【SECURITY SETTING】\n4桁の数字を入力してください:");
+            if(newPass && newPass.length === 4 && !isNaN(newPass)) {
+                localStorage.setItem('chronex_passcode', newPass);
+                alert("LOCK SEQUENCE INITIATED.");
+                checkArchiveLock();
+            } else {
+                alert("ERROR: INVALID FORMAT.");
+            }
         }
+
+        // Unlock
+        function unlockArchive() {
+            const input = passInput.value;
+            const stored = localStorage.getItem('chronex_passcode');
+            if(input === stored) {
+                securityOverlay.style.display = 'none';
+            } else {
+                passInput.style.borderColor = "#fff";
+                setTimeout(() => passInput.style.borderColor = "var(--forbidden-red)", 200);
+            }
+        }
+
+        // Delete All
         function clearArchive() {
-            if(confirm("BURN DATA?")) {
-                rawText = ""; archiveArea.value = ""; isSealed = false;
-                archiveArea.classList.remove('encrypted-text'); archiveArea.removeAttribute('readonly');
-                localStorage.setItem('forbiddenText', "");
+            if(confirm("WARNING: ALL DATA WILL BE LOST.\n(メモとロック設定を破棄しますか？)")) {
+                archiveArea.value = "";
+                localStorage.removeItem('chronex_memo_v2');
+                localStorage.removeItem('chronex_passcode');
+                securityOverlay.style.display = 'none';
+                alert("DATA PURGED.");
             }
         }
     </script>
