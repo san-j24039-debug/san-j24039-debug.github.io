@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>AETHER CHRONICLE v5.2</title>
+<title>AETHER CHRONICLE v5.3 (Fixed)</title>
 
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -675,6 +675,7 @@ body {
         }
 
         function runDecryptAnim(realText) {
+            if(!realText) realText = ""; // Safety for empty memos
             const len = realText.length || 100;
             let step = 0; const stepsTotal = 30;
             archiveEditor.readOnly = true;
@@ -687,7 +688,7 @@ body {
                 archiveEditor.value = display;
                 if(step >= stepsTotal) { 
                     clearInterval(timer); 
-                    archiveEditor.value = realText; 
+                    archiveEditor.value = realText; // Force exact final value
                     toggleEditorButtons(true); 
                 }
             }, 30);
@@ -712,13 +713,24 @@ body {
         function unlockOverlay() {
             if(passIn.value === localStorage.getItem('chronex_passcode')) {
                 overlay.style.display = 'none';
-                // FIX: Check if editor is open and decrypt content
+                
+                // === FIX START ===
+                // Check if editor is open. If so, fetch the REAL content from array and animate it.
                 if(editorView.style.display === 'flex' && currentEditId) {
                     const item = archives.find(a => a.id === currentEditId);
-                    if(item) runDecryptAnim(item.content);
+                    if(item) {
+                        runDecryptAnim(item.content);
+                    } else {
+                        // Fallback if item not found? Just clear it
+                        archiveEditor.value = "";
+                        toggleEditorButtons(true);
+                    }
                 } else if(editorView.style.display === 'flex') {
+                    // New file case
                     toggleEditorButtons(true);
                 }
+                // === FIX END ===
+
             } else {
                 passIn.style.borderColor = "#fff"; setTimeout(()=>passIn.style.borderColor="var(--forbidden-red)", 200);
             }
@@ -732,7 +744,7 @@ body {
                 localStorage.removeItem('chronex_passcode');
                 updateLockStatusUI();
                 
-                // FIX: Trigger decrypt anim if editor is open
+                // === FIX START ===
                 if(editorView.style.display === 'flex' && currentEditId) {
                     const item = archives.find(a => a.id === currentEditId);
                     if(item) runDecryptAnim(item.content);
@@ -740,6 +752,8 @@ body {
                     toggleEditorButtons(true);
                     archiveEditor.value = "";
                 }
+                // === FIX END ===
+
                 alert("SYSTEM UNLOCKED.");
             } else if(p!==null) alert("WRONG PASSCODE.");
         }
