@@ -397,13 +397,15 @@ body {
         <div class="modal-content" style="position:relative; padding:0; height:100%; display:flex; flex-direction:column;">
             
             <div id="archive-list-view" style="padding:20px;">
-                <button class="arch-btn btn-new" onclick="createNewMemo()">+ INITIATE NEW FILE</button>
+              <button class="arch-btn btn-new" onclick="createNewMemo()" style="font-family: 'Zen Old Mincho', serif;">
+    + 新タナル記憶ヲ生成スル
+</button>
                 <div id="archive-list-container"></div>
             </div>
 
             <div id="archive-editor-view" style="padding:20px;">
-                <input type="text" id="archive-title-input" placeholder="FILE NAME...">
-                <textarea id="archive-editor-area" class="archive-editor" placeholder=">> INPUT DATA..."></textarea>
+                <input type="text" id="archive-title-input" placeholder="汝ノ真名ヲ告げよ...">
+                <textarea id="archive-editor-area" class="archive-editor" placeholder=">> 世界ヘノ侵略ヲ　開始セヨ..."></textarea>
                 <div style="display:flex; justify-content:space-between; margin-top:10px;">
                     <button class="arch-btn" onclick="closeEditor()">← BACK</button>
                     <div style="display:flex; gap:10px;">
@@ -874,3 +876,4 @@ body {
     </script>
 </body>
 </html>
+
