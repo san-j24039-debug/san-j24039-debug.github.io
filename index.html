@@ -3,11 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>AETHER CHRONICLE v5.3 (Fixed)</title>
+<title>AETHER CHRONICLE v5.4 (Restore Fix)</title>
 
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="apple-touch-icon" href="icon.png">
 
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Orbitron:wght@500;900&family=Zen+Old+Mincho&display=swap" rel="stylesheet">
 
@@ -675,10 +674,13 @@ body {
         }
 
         function runDecryptAnim(realText) {
-            if(!realText) realText = ""; // Safety for empty memos
-            const len = realText.length || 100;
+            // Safety: if realText is null or undefined (e.g. new file), treat as empty
+            if(realText === null || realText === undefined) realText = "";
+            
+            const len = realText.length || 50; // default length for empty new files
             let step = 0; const stepsTotal = 30;
             archiveEditor.readOnly = true;
+            
             const timer = setInterval(() => {
                 step++; let display = "";
                 for(let i=0; i<len; i++) {
@@ -714,22 +716,23 @@ body {
             if(passIn.value === localStorage.getItem('chronex_passcode')) {
                 overlay.style.display = 'none';
                 
-                // === FIX START ===
-                // Check if editor is open. If so, fetch the REAL content from array and animate it.
-                if(editorView.style.display === 'flex' && currentEditId) {
-                    const item = archives.find(a => a.id === currentEditId);
-                    if(item) {
-                        runDecryptAnim(item.content);
+                // === FIX CORE RESTORE LOGIC ===
+                if(editorView.style.display === 'flex') {
+                    // 既存ファイルを開いていた場合
+                    if(currentEditId) {
+                        const item = archives.find(a => a.id === currentEditId);
+                        if(item) {
+                            runDecryptAnim(item.content); // メモリから正しいデータを復元
+                        } else {
+                            runDecryptAnim(""); // データが見つからない場合の安全策
+                        }
                     } else {
-                        // Fallback if item not found? Just clear it
-                        archiveEditor.value = "";
+                        // 新規作成中だった場合 (IDなし) -> 空にして編集許可
                         toggleEditorButtons(true);
+                        archiveEditor.value = "";
                     }
-                } else if(editorView.style.display === 'flex') {
-                    // New file case
-                    toggleEditorButtons(true);
                 }
-                // === FIX END ===
+                // === END FIX ===
 
             } else {
                 passIn.style.borderColor = "#fff"; setTimeout(()=>passIn.style.borderColor="var(--forbidden-red)", 200);
@@ -744,15 +747,21 @@ body {
                 localStorage.removeItem('chronex_passcode');
                 updateLockStatusUI();
                 
-                // === FIX START ===
-                if(editorView.style.display === 'flex' && currentEditId) {
-                    const item = archives.find(a => a.id === currentEditId);
-                    if(item) runDecryptAnim(item.content);
-                } else if (editorView.style.display === 'flex') {
-                    toggleEditorButtons(true);
-                    archiveEditor.value = "";
+                // === FIX CORE RESTORE LOGIC ===
+                if(editorView.style.display === 'flex') {
+                     if(currentEditId) {
+                        const item = archives.find(a => a.id === currentEditId);
+                        if(item) {
+                            runDecryptAnim(item.content);
+                        } else {
+                            runDecryptAnim(""); 
+                        }
+                    } else {
+                        toggleEditorButtons(true);
+                        archiveEditor.value = "";
+                    }
                 }
-                // === FIX END ===
+                // === END FIX ===
 
                 alert("SYSTEM UNLOCKED.");
             } else if(p!==null) alert("WRONG PASSCODE.");
