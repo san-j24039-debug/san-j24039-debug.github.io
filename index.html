@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>AETHER CHRONICLE v2.1</title>
+<title>AETHER CHRONICLE v3.0</title>
 
 <link rel="manifest" href="manifest.json" />
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -135,7 +135,6 @@ body {
 .c-ring-2 { width: 85%; height: 85%; border-left-color: var(--neon-cyan); border-right-color: var(--neon-cyan); animation: spin 10s linear infinite reverse; box-shadow: 0 0 10px rgba(0,243,255,0.2); }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* Time Display */
 .glitch-wrapper { position: relative; z-index: 10; text-align: center; }
 .time-display {
     display: flex; align-items: center; justify-content: center;
@@ -177,6 +176,33 @@ body {
 @keyframes glitch-anim-2 { 0%{clip-path:inset(10% 0 60% 0);} 100%{clip-path:inset(60% 0 10% 0);} }
 
 .date-row { font-family: 'Cinzel', serif; font-size: 12px; color: var(--neon-pink); letter-spacing: 3px; margin-top: 15px; display: flex; justify-content: center; gap: 10px; }
+
+/* === NEW SEARCH BAR === */
+.search-container {
+    margin-top: 15px; width: 100%; display: flex; justify-content: center;
+    position: relative;
+}
+#search-input {
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    color: #fff;
+    padding: 8px 15px;
+    width: 200px;
+    font-family: 'Orbitron';
+    font-size: 12px;
+    text-align: center;
+    outline: none;
+    transition: all 0.3s;
+    letter-spacing: 1px;
+}
+#search-input:focus {
+    border-color: var(--neon-cyan);
+    box-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+    width: 240px;
+    background: rgba(0, 243, 255, 0.05);
+}
+#search-input::placeholder { color: rgba(255,255,255,0.3); }
 
 /* === MODULE GRID === */
 .modules-container { width: 100%; max-width: 450px; padding: 0 20px 30px 20px; display: flex; flex-direction: column; gap: 12px; box-sizing: border-box; z-index: 10; }
@@ -325,6 +351,9 @@ body {
                     <span id="date-text">--.--.--</span>
                     <span id="day-text">[---]</span>
                 </div>
+                <div class="search-container">
+                    <input type="text" id="search-input" placeholder="SEARCH DATASPHERE..." onkeypress="handleSearch(event)">
+                </div>
             </div>
         </div>
     </div>
@@ -468,6 +497,17 @@ body {
             }
         }
         setInterval(updateClock, 1000); updateClock();
+
+        // === SEARCH FUNCTION ===
+        function handleSearch(e) {
+            if (e.key === 'Enter') {
+                const query = document.getElementById('search-input').value;
+                if(query) {
+                    window.open(`https://www.google.com/search?q=${encodeURIComponent(query)}`, '_blank');
+                    document.getElementById('search-input').value = '';
+                }
+            }
+        }
 
         // === WEATHER & BG ===
         async function fetchWeather() {
@@ -674,58 +714,101 @@ body {
             elTimer.innerText = `${m}:${s}`;
         }
 
-        // === ARCHIVE & SECURITY SYSTEM (REVISED) ===
+        // === ARCHIVE & SECURITY SYSTEM (DECRYPTION ANIMATION) ===
         const archiveArea = document.getElementById('archive-area');
         const securityOverlay = document.getElementById('security-overlay');
         const passInput = document.getElementById('passcode-input');
         const lockStatusText = document.getElementById('lock-indicator');
 
-        // Load Memo
-        let savedMemo = localStorage.getItem('chronex_memo_v2');
-        if(savedMemo) archiveArea.value = savedMemo;
+        const glChars = "ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝabcdef0123456789!@#$%^&*";
 
-        // Auto Save
+        // Auto Save (Only if NOT locked)
         archiveArea.addEventListener('input', () => {
-            localStorage.setItem('chronex_memo_v2', archiveArea.value);
+            if(!localStorage.getItem('chronex_passcode')) {
+                localStorage.setItem('chronex_memo_v2', archiveArea.value);
+            }
         });
 
-        // Update Status Text (Green/Red)
         function updateLockStatusUI() {
             const isLocked = localStorage.getItem('chronex_passcode');
             if(isLocked) {
-                lockStatusText.innerText = "STATUS: LOCKED [SECURE]";
+                lockStatusText.innerText = "STATUS: LOCKED [ENCRYPTED]";
                 lockStatusText.className = "lock-status status-locked";
             } else {
-                lockStatusText.innerText = "STATUS: UNLOCKED [OPEN]";
+                lockStatusText.innerText = "STATUS: UNLOCKED [PLAIN TEXT]";
                 lockStatusText.className = "lock-status status-open";
             }
         }
 
-        // Open Modal Check: Show overlay if locked
         function checkOverlayRequirement() {
             const savedPass = localStorage.getItem('chronex_passcode');
+            // If locked, show random glitch text and overlay
             if(savedPass) {
                 securityOverlay.style.display = 'flex';
                 passInput.value = "";
                 passInput.focus();
+                
+                // Fill with Mojibake
+                archiveArea.value = generateGlitchText(200);
+                archiveArea.readOnly = true;
             } else {
                 securityOverlay.style.display = 'none';
+                archiveArea.value = localStorage.getItem('chronex_memo_v2') || "";
+                archiveArea.readOnly = false;
             }
         }
 
-        // Overlay Unlock (Session Access)
+        function generateGlitchText(length) {
+            let res = "";
+            for(let i=0; i<length; i++) res += glChars.charAt(Math.floor(Math.random()*glChars.length));
+            return res;
+        }
+
+        // DECRYPTION EFFECT (Animation)
+        function decryptEffect(finalText) {
+            const totalFrames = 30; // 1 second approx
+            let frame = 0;
+            const len = finalText.length || 100; // default len if empty
+            
+            const interval = setInterval(() => {
+                let display = "";
+                const progress = frame / totalFrames;
+                
+                // Construct the string: part real, part random
+                for(let i=0; i<len; i++) {
+                    if(i < len * progress) {
+                        display += finalText.charAt(i) || "";
+                    } else {
+                        display += glChars.charAt(Math.floor(Math.random()*glChars.length));
+                    }
+                }
+                
+                archiveArea.value = display;
+                frame++;
+                
+                if(frame > totalFrames) {
+                    clearInterval(interval);
+                    archiveArea.value = finalText;
+                    archiveArea.readOnly = false;
+                }
+            }, 30);
+        }
+
         function unlockOverlay() {
             const input = passInput.value;
             const stored = localStorage.getItem('chronex_passcode');
+            
             if(input === stored) {
                 securityOverlay.style.display = 'none';
+                // Start Animation
+                const realMemo = localStorage.getItem('chronex_memo_v2') || "";
+                decryptEffect(realMemo);
             } else {
                 passInput.style.borderColor = "#fff";
                 setTimeout(() => passInput.style.borderColor = "var(--forbidden-red)", 200);
             }
         }
 
-        // Action: Set Lock (Button)
         function setLock() {
             if(localStorage.getItem('chronex_passcode')) {
                 alert("ALREADY LOCKED.");
@@ -734,27 +817,36 @@ body {
             const newPass = prompt("【LOCK SETUP】\n設定する4桁の数字を入力してください:");
             if(newPass && newPass.length === 4 && !isNaN(newPass)) {
                 localStorage.setItem('chronex_passcode', newPass);
-                alert("LOCK ENABLED.");
+                alert("ENCRYPTION STARTED.");
                 updateLockStatusUI();
+                
+                // Immediately apply lock effect visual
+                archiveArea.value = generateGlitchText(200);
+                archiveArea.readOnly = true;
+                
             } else if(newPass !== null) {
-                alert("ERROR: INVALID FORMAT (4 DIGITS REQUIRED).");
+                alert("ERROR: INVALID FORMAT.");
             }
         }
 
-        // Action: Remove Lock (Button)
         function removeLock() {
             const stored = localStorage.getItem('chronex_passcode');
             if(!stored) {
                 alert("ALREADY UNLOCKED.");
                 return;
             }
-            const input = prompt("【SECURITY CLEARANCE】\n解除のため現在のパスワードを入力してください:");
+            const input = prompt("【DECRYPTION】\n解除のため現在のパスワードを入力してください:");
             if(input === stored) {
                 localStorage.removeItem('chronex_passcode');
-                alert("LOCK DISABLED.");
+                alert("DECRYPTION COMPLETE.");
                 updateLockStatusUI();
+                
+                // Restore text
+                archiveArea.readOnly = false;
+                archiveArea.value = localStorage.getItem('chronex_memo_v2') || "";
+                
             } else if (input !== null) {
-                alert("ACCESS DENIED: WRONG PASSCODE.");
+                alert("ACCESS DENIED.");
             }
         }
 
