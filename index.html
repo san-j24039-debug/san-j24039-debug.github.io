@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>AETHER CHRONICLE v5.1</title>
+<title>AETHER CHRONICLE v5.2</title>
 
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -211,7 +211,7 @@ body {
 .toggle-chk:checked { background: var(--neon-cyan); box-shadow: 0 0 10px var(--neon-cyan); }
 .toggle-chk:checked::after { transform: translateX(15px); background: #000; }
 
-/* ARCHIVE (Expanded) */
+/* ARCHIVE */
 #modal-archive.active { animation: archiveFlash 0.3s; }
 @keyframes archiveFlash { 0% { background: #500; } 100% { background: #000; } }
 
@@ -489,12 +489,12 @@ body {
                 return;
             }
 
-            if(noiseNode && !forceStart) { // Toggle Off
+            if(noiseNode && !forceStart) { 
                 try{noiseNode.stop();}catch(e){} noiseNode=null;
                 return; 
             }
             
-            if(noiseNode) return; // Already playing
+            if(noiseNode) return; 
 
             const b = audioCtx.createBuffer(1, audioCtx.sampleRate*2, audioCtx.sampleRate);
             const d = b.getChannelData(0); for(let i=0; i<d.length; i++) d[i]=Math.random()*2-1;
@@ -518,27 +518,25 @@ body {
         }
         function stopVizLoop() { cancelAnimationFrame(vizReq); }
 
-        // === VITAL KEEPER (Fixed Noise Toggle) ===
+        // === VITAL KEEPER ===
         let vitalInt, vitalTime=25*60;
         function startVital(){ 
             if(!vitalInt) {
-                // Check if switch is ON
                 const useNoise = document.getElementById('vital-noise-toggle').checked;
                 if(useNoise) toggleNoise(true);
-                
                 vitalInt=setInterval(()=>{ vitalTime--; updateVital(); if(vitalTime<=0)resetVital(); },1000); 
             }
         }
         function pauseVital(){ 
             clearInterval(vitalInt); vitalInt=null; 
-            toggleNoise(false, true); // Force Stop Noise
+            toggleNoise(false, true); 
         }
         function resetVital(){ 
             pauseVital(); vitalTime=25*60; updateVital(); 
         }
         function updateVital(){ document.getElementById('vital-timer').innerText = `${Math.floor(vitalTime/60).toString().padStart(2,'0')}:${(vitalTime%60).toString().padStart(2,'0')}`; }
 
-        // === ARCHIVE SYSTEM (Bug Fixes) ===
+        // === ARCHIVE SYSTEM ===
         let archives = JSON.parse(localStorage.getItem('chronex_archives')) || [];
         let currentEditId = null;
         const archiveEditor = document.getElementById('archive-editor-area');
@@ -550,14 +548,6 @@ body {
         const glChars = "ﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ0123456789XKZW@#&";
         const btnSave = document.getElementById('btn-save');
         const btnDel = document.getElementById('btn-delete');
-
-        // Migration for old single memo
-        const oldMemo = localStorage.getItem('chronex_memo_v2');
-        if(oldMemo) {
-            archives.push({ id: Date.now(), title: "RECOVERED_DATA", content: oldMemo, date: new Date().toLocaleDateString() });
-            localStorage.removeItem('chronex_memo_v2');
-            localStorage.setItem('chronex_archives', JSON.stringify(archives));
-        }
 
         function renderArchiveList() {
             const container = document.getElementById('archive-list-container');
@@ -584,10 +574,10 @@ body {
             if(item) {
                 currentEditId = id;
                 titleInput.value = item.title;
-                archiveEditor.value = item.content; // Load Clean Data
+                archiveEditor.value = item.content; 
                 switchView('editor');
                 
-                // If system is currently locked, we play encrypt effect immediately and disable saving
+                // If locked, encrypt immediately and disable save
                 if(localStorage.getItem('chronex_passcode')) {
                     toggleEditorButtons(false);
                     runEncryptAnim(null); 
@@ -598,27 +588,24 @@ body {
         }
 
         function saveCurrentMemo() {
-            // Safety: Do not save if locked (content is garbage)
             if(localStorage.getItem('chronex_passcode')) return;
-
             const title = titleInput.value || "UNTITLED_FILE";
             const content = archiveEditor.value;
             const date = new Date().toLocaleDateString();
-
             if(currentEditId) {
                 const idx = archives.findIndex(a => a.id === currentEditId);
                 if(idx !== -1) { archives[idx] = { id: currentEditId, title, content, date }; }
             } else {
                 const newId = Date.now();
                 archives.push({ id: newId, title, content, date });
-                currentEditId = newId; // Update ID so next save overwrites
+                currentEditId = newId; 
             }
             localStorage.setItem('chronex_archives', JSON.stringify(archives));
             alert("DATA SAVED.");
         }
 
         function deleteCurrentMemo() {
-            if(localStorage.getItem('chronex_passcode')) return; // Safety
+            if(localStorage.getItem('chronex_passcode')) return; 
             if(currentEditId && confirm("PERMANENTLY DELETE?")) {
                 archives = archives.filter(a => a.id !== currentEditId);
                 localStorage.setItem('chronex_archives', JSON.stringify(archives));
@@ -662,11 +649,8 @@ body {
         }
 
         function checkOverlayRequirement() {
-            // Always show overlay if locked and not authenticated in this session
-            // But for simplicity in this app, we just check localstorage
             if(localStorage.getItem('chronex_passcode')) {
                 overlay.style.display = 'flex'; passIn.value = "";
-                // Do NOT generate random glitch here for editor, handled by openEditor logic if needed
             } else {
                 overlay.style.display = 'none';
                 renderArchiveList();
@@ -674,7 +658,6 @@ body {
         }
         function generateGlitch(len) { let s=""; for(let i=0;i<len;i++) s+=glChars.charAt(Math.floor(Math.random()*glChars.length)); return s; }
 
-        // Animations
         function runEncryptAnim(callback) {
             const original = archiveEditor.value;
             const len = original.length || 100;
@@ -705,7 +688,7 @@ body {
                 if(step >= stepsTotal) { 
                     clearInterval(timer); 
                     archiveEditor.value = realText; 
-                    toggleEditorButtons(true); // Re-enable editing
+                    toggleEditorButtons(true); 
                 }
             }, 30);
         }
@@ -717,8 +700,6 @@ body {
             if(p && p.length===4 && !isNaN(p)) {
                 localStorage.setItem('chronex_passcode', p);
                 updateLockStatusUI();
-                
-                // If we are in the editor, encrypt visibly and disable saving
                 if(editorView.style.display === 'flex') {
                     toggleEditorButtons(false);
                     runEncryptAnim(null);
@@ -731,9 +712,13 @@ body {
         function unlockOverlay() {
             if(passIn.value === localStorage.getItem('chronex_passcode')) {
                 overlay.style.display = 'none';
-                // If we are unlocked via overlay, it means we probably were just opening the app or list
-                // Just render list
-                renderArchiveList();
+                // FIX: Check if editor is open and decrypt content
+                if(editorView.style.display === 'flex' && currentEditId) {
+                    const item = archives.find(a => a.id === currentEditId);
+                    if(item) runDecryptAnim(item.content);
+                } else if(editorView.style.display === 'flex') {
+                    toggleEditorButtons(true);
+                }
             } else {
                 passIn.style.borderColor = "#fff"; setTimeout(()=>passIn.style.borderColor="var(--forbidden-red)", 200);
             }
@@ -747,16 +732,14 @@ body {
                 localStorage.removeItem('chronex_passcode');
                 updateLockStatusUI();
                 
-                // If in editor, restore original text from memory
+                // FIX: Trigger decrypt anim if editor is open
                 if(editorView.style.display === 'flex' && currentEditId) {
                     const item = archives.find(a => a.id === currentEditId);
                     if(item) runDecryptAnim(item.content);
                 } else if (editorView.style.display === 'flex') {
-                    // New unsaved file
                     toggleEditorButtons(true);
                     archiveEditor.value = "";
                 }
-                
                 alert("SYSTEM UNLOCKED.");
             } else if(p!==null) alert("WRONG PASSCODE.");
         }
