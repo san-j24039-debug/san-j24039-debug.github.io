@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>AETHER CHRONICLE v8.0 (Trash & Chunibyo)</title>
+<title>AETHER CHRONICLE v8.1 (Undo & Fix)</title>
 
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -265,6 +265,19 @@ body {
 .tiny-hint { position: absolute; bottom: 5px; right: 5px; font-size: 8px; color: #111; font-family: 'Orbitron'; user-select: none; }
 .tiny-hint:hover { color: #333; }
 
+/* Undo Toast */
+.undo-toast {
+    position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+    background: #111; border: 1px solid var(--neon-cyan); color: var(--neon-cyan);
+    padding: 10px 30px; font-family: 'Orbitron'; font-size: 12px; letter-spacing: 1px;
+    box-shadow: 0 0 15px rgba(0,243,255,0.3); z-index: 1000;
+    display: none; align-items: center; justify-content: space-between; gap: 20px;
+    animation: slideUp 0.3s ease-out;
+}
+.undo-toast.active { display: flex; }
+@keyframes slideUp { from { transform: translate(-50%, 20px); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
+.undo-action { font-weight: bold; text-decoration: underline; cursor: pointer; color: #fff; }
+
 /* Disabled state */
 .btn-disabled { opacity: 0.3; cursor: not-allowed; border-color: #333 !important; color: #333 !important; pointer-events: none; }
 </style>
@@ -413,6 +426,11 @@ body {
                 <input type="tel" id="passcode-input" maxlength="4" style="background:transparent; border:2px solid var(--forbidden-red); color:var(--forbidden-red); font-family:'Orbitron'; font-size:32px; width:150px; text-align:center; outline:none; letter-spacing:10px; margin-bottom:20px;">
                 <button id="sec-btn" onclick="handleSecurityInput()" style="background:var(--forbidden-red); color:#000; border:none; padding:10px 40px; font-family:'Orbitron'; font-weight:bold; cursor:pointer; clip-path: polygon(10% 0, 100% 0, 100% 70%, 90% 100%, 0 100%, 0 30%);">UNLOCK</button>
                 <div class="tiny-hint" id="tiny-pass-hint"></div>
+            </div>
+
+            <div id="undo-toast" class="undo-toast">
+                <span>データ消去... 復元シマスカ？</span>
+                <span class="undo-action" onclick="undoDelete()">UNDO</span>
             </div>
 
         </div>
@@ -572,6 +590,10 @@ body {
         let currentEditId = null;
         let isSetupMode = false;
         
+        // Undo Variables
+        let lastDeletedItem = null;
+        let undoTimeout = null;
+
         const archiveEditor = document.getElementById('archive-editor-area');
         const titleInput = document.getElementById('archive-title-input');
         const listView = document.getElementById('archive-list-view');
@@ -599,7 +621,7 @@ body {
                     </div>
                     <div style="display:flex; align-items:center;">
                         <span style="color:var(--neon-cyan); font-size:10px; margin-right:10px;">>> OPEN</span>
-                        <button class="list-del-btn" onclick="moveToTrash(${item.id})">🗑</button>
+                        <button class="list-del-btn" onclick="deleteFromList(${item.id})">🗑</button>
                     </div>`;
                 container.appendChild(div);
             });
@@ -678,6 +700,7 @@ body {
         }
 
         function closeTrash() {
+            renderArchiveList(); // Re-render to show any restored items
             switchView('list');
         }
 
@@ -704,13 +727,43 @@ body {
             });
         }
 
-        function moveToTrash(id) {
+        function deleteFromList(id) {
             const idx = archives.findIndex(a => a.id === id);
             if(idx !== -1) {
+                lastDeletedItem = archives[idx]; // Backup for immediate Undo
+                
+                // Move to trash
                 trashArchives.push(archives[idx]);
                 archives.splice(idx, 1);
+                
                 updateStorage();
                 renderArchiveList();
+                showUndoToast();
+            }
+        }
+
+        function showUndoToast() {
+            const t = document.getElementById('undo-toast');
+            t.classList.add('active');
+            if(undoTimeout) clearTimeout(undoTimeout);
+            undoTimeout = setTimeout(() => {
+                t.classList.remove('active');
+                lastDeletedItem = null; 
+            }, 4000); 
+        }
+
+        function undoDelete() {
+            if(lastDeletedItem) {
+                // Remove from trash first
+                trashArchives = trashArchives.filter(item => item.id !== lastDeletedItem.id);
+                // Add back to archives
+                archives.push(lastDeletedItem);
+                archives.sort((a,b) => a.id - b.id);
+                
+                updateStorage();
+                renderArchiveList();
+                document.getElementById('undo-toast').classList.remove('active');
+                lastDeletedItem = null;
             }
         }
 
