@@ -517,8 +517,8 @@ body {
             <div id="security-overlay" style="display:flex;">
                 <div class="overlay-top-left">禁忌ノ書庫</div>
 
-                <div id="sec-title" style="color:var(--forbidden-red); font-size:24px; font-weight:bold; letter-spacing:5px; margin-bottom:20px; text-align:center;">[[ 警告：接近権限・拒絶 ]]</div>
-                <div id="sec-sub" style="color:#fff; font-size:12px; margin-bottom:10px; font-family:'Orbitron';">>> 暗号鍵（コード）ノ提示ヲ求ム</div>
+                <div id="sec-title" style="color:var(--forbidden-red); font-size:24px; font-weight:bold; letter-spacing:5px; margin-bottom:20px; text-align:center;">[[ 警告：接近権限：拒絶 ]]</div>
+                <div id="sec-sub" style="color:#fff; font-size:12px; margin-bottom:10px; font-family:'Orbitron';">>> 暗号コードノ提示ヲ求ム</div>
                 <input type="tel" id="passcode-input" maxlength="4" style="background:transparent; border:2px solid var(--forbidden-red); color:var(--forbidden-red); font-family:'Orbitron'; font-size:32px; width:150px; text-align:center; outline:none; letter-spacing:10px; margin-bottom:20px;">
                 <button id="sec-btn" onclick="handleSecurityInput()" style="background:var(--forbidden-red); color:#000; border:none; padding:10px 40px; font-family:'Orbitron'; font-weight:bold; cursor:pointer; clip-path: polygon(10% 0, 100% 0, 100% 70%, 90% 100%, 0 100%, 0 30%);">UNLOCK</button>
                 
@@ -527,13 +527,13 @@ body {
                 <div id="pass-reveal"></div>
 
                 <div id="hint-modal">
-                    <div class="hint-text">真実ハ<br>視界ノ隅（ミギシタ）ニ<br>潜ム...</div>
+                    <div class="hint-text">真実ハ<br>視界ノ右隅ニ<br>潜ム...</div>
                     <button class="arch-btn" style="font-size:10px;" onclick="closeHintModal()">CLOSE</button>
                 </div>
             </div>
 
             <div id="undo-toast" class="undo-toast">
-                <span>データ消去... 復元シマスワ？</span>
+                <span>データヲ消去... 復元シマスカ？</span>
                 <span class="undo-action" onclick="undoDelete()">UNDO</span>
             </div>
 
@@ -1073,3 +1073,4 @@ body {
     </script>
 </body>
 </html>
+
