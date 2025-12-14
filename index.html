@@ -278,12 +278,13 @@ body {
 .tiny-hint { position: absolute; bottom: 5px; right: 5px; font-size: 8px; color: #111; font-family: 'Orbitron'; user-select: none; }
 .tiny-hint:hover { color: #333; }
 
-/* Forgot Password Link */
+/* Forgot Password Link (修正: 色と視認性を向上) */
 .forgot-link {
-    margin-top: 20px; font-size: 10px; color: #555; cursor: pointer;
+    margin-top: 20px; font-size: 10px; color: #ccc; cursor: pointer;
     font-family: 'Zen Old Mincho', serif; text-decoration: underline; transition: 0.3s;
+    text-shadow: 0 0 2px rgba(255, 255, 255, 0.3); /* 薄い発光を追加 */
 }
-.forgot-link:hover { color: var(--neon-cyan); text-shadow: 0 0 5px var(--neon-cyan); }
+.forgot-link:hover { color: var(--neon-cyan); text-shadow: 0 0 8px var(--neon-cyan); }
 
 /* Hint Modal */
 #hint-modal {
@@ -293,13 +294,13 @@ body {
     display: none; flex-direction: column; align-items: center; text-align: center;
 }
 .hint-text {
-    color: #fff; font-family: 'Zen Old Mincho', serif; font-size: 14px; margin-bottom: 15px; line-height: 1.6;
+    color: #ccc; font-family: 'Zen Old Mincho', serif; font-size: 14px; margin-bottom: 15px; line-height: 1.6;
 }
 
-/* Bottom Right Pass Reveal */
+/* Bottom Right Pass Reveal (修正: iPhoneで見切れない位置へ調整) */
 #pass-reveal {
-    position: absolute; bottom: 5px; right: 5px;
-    font-size: 10px; color: rgba(255,255,255,0.15); font-family: 'Orbitron';
+    position: absolute; bottom: 40px; right: 50px; /* 位置を上と左に移動 */
+    font-size: 10px; color: rgba(255,255,255,0.2); font-family: 'Orbitron';
     pointer-events: none;
 }
 
@@ -381,7 +382,7 @@ body {
                 <div class="app-title">VITAL KEEPER</div><div class="app-status">Life Support</div><div class="app-icon-bg">♥</div>
             </div>
             <div class="app-card card-forbidden" onclick="triggerTransition('modal-archive', '>> 封印サレシ記憶、解凍...')">
-                <div class="app-title" style="font-family: 'Zen Old Mincho', serif;">禁忌ノ書庫</div>
+                <div class="app-title">FORBIDDEN ARCHIVE</div>
                 <div class="app-status" style="color:#aa5555;">[[ LOCKED ]]</div>
                 <div class="app-icon-bg">👁</div>
             </div>
@@ -464,22 +465,22 @@ body {
                 <div class="overlay-top-left">禁忌ノ書庫</div>
 
                 <div id="sec-title" style="color:var(--forbidden-red); font-size:24px; font-weight:bold; letter-spacing:5px; margin-bottom:20px; text-align:center;">[[ 警告：接近権限・拒絶 ]]</div>
-                <div id="sec-sub" style="color:#fff; font-size:12px; margin-bottom:10px; font-family:'Orbitron';">>> 暗号鍵（コード）ノ提示ヲ求ム</div>
+                <div id="sec-sub" style="color:#fff; font-size:12px; margin-bottom:10px; font-family:'Orbitron';">>> 暗号コード　ノ　提示ヲ求ム</div>
                 <input type="tel" id="passcode-input" maxlength="4" style="background:transparent; border:2px solid var(--forbidden-red); color:var(--forbidden-red); font-family:'Orbitron'; font-size:32px; width:150px; text-align:center; outline:none; letter-spacing:10px; margin-bottom:20px;">
                 <button id="sec-btn" onclick="handleSecurityInput()" style="background:var(--forbidden-red); color:#000; border:none; padding:10px 40px; font-family:'Orbitron'; font-weight:bold; cursor:pointer; clip-path: polygon(10% 0, 100% 0, 100% 70%, 90% 100%, 0 100%, 0 30%);">UNLOCK</button>
                 
-                <div class="forgot-link" onclick="openHintModal()">>> 記憶（コード）ヲ喪失セシ者...</div>
+                <div class="forgot-link" onclick="openHintModal()">記憶ヲ 喪失セシ者...</div>
 
                 <div id="pass-reveal"></div>
 
                 <div id="hint-modal">
-                    <div class="hint-text">真実ハ<br>視界ノ隅（ミギシタ）ニ<br>潜ム...</div>
+                    <div class="hint-text">真実ハ<br>視界ノ　右隅　ニ<br>潜ム...</div>
                     <button class="arch-btn" style="font-size:10px;" onclick="closeHintModal()">CLOSE</button>
                 </div>
             </div>
 
             <div id="undo-toast" class="undo-toast">
-                <span>データ消去... 復元シマスワ？</span>
+                <span>データヲ消去... 復元シマスカ？</span>
                 <span class="undo-action" onclick="undoDelete()">UNDO</span>
             </div>
 
@@ -698,7 +699,7 @@ body {
                 document.querySelector('.forgot-link').style.display = 'none';
             } else {
                 isSetupMode = false;
-                secTitle.innerText = "[[ 警告：接近権限・拒絶 ]]";
+                secTitle.innerText = "[[ 警告：接近権限：拒絶 ]]";
                 secTitle.style.color = "var(--forbidden-red)";
                 secSub.innerText = ">> 暗号鍵（コード）ノ提示ヲ求ム";
                 secBtn.innerText = "UNLOCK";
