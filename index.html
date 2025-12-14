@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>AETHER CHRONICLE v4.1</title>
+<title>AETHER CHRONICLE v4.2</title>
 
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -23,7 +23,6 @@
     --safe-green: #33ff33;
     --silver-metal: #e0e5eb;
     --border: rgba(255, 255, 255, 0.15);
-    /* 修正: 枠線を少し明るく太くするための変数 */
     --border-strong: rgba(255, 255, 255, 0.35);
 }
 
@@ -121,36 +120,17 @@ body {
 
 .glitch-wrapper { position: relative; z-index: 10; text-align: center; }
 
-/* 修正: 時間表示の固定化（左右ブレ防止） */
+/* Fixed Width Clock */
 .time-display {
     display: flex; align-items: center; justify-content: center;
     font-family: 'Orbitron', monospace; color: #fff;
     text-shadow: 0 0 15px var(--neon-cyan);
     font-size: 52px; font-weight: 900; letter-spacing: 2px;
     width: 320px;
-    /* 子要素で幅を固定するため、ここはflexコンテナとして機能させる */
 }
-
-/* 時間（時:分）を右寄せ固定幅に */
-#h-min {
-    width: 170px;
-    text-align: right;
-    display: inline-block;
-}
-/* コロンを中央固定幅に */
-.time-colon { 
-    width: 20px; 
-    text-align: center; 
-    display: inline-block;
-    animation: blink 1s infinite;
-    margin-bottom: 5px;
-}
-/* 秒を左寄せ固定幅に */
-#sec-text {
-    width: 80px;
-    text-align: left;
-    display: inline-block;
-}
+#h-min { width: 170px; text-align: right; display: inline-block; }
+.time-colon { width: 20px; text-align: center; display: inline-block; animation: blink 1s infinite; margin-bottom: 5px; }
+#sec-text { width: 80px; text-align: left; display: inline-block; }
 
 @keyframes blink { 50% { opacity: 0; } }
 
@@ -187,7 +167,6 @@ body {
 
 .app-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; }
 
-/* 修正: 枠線を太く(2px)、色を明るく */
 .app-card {
     height: 90px; background: rgba(255,255,255,0.03);
     border: 2px solid var(--border-strong); border-radius: 8px;
@@ -248,7 +227,6 @@ body {
 .btn-lock:hover { background: var(--forbidden-red); color: #000; }
 .btn-unlock { border-color: var(--safe-green); color: var(--safe-green); }
 .btn-unlock:hover { background: var(--safe-green); color: #000; }
-.footer-info { font-size: 10px; color: #555; text-align: center; width: 100%; padding-bottom: 5px; margin-top: 10px; }
 </style>
 </head>
 <body>
@@ -319,8 +297,6 @@ body {
         </div>
     </div>
     
-    <div class="footer-info">CREDITS ACQUIRED: <span id="credit-val" style="color:var(--neon-gold);">0</span> G</div>
-
     <div id="modal-quest" class="modal">
         <div class="modal-header"><span class="modal-title">QUEST BOARD</span><span class="close-btn" onclick="closeModal('modal-quest')">×</span></div>
         <div class="modal-content">
@@ -386,7 +362,7 @@ body {
             document.getElementById('date-text').innerText = now.toLocaleDateString();
             document.getElementById('day-text').innerText = `[${days[now.getDay()]}]`;
             
-            // 修正: ノイズ頻度を増加 (0.03 -> 0.20)
+            // ノイズ頻度 (20%)
             if(Math.random() < 0.20) { 
                 const cw = document.getElementById('clock-wrapper'); cw.classList.add('glitch-active');
                 setTimeout(()=> cw.classList.remove('glitch-active'), 300);
@@ -441,8 +417,7 @@ body {
 
         // === QUEST BOARD LOGIC ===
         let quests = JSON.parse(localStorage.getItem('quests_v3')) || [];
-        let credits = parseInt(localStorage.getItem('credits')) || 0;
-        document.getElementById('credit-val').innerText = credits;
+        // Removed credits logic here
         renderQuests();
         function addQuest() {
             const t = document.getElementById('quest-in-text').value;
@@ -459,23 +434,55 @@ body {
         }
         function completeQuest(i) {
             document.getElementById('quest-clear-overlay').classList.add('active');
-            let r=100; if(quests[i].r==='S')r=500; else if(quests[i].r==='A')r=300;
-            credits+=r; localStorage.setItem('credits', credits); document.getElementById('credit-val').innerText = credits;
+            // Removed credits calculation
             quests.splice(i,1); localStorage.setItem('quests_v3', JSON.stringify(quests)); renderQuests();
             setTimeout(()=>document.getElementById('quest-clear-overlay').classList.remove('active'), 1500);
         }
 
-        // === NOISE TUNER LOGIC ===
+        // === NOISE TUNER LOGIC (Fixed for Sound) ===
         let audioCtx, noiseNode, vizReq;
         function toggleNoise() {
-            if(!audioCtx) { audioCtx = new (window.AudioContext||window.webkitAudioContext)(); }
-            if(noiseNode) { noiseNode.stop(); noiseNode=null; return; }
-            const b = audioCtx.createBuffer(1, audioCtx.sampleRate*2, audioCtx.sampleRate);
-            const d = b.getChannelData(0); for(let i=0; i<d.length; i++) d[i]=Math.random()*2-1;
-            noiseNode = audioCtx.createBufferSource(); noiseNode.buffer = b; noiseNode.loop = true;
-            const g = audioCtx.createGain(); g.gain.value = 0.05;
-            noiseNode.connect(g); g.connect(audioCtx.destination); noiseNode.start();
+            // Initialize AudioContext if not exists
+            if(!audioCtx) { 
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContext(); 
+            }
+
+            // IMPORTANT: Browsers block sound until user interacts. 
+            // We force resume here on click.
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            // If playing, stop it
+            if(noiseNode) { 
+                try { noiseNode.stop(); } catch(e){}
+                noiseNode = null; 
+                return; 
+            }
+
+            // Create White Noise
+            const bufferSize = audioCtx.sampleRate * 2; // 2 sec buffer
+            const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const data = buffer.getChannelData(0);
+
+            for (let i = 0; i < bufferSize; i++) {
+                data[i] = Math.random() * 2 - 1;
+            }
+
+            noiseNode = audioCtx.createBufferSource();
+            noiseNode.buffer = buffer;
+            noiseNode.loop = true;
+
+            // Gain Node for Volume (Increased to 0.15 for better audibility)
+            const gainNode = audioCtx.createGain();
+            gainNode.gain.value = 0.15; 
+
+            noiseNode.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            noiseNode.start();
         }
+
         function startVizLoop() {
             const cvs = document.getElementById('viz-canvas'); const ctx = cvs.getContext('2d');
             cvs.width = cvs.parentElement.clientWidth; cvs.height = 200;
