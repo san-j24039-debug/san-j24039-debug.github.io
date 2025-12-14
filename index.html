@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>AETHER CHRONICLE v4.2</title>
+<title>AETHER CHRONICLE v5.0</title>
 
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -35,7 +35,7 @@ body {
     transition: background 1s ease;
 }
 
-/* === TRANSITION LAYER (Loading Effect) === */
+/* === TRANSITION LAYER === */
 #transition-layer {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     background: #000; z-index: 9999;
@@ -66,29 +66,25 @@ body {
     background: rgba(255, 204, 0, 0.1); transform: rotate(-5deg);
 }
 
-/* === BACKGROUND LAYERS (Weather) === */
+/* === BACKGROUND LAYERS === */
 .bg-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; opacity: 0; transition: opacity 1.5s; pointer-events: none; }
 .bg-layer.active { opacity: 1; }
 
-/* Sunny */
 #bg-sunny { background: radial-gradient(circle at center, #553300 0%, #000 80%); }
 #bg-sunny::before { content: ""; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: conic-gradient(from 0deg, transparent 0deg, rgba(255, 200, 0, 0.1) 20deg, transparent 40deg, rgba(255, 200, 0, 0.1) 60deg, transparent 80deg, rgba(255, 200, 0, 0.1) 100deg, transparent 120deg, rgba(255, 200, 0, 0.1) 140deg, transparent 160deg); animation: sunRotate 60s linear infinite; }
 #bg-sunny::after { content: ""; position: absolute; width: 100%; height: 100%; background: radial-gradient(circle at 50% 30%, rgba(255, 220, 100, 0.2) 0%, transparent 60%); animation: sunPulse 4s ease-in-out infinite alternate; }
 @keyframes sunRotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 @keyframes sunPulse { 0% { opacity: 0.5; transform: scale(1); } 100% { opacity: 1; transform: scale(1.1); } }
 
-/* Cloudy */
 #bg-cloudy { background: #0a1116; }
 #bg-cloudy::before { content: ""; position: absolute; top: 0; left: 0; width: 200%; height: 100%; background: repeating-linear-gradient(90deg, transparent 0%, rgba(0, 243, 255, 0.05) 20%, transparent 40%); background-size: 50% 100%; animation: fogFlow 20s linear infinite; }
 #bg-cloudy::after { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at bottom, rgba(200, 200, 210, 0.15) 0%, transparent 70%); }
 @keyframes fogFlow { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 
-/* Rain */
 #bg-rain { background: linear-gradient(to bottom, #050510, #000); }
 .rain-drop { position: absolute; top:-10vh; background: rgba(0, 243, 255, 0.5); width: 1px; height: 60px; animation: rainFall linear infinite; }
 @keyframes rainFall { to { transform: translateY(110vh); } }
 
-/* Thunder */
 #bg-thunder { background: radial-gradient(circle at 30% 30%, #220033 0%, #000 90%); }
 .flash-overlay { position: absolute; width:100%; height:100%; background: rgba(255,255,255,0.15); opacity:0; pointer-events:none; }
 @keyframes flashAnim { 0%,100%{opacity:0;} 2%{opacity:0.4;} 4%{opacity:0;} }
@@ -109,7 +105,7 @@ body {
 .icon-btn:hover .icon-symbol { color: #fff; text-shadow: 0 0 10px #fff; }
 .icon-label { font-size: 8px; color: #aaa; letter-spacing: 0.5px; }
 
-/* === MAIN CLOCK & SEARCH === */
+/* === CLOCK & SEARCH === */
 .main-section { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; position: relative; }
 .clock-container { position: relative; width: 300px; height: 300px; display: flex; justify-content: center; align-items: center; }
 
@@ -119,8 +115,6 @@ body {
 @keyframes spin { to { transform: rotate(360deg); } }
 
 .glitch-wrapper { position: relative; z-index: 10; text-align: center; }
-
-/* Fixed Width Clock */
 .time-display {
     display: flex; align-items: center; justify-content: center;
     font-family: 'Orbitron', monospace; color: #fff;
@@ -131,16 +125,13 @@ body {
 #h-min { width: 170px; text-align: right; display: inline-block; }
 .time-colon { width: 20px; text-align: center; display: inline-block; animation: blink 1s infinite; margin-bottom: 5px; }
 #sec-text { width: 80px; text-align: left; display: inline-block; }
-
 @keyframes blink { 50% { opacity: 0; } }
 
-/* Glitch Animation */
 .glitch-active .time-display { animation: glitch-skew 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both infinite; color: var(--neon-pink); text-shadow: 2px 0 var(--neon-cyan), -2px 0 var(--neon-gold); }
 @keyframes glitch-skew { 0%{transform:skew(0deg);} 20%{transform:skew(-10deg);} 40%{transform:skew(10deg);} 60%{transform:skew(-5deg);} 80%{transform:skew(5deg);} 100%{transform:skew(0deg);} }
 
 .date-row { font-family: 'Cinzel', serif; font-size: 12px; color: var(--neon-pink); letter-spacing: 3px; margin-top: 15px; display: flex; justify-content: center; gap: 10px; }
 
-/* SEARCH BAR */
 .search-container { margin-top: 15px; width: 100%; display: flex; justify-content: center; position: relative; }
 #search-input {
     background: rgba(0, 0, 0, 0.5); border: 1px solid var(--border); border-radius: 20px;
@@ -166,7 +157,6 @@ body {
 .w-icon { font-size: 24px; }
 
 .app-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; }
-
 .app-card {
     height: 90px; background: rgba(255,255,255,0.03);
     border: 2px solid var(--border-strong); border-radius: 8px;
@@ -181,7 +171,7 @@ body {
 .card-forbidden { border-color: rgba(255, 51, 51, 0.5); }
 .card-forbidden .app-title { color: var(--forbidden-red); }
 
-/* === MODAL SYSTEM === */
+/* === MODALS === */
 .modal {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     background: rgba(5, 5, 8, 0.98); backdrop-filter: blur(15px);
@@ -195,7 +185,7 @@ body {
 .close-btn { font-size: 24px; color: #fff; cursor: pointer; }
 .modal-content { flex: 1; padding: 20px; overflow-y: auto; position: relative; }
 
-/* Quest Styles */
+/* QUEST */
 #modal-quest.active .modal-content { animation: questOpen 0.5s ease-out forwards; }
 @keyframes questOpen { from { transform: rotateX(20deg) translateY(50px); opacity: 0; } to { transform: rotateX(0) translateY(0); opacity: 1; } }
 .quest-card { background: rgba(0, 0, 0, 0.9); border: 1px solid #333; margin-bottom: 8px; padding: 12px; display: flex; justify-content: space-between; align-items: center; border-left-width: 4px; }
@@ -205,28 +195,49 @@ body {
 #quest-rank-sel { background: #000; color: #fff; border: 1px solid var(--neon-cyan); font-family: 'Orbitron'; }
 #quest-add-btn { background: var(--neon-cyan); color: #000; border: none; padding: 0 15px; font-weight: bold; cursor: pointer; }
 
-/* Tuner Styles */
+/* TUNER */
 .tuner-viz { width: 100%; height: 200px; background: #000; border: 1px solid #333; border-radius: 4px; margin-bottom: 20px; box-sizing: border-box; }
 
-/* Vital Styles */
+/* VITAL */
 .vital-pod { width: 220px; height: 220px; border-radius: 50%; border: 4px solid #222; margin: 20px auto; display: flex; justify-content: center; align-items: center; position: relative; background: #000; }
 .vital-ring { position: absolute; width: 100%; height: 100%; border-radius: 50%; border-top: 4px solid var(--neon-pink); border-right: 4px solid transparent; animation: spin 2s linear infinite; }
 #vital-timer { font-size: 48px; font-weight: bold; color: #fff; text-shadow: 0 0 10px var(--neon-pink); z-index: 10; font-family: 'Orbitron'; }
 
-/* Archive Styles (Forbidden) */
+/* ARCHIVE (Expanded) */
 #modal-archive.active { animation: archiveFlash 0.3s; }
 @keyframes archiveFlash { 0% { background: #500; } 100% { background: #000; } }
+
+/* Archive List View */
+#archive-list-view { display: flex; flex-direction: column; height: 100%; }
+.archive-item {
+    background: rgba(255, 50, 50, 0.05); border: 1px solid #522; padding: 15px; margin-bottom: 8px;
+    display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.2s;
+}
+.archive-item:hover { background: rgba(255, 50, 50, 0.2); border-color: var(--forbidden-red); transform: translateX(5px); }
+.ai-title { font-family: 'Zen Old Mincho', serif; font-size: 16px; color: #eebbcc; }
+.ai-date { font-family: 'Orbitron'; font-size: 10px; color: #744; }
+
+/* Archive Editor View */
+#archive-editor-view { display: none; flex-direction: column; height: 100%; }
+#archive-title-input {
+    background: transparent; border: none; border-bottom: 2px solid var(--forbidden-red);
+    color: var(--neon-gold); font-family: 'Orbitron'; font-size: 18px; padding: 10px; margin-bottom: 10px; outline: none; width: 100%; box-sizing: border-box;
+}
 .archive-editor { flex: 1; background: rgba(20, 0, 0, 0.3); border: 1px solid var(--forbidden-red); padding: 15px; color: #ccaaaa; font-family: 'Zen Old Mincho', serif; font-size: 14px; line-height: 1.8; outline: none; resize: none; width: 100%; box-sizing: border-box; }
-.lock-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+
+.lock-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 0 20px; margin-top: 10px; }
 .lock-status { font-size: 10px; font-family: 'Orbitron'; letter-spacing: 1px; }
 .status-locked { color: var(--forbidden-red); text-shadow: 0 0 5px var(--forbidden-red); }
 .status-open { color: var(--safe-green); text-shadow: 0 0 5px var(--safe-green); }
-.arch-btn { background: transparent; border: 1px solid #555; color: #aaa; padding: 6px 10px; font-family: 'Orbitron'; font-size: 10px; cursor: pointer; transition: 0.2s; }
+
+.arch-btn { background: transparent; border: 1px solid #555; color: #aaa; padding: 6px 12px; font-family: 'Orbitron'; font-size: 10px; cursor: pointer; transition: 0.2s; }
 .arch-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
 .btn-lock { border-color: var(--forbidden-red); color: var(--forbidden-red); }
 .btn-lock:hover { background: var(--forbidden-red); color: #000; }
 .btn-unlock { border-color: var(--safe-green); color: var(--safe-green); }
 .btn-unlock:hover { background: var(--safe-green); color: #000; }
+.btn-new { border-color: var(--neon-cyan); color: var(--neon-cyan); width: 100%; margin-bottom: 10px; padding: 10px; font-weight: bold; }
+.btn-new:hover { background: rgba(0,243,255,0.1); color: #fff; }
 </style>
 </head>
 <body>
@@ -278,9 +289,7 @@ body {
             </div>
             <div class="w-temp" id="w-temp">--°C</div>
         </div>
-        
         <div style="height:10px;"></div>
-
         <div class="app-grid">
             <div class="app-card" onclick="triggerTransition('modal-quest', '>> INITIALIZING MISSION...')">
                 <div class="app-title">QUEST BOARD</div><div class="app-status">Active: <span id="m-count">0</span></div><div class="app-icon-bg">⚔</div>
@@ -296,7 +305,7 @@ body {
             </div>
         </div>
     </div>
-    
+
     <div id="modal-quest" class="modal">
         <div class="modal-header"><span class="modal-title">QUEST BOARD</span><span class="close-btn" onclick="closeModal('modal-quest')">×</span></div>
         <div class="modal-content">
@@ -326,23 +335,40 @@ body {
                 <button class="arch-btn" style="border-color:#fff; color:#fff;" onclick="pauseVital()">STOP</button>
                 <button class="arch-btn" onclick="resetVital()">RESET</button>
             </div>
+            <div style="margin-top:10px; font-size:10px; color:#666;">AUTO-NOISE: ON</div>
         </div>
     </div>
 
     <div id="modal-archive" class="modal">
         <div class="modal-header"><span class="modal-title">FORBIDDEN ARCHIVE</span><span class="close-btn" onclick="closeModal('modal-archive')">×</span></div>
+        
+        <div class="lock-controls">
+            <div id="lock-indicator" class="lock-status status-open">STATUS: UNLOCKED</div>
+            <div style="display:flex; gap:5px;">
+                <button class="arch-btn btn-lock" onclick="setLock()">🔒 LOCK</button>
+                <button class="arch-btn btn-unlock" onclick="removeLock()">🔓 UNLOCK</button>
+            </div>
+        </div>
+
         <div class="modal-content" style="position:relative; padding:0; height:100%; display:flex; flex-direction:column;">
-            <div style="padding:20px; flex:1; display:flex; flex-direction:column;">
-                <div class="lock-controls">
-                    <div id="lock-indicator" class="lock-status status-open">STATUS: UNLOCKED</div>
-                    <div style="display:flex; gap:5px;">
-                        <button class="arch-btn btn-lock" onclick="setLock()">🔒 LOCK</button>
-                        <button class="arch-btn btn-unlock" onclick="removeLock()">🔓 UNLOCK</button>
+            
+            <div id="archive-list-view" style="padding:20px;">
+                <button class="arch-btn btn-new" onclick="createNewMemo()">+ INITIATE NEW FILE</button>
+                <div id="archive-list-container"></div>
+            </div>
+
+            <div id="archive-editor-view" style="padding:20px;">
+                <input type="text" id="archive-title-input" placeholder="FILE NAME...">
+                <textarea id="archive-editor-area" class="archive-editor" placeholder=">> INPUT DATA..."></textarea>
+                <div style="display:flex; justify-content:space-between; margin-top:10px;">
+                    <button class="arch-btn" onclick="closeEditor()">← BACK</button>
+                    <div style="display:flex; gap:10px;">
+                        <button class="arch-btn" style="color:var(--forbidden-red); border-color:var(--forbidden-red);" onclick="deleteCurrentMemo()">DELETE</button>
+                        <button class="arch-btn" style="color:var(--neon-cyan); border-color:var(--neon-cyan);" onclick="saveCurrentMemo()">SAVE DATA</button>
                     </div>
                 </div>
-                <textarea id="archive-area" class="archive-editor" placeholder=">> 記録ハ ココデ 途絶エテイル..."></textarea>
-                <div style="display:flex; justify-content:flex-end; margin-top:5px;"><button class="arch-btn" onclick="clearArchive()">🗑 BURN</button></div>
             </div>
+
             <div id="security-overlay" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.98); z-index:10; flex-direction:column; justify-content:center; align-items:center; backdrop-filter:blur(5px);">
                 <div style="color:var(--forbidden-red); font-size:24px; font-weight:bold; letter-spacing:5px; margin-bottom:20px;">ACCESS DENIED</div>
                 <div style="color:#fff; font-size:12px; margin-bottom:10px;">ENTER PASSCODE</div>
@@ -353,7 +379,7 @@ body {
     </div>
 
     <script>
-        // === CORE CLOCK & SEARCH ===
+        // === CORE CLOCK ===
         const days = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
         function updateClock() {
             const now = new Date();
@@ -361,8 +387,6 @@ body {
             document.getElementById('sec-text').innerText = String(now.getSeconds()).padStart(2,'0');
             document.getElementById('date-text').innerText = now.toLocaleDateString();
             document.getElementById('day-text').innerText = `[${days[now.getDay()]}]`;
-            
-            // ノイズ頻度 (20%)
             if(Math.random() < 0.20) { 
                 const cw = document.getElementById('clock-wrapper'); cw.classList.add('glitch-active');
                 setTimeout(()=> cw.classList.remove('glitch-active'), 300);
@@ -377,7 +401,7 @@ body {
             }
         }
 
-        // === WEATHER API ===
+        // === WEATHER ===
         async function fetchWeather() {
             try {
                 const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=34.9756&longitude=138.3828&current_weather=true');
@@ -399,7 +423,7 @@ body {
         }
         fetchWeather(); setInterval(fetchWeather, 600000);
 
-        // === SYSTEM UI (Modal & Transition) ===
+        // === MODALS ===
         function triggerTransition(id, txt) {
             document.getElementById('transition-text').innerHTML = txt + '<span class="blink-caret">_</span>';
             const ol = document.getElementById('transition-layer'); ol.classList.add('active');
@@ -415,9 +439,8 @@ body {
             if(id==='modal-tuner') stopVizLoop();
         }
 
-        // === QUEST BOARD LOGIC ===
+        // === QUEST BOARD (No Credits) ===
         let quests = JSON.parse(localStorage.getItem('quests_v3')) || [];
-        // Removed credits logic here
         renderQuests();
         function addQuest() {
             const t = document.getElementById('quest-in-text').value;
@@ -434,55 +457,37 @@ body {
         }
         function completeQuest(i) {
             document.getElementById('quest-clear-overlay').classList.add('active');
-            // Removed credits calculation
             quests.splice(i,1); localStorage.setItem('quests_v3', JSON.stringify(quests)); renderQuests();
             setTimeout(()=>document.getElementById('quest-clear-overlay').classList.remove('active'), 1500);
         }
 
-        // === NOISE TUNER LOGIC (Fixed for Sound) ===
+        // === NOISE TUNER (Enhanced) ===
         let audioCtx, noiseNode, vizReq;
-        function toggleNoise() {
-            // Initialize AudioContext if not exists
+        function toggleNoise(forceStart = false, forceStop = false) {
             if(!audioCtx) { 
                 const AudioContext = window.AudioContext || window.webkitAudioContext;
                 audioCtx = new AudioContext(); 
             }
+            if(audioCtx.state === 'suspended') audioCtx.resume();
 
-            // IMPORTANT: Browsers block sound until user interacts. 
-            // We force resume here on click.
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
+            if(forceStop) {
+                if(noiseNode) { try{noiseNode.stop();}catch(e){} noiseNode=null; }
+                return;
             }
 
-            // If playing, stop it
-            if(noiseNode) { 
-                try { noiseNode.stop(); } catch(e){}
-                noiseNode = null; 
+            if(noiseNode && !forceStart) { // Toggle Off
+                try{noiseNode.stop();}catch(e){} noiseNode=null;
                 return; 
             }
+            
+            if(noiseNode) return; // Already playing
 
-            // Create White Noise
-            const bufferSize = audioCtx.sampleRate * 2; // 2 sec buffer
-            const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-            const data = buffer.getChannelData(0);
-
-            for (let i = 0; i < bufferSize; i++) {
-                data[i] = Math.random() * 2 - 1;
-            }
-
-            noiseNode = audioCtx.createBufferSource();
-            noiseNode.buffer = buffer;
-            noiseNode.loop = true;
-
-            // Gain Node for Volume (Increased to 0.15 for better audibility)
-            const gainNode = audioCtx.createGain();
-            gainNode.gain.value = 0.15; 
-
-            noiseNode.connect(gainNode);
-            gainNode.connect(audioCtx.destination);
-            noiseNode.start();
+            const b = audioCtx.createBuffer(1, audioCtx.sampleRate*2, audioCtx.sampleRate);
+            const d = b.getChannelData(0); for(let i=0; i<d.length; i++) d[i]=Math.random()*2-1;
+            noiseNode = audioCtx.createBufferSource(); noiseNode.buffer = b; noiseNode.loop = true;
+            const g = audioCtx.createGain(); g.gain.value = 0.15;
+            noiseNode.connect(g); g.connect(audioCtx.destination); noiseNode.start();
         }
-
         function startVizLoop() {
             const cvs = document.getElementById('viz-canvas'); const ctx = cvs.getContext('2d');
             cvs.width = cvs.parentElement.clientWidth; cvs.height = 200;
@@ -499,24 +504,117 @@ body {
         }
         function stopVizLoop() { cancelAnimationFrame(vizReq); }
 
-        // === VITAL KEEPER LOGIC ===
+        // === VITAL KEEPER (Linked to Noise) ===
         let vitalInt, vitalTime=25*60;
-        function startVital(){ if(!vitalInt) vitalInt=setInterval(()=>{ vitalTime--; updateVital(); if(vitalTime<=0)resetVital(); },1000); }
-        function pauseVital(){ clearInterval(vitalInt); vitalInt=null; }
-        function resetVital(){ pauseVital(); vitalTime=25*60; updateVital(); }
+        function startVital(){ 
+            if(!vitalInt) {
+                toggleNoise(true); // Force Start Noise
+                vitalInt=setInterval(()=>{ vitalTime--; updateVital(); if(vitalTime<=0)resetVital(); },1000); 
+            }
+        }
+        function pauseVital(){ 
+            clearInterval(vitalInt); vitalInt=null; 
+            toggleNoise(false, true); // Force Stop Noise
+        }
+        function resetVital(){ 
+            pauseVital(); vitalTime=25*60; updateVital(); 
+        }
         function updateVital(){ document.getElementById('vital-timer').innerText = `${Math.floor(vitalTime/60).toString().padStart(2,'0')}:${(vitalTime%60).toString().padStart(2,'0')}`; }
 
-        // === ARCHIVE: ENCRYPTION & ANIMATION LOGIC ===
-        const archiveArea = document.getElementById('archive-area');
+        // === ARCHIVE SYSTEM (List & Save) ===
+        let archives = JSON.parse(localStorage.getItem('chronex_archives')) || [];
+        let currentEditId = null;
+        const archiveEditor = document.getElementById('archive-editor-area');
+        const titleInput = document.getElementById('archive-title-input');
+        const listView = document.getElementById('archive-list-view');
+        const editorView = document.getElementById('archive-editor-view');
         const overlay = document.getElementById('security-overlay');
         const passIn = document.getElementById('passcode-input');
         const glChars = "ﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ0123456789XKZW@#&";
 
-        // Auto Save (Only if not locked)
-        archiveArea.addEventListener('input', () => {
-            if(!localStorage.getItem('chronex_passcode')) localStorage.setItem('chronex_memo_v2', archiveArea.value);
-        });
+        // Migration for old single memo
+        const oldMemo = localStorage.getItem('chronex_memo_v2');
+        if(oldMemo) {
+            archives.push({ id: Date.now(), title: "RECOVERED_DATA", content: oldMemo, date: new Date().toLocaleDateString() });
+            localStorage.removeItem('chronex_memo_v2');
+            localStorage.setItem('chronex_archives', JSON.stringify(archives));
+        }
 
+        function renderArchiveList() {
+            const container = document.getElementById('archive-list-container');
+            container.innerHTML = "";
+            archives.forEach(item => {
+                const div = document.createElement('div');
+                div.className = "archive-item";
+                div.innerHTML = `<div><div class="ai-title">${item.title}</div><div class="ai-date">${item.date}</div></div><div style="color:var(--neon-cyan)">>> OPEN</div>`;
+                div.onclick = () => openEditor(item.id);
+                container.appendChild(div);
+            });
+        }
+
+        function createNewMemo() {
+            currentEditId = null;
+            titleInput.value = "";
+            archiveEditor.value = "";
+            switchView('editor');
+        }
+
+        function openEditor(id) {
+            const item = archives.find(a => a.id === id);
+            if(item) {
+                currentEditId = id;
+                titleInput.value = item.title;
+                // If unlocked, run decrypt anim on load
+                if(!localStorage.getItem('chronex_passcode')) {
+                    runDecryptAnim(item.content); 
+                } else {
+                    // This case shouldn't be reached if overlay works, but safety fallback
+                    archiveEditor.value = item.content;
+                }
+                switchView('editor');
+            }
+        }
+
+        function saveCurrentMemo() {
+            const title = titleInput.value || "UNTITLED_FILE";
+            const content = archiveEditor.value;
+            const date = new Date().toLocaleDateString();
+
+            if(currentEditId) {
+                const idx = archives.findIndex(a => a.id === currentEditId);
+                if(idx !== -1) { archives[idx] = { id: currentEditId, title, content, date }; }
+            } else {
+                archives.push({ id: Date.now(), title, content, date });
+            }
+            localStorage.setItem('chronex_archives', JSON.stringify(archives));
+            alert("DATA SAVED.");
+            closeEditor();
+        }
+
+        function deleteCurrentMemo() {
+            if(currentEditId && confirm("PERMANENTLY DELETE?")) {
+                archives = archives.filter(a => a.id !== currentEditId);
+                localStorage.setItem('chronex_archives', JSON.stringify(archives));
+                closeEditor();
+            }
+        }
+
+        function closeEditor() {
+            switchView('list');
+            renderArchiveList();
+        }
+
+        function switchView(view) {
+            if(view === 'list') {
+                listView.style.display = 'flex';
+                editorView.style.display = 'none';
+            } else {
+                listView.style.display = 'none';
+                editorView.style.display = 'flex';
+            }
+        }
+
+        // Security Logic
         function updateLockStatusUI() {
             const l = localStorage.getItem('chronex_passcode');
             const stat = document.getElementById('lock-indicator');
@@ -527,73 +625,70 @@ body {
         function checkOverlayRequirement() {
             if(localStorage.getItem('chronex_passcode')) {
                 overlay.style.display = 'flex'; passIn.value = "";
-                // Fill with garbage on open if locked
-                archiveArea.value = generateGlitch(200); archiveArea.readOnly = true;
+                // If locked, we can't see list, but if we forced visual glitch on editor
+                archiveEditor.value = generateGlitch(200); 
             } else {
                 overlay.style.display = 'none';
-                archiveArea.value = localStorage.getItem('chronex_memo_v2') || ""; archiveArea.readOnly = false;
+                renderArchiveList(); // Show list when unlocked
             }
         }
         function generateGlitch(len) { let s=""; for(let i=0;i<len;i++) s+=glChars.charAt(Math.floor(Math.random()*glChars.length)); return s; }
 
-        // --- ANIMATIONS ---
-        
-        // Encrypt: Real Text -> Garbage (Kata-kata)
+        // Animations
         function runEncryptAnim(callback) {
-            const original = archiveArea.value;
+            const original = archiveEditor.value;
             const len = original.length || 100;
-            let step = 0; const stepsTotal = 30; // approx 1 sec
-            archiveArea.readOnly = true;
-            
+            let step = 0; const stepsTotal = 30;
+            archiveEditor.readOnly = true;
             const timer = setInterval(() => {
-                step++;
-                let display = "";
+                step++; let display = "";
                 for(let i=0; i<len; i++) {
-                    // Progressively replace from start
                     if(i < (len * (step/stepsTotal))) display += glChars.charAt(Math.floor(Math.random()*glChars.length));
                     else display += original.charAt(i) || "";
                 }
-                archiveArea.value = display;
+                archiveEditor.value = display;
                 if(step >= stepsTotal) { clearInterval(timer); if(callback) callback(); }
             }, 30);
         }
 
-        // Decrypt: Garbage -> Real Text (Kata-kata)
         function runDecryptAnim(realText) {
             const len = realText.length || 100;
-            let step = 0; const stepsTotal = 40; // approx 1.2 sec
-            
+            let step = 0; const stepsTotal = 40;
             const timer = setInterval(() => {
-                step++;
-                let display = "";
+                step++; let display = "";
                 for(let i=0; i<len; i++) {
-                    // Progressively reveal from start
                     if(i < (len * (step/stepsTotal))) display += realText.charAt(i);
                     else display += glChars.charAt(Math.floor(Math.random()*glChars.length));
                 }
-                archiveArea.value = display;
-                if(step >= stepsTotal) { clearInterval(timer); archiveArea.value = realText; archiveArea.readOnly = false; }
+                archiveEditor.value = display;
+                if(step >= stepsTotal) { clearInterval(timer); archiveEditor.value = realText; archiveEditor.readOnly = false; }
             }, 30);
         }
 
-        // --- ACTIONS ---
+        // Lock Actions
         function setLock() {
             if(localStorage.getItem('chronex_passcode')) return alert("ALREADY LOCKED.");
             const p = prompt("【LOCK SETUP】\n設定するパスワード(4桁)を入力:");
             if(p && p.length===4 && !isNaN(p)) {
-                // Animate FIRST, then lock
-                runEncryptAnim(() => {
+                // If in editor, encrypt visual. If in list, just lock overlay.
+                if(editorView.style.display === 'flex') {
+                    runEncryptAnim(() => {
+                        localStorage.setItem('chronex_passcode', p);
+                        updateLockStatusUI();
+                        // closeEditor(); // Optional: force back to list? No, keep confusing visual.
+                    });
+                } else {
                     localStorage.setItem('chronex_passcode', p);
                     updateLockStatusUI();
-                });
+                    checkOverlayRequirement();
+                }
             } else if(p!==null) alert("INVALID PASSCODE.");
         }
 
         function unlockOverlay() {
             if(passIn.value === localStorage.getItem('chronex_passcode')) {
                 overlay.style.display = 'none';
-                const real = localStorage.getItem('chronex_memo_v2') || "";
-                runDecryptAnim(real);
+                renderArchiveList(); // Load data
             } else {
                 passIn.style.borderColor = "#fff"; setTimeout(()=>passIn.style.borderColor="var(--forbidden-red)", 200);
             }
@@ -604,15 +699,10 @@ body {
             if(!stored) return alert("ALREADY UNLOCKED.");
             const p = prompt("【UNLOCK】\n現在のパスワードを入力:");
             if(p === stored) {
-                const real = localStorage.getItem('chronex_memo_v2') || "";
-                runDecryptAnim(real); // Animate restoration
                 localStorage.removeItem('chronex_passcode');
                 updateLockStatusUI();
+                alert("SYSTEM UNLOCKED.");
             } else if(p!==null) alert("WRONG PASSCODE.");
-        }
-
-        function clearArchive() {
-            if(confirm("DELETE ALL DATA?")) { archiveArea.value=""; localStorage.removeItem('chronex_memo_v2'); }
         }
     </script>
 </body>
