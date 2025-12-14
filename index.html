@@ -25,7 +25,7 @@
     --forbidden-red: #ff3333;
     --safe-green: #33ff33;
     --silver-metal: #e0e5eb;
-    --moon-pale: #eef2f5; /* 追加: 月の色 */
+    --moon-pale: #eef2f5; 
     --border: rgba(255, 255, 255, 0.15);
     --border-strong: rgba(255, 255, 255, 0.35);
 }
@@ -120,7 +120,6 @@ body {
 
 .glitch-wrapper { position: relative; z-index: 10; text-align: center; }
 
-/* --- 時計表示の修正 --- */
 .time-display {
     display: flex; align-items: center; justify-content: center;
     font-family: 'Orbitron', monospace; color: #fff;
@@ -130,23 +129,9 @@ body {
     width: 350px; 
     font-variant-numeric: tabular-nums;
 }
-/* 各パーツに固定幅を与えて左右ズレを防止 */
-#h-min {
-    width: 170px;
-    text-align: right;
-    display: inline-block;
-}
-.time-colon {
-    width: 30px;
-    text-align: center;
-    display: inline-block;
-    animation: blink 1s infinite;
-}
-#sec-text {
-    width: 80px;
-    text-align: left;
-    display: inline-block;
-}
+#h-min { width: 170px; text-align: right; display: inline-block; }
+.time-colon { width: 30px; text-align: center; display: inline-block; animation: blink 1s infinite; }
+#sec-text { width: 80px; text-align: left; display: inline-block; }
 
 @keyframes blink { 50% { opacity: 0; } }
 
@@ -230,11 +215,9 @@ body {
     width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;
     padding: 20px 0; position: relative;
 }
-.moon-viz { width: 200px; height: 200px; position: relative; margin-bottom: 20px; }
+.moon-viz { width: 220px; height: 220px; position: relative; margin-bottom: 20px; }
 #moon-canvas { width: 100%; height: 100%; }
-.moon-info {
-    text-align: center; color: #fff; font-family: 'Orbitron'; width: 100%;
-}
+.moon-info { text-align: center; color: #fff; font-family: 'Orbitron'; width: 100%; }
 .moon-phase-name {
     color: var(--silver-metal); font-family: 'Zen Old Mincho', serif; font-size: 20px;
     margin-bottom: 5px; letter-spacing: 2px; text-shadow: 0 0 10px rgba(255,255,255,0.3);
@@ -244,6 +227,21 @@ body {
 }
 .md-item { background: rgba(255,255,255,0.05); padding: 8px; border: 1px solid #333; font-size: 10px; color: #aaa; }
 .md-val { color: var(--neon-cyan); font-size: 14px; font-weight: bold; display: block; margin-top: 3px; }
+
+/* WEEKLY MOON CALENDAR (NEW) */
+.moon-weekly-container {
+    width: 100%; max-width: 350px; margin-top: 25px; border-top: 1px solid #333; padding-top: 15px;
+}
+.mw-title { font-size: 10px; color: var(--neon-cyan); letter-spacing: 2px; margin-bottom: 12px; text-align: left; }
+.mw-grid { display: flex; justify-content: space-between; gap: 4px; overflow-x: auto; padding-bottom: 5px; }
+.mw-day {
+    min-width: 40px; display: flex; flex-direction: column; align-items: center;
+    background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1);
+    padding: 6px 2px; border-radius: 4px; transition: 0.2s;
+}
+.mw-day:hover { background: rgba(255,255,255,0.08); border-color: var(--neon-cyan); }
+.mw-date { font-size: 9px; color: #888; margin-bottom: 6px; font-family: 'Orbitron'; }
+.mw-canvas-wrap { width: 24px; height: 24px; display: flex; justify-content: center; align-items: center; }
 
 /* VITAL */
 .vital-pod { width: 220px; height: 220px; border-radius: 50%; border: 4px solid #222; margin: 20px auto; display: flex; justify-content: center; align-items: center; position: relative; background: #000; }
@@ -304,13 +302,12 @@ body {
 /* Security Overlay */
 #security-overlay { display:flex; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.98); z-index:999; flex-direction:column; justify-content:center; align-items:center; backdrop-filter:blur(10px); }
 
-/* --- 修正: 左上の文字を赤に変更 --- */
 .overlay-top-left {
     position: absolute; top: 20px; left: 20px;
-    color: var(--forbidden-red); /* 水色から赤に変更 */
+    color: var(--forbidden-red);
     font-family: 'Zen Old Mincho', serif;
     font-size: 18px; letter-spacing: 2px;
-    text-shadow: 0 0 5px var(--forbidden-red); /* 光彩も赤に変更 */
+    text-shadow: 0 0 5px var(--forbidden-red);
 }
 
 .tiny-hint { position: absolute; bottom: 5px; right: 5px; font-size: 8px; color: #111; font-family: 'Orbitron'; user-select: none; }
@@ -444,7 +441,7 @@ body {
         <div class="modal-content">
             <div class="moon-container">
                 <div class="moon-viz">
-                    <canvas id="moon-canvas" width="200" height="200"></canvas>
+                    <canvas id="moon-canvas" width="220" height="220"></canvas>
                 </div>
                 <div class="moon-info">
                     <div class="moon-phase-name" id="moon-phase-name">Analyzing...</div>
@@ -455,6 +452,12 @@ body {
                         <div class="md-item">CYCLE<span class="md-val">29.53 Days</span></div>
                     </div>
                 </div>
+                
+                <div class="moon-weekly-container">
+                    <div class="mw-title">>> WEEKLY TRAJECTORY (7 DAYS)</div>
+                    <div class="mw-grid" id="moon-weekly-grid"></div>
+                </div>
+
             </div>
         </div>
     </div>
@@ -514,8 +517,8 @@ body {
             <div id="security-overlay" style="display:flex;">
                 <div class="overlay-top-left">禁忌ノ書庫</div>
 
-                <div id="sec-title" style="color:var(--forbidden-red); font-size:24px; font-weight:bold; letter-spacing:5px; margin-bottom:20px; text-align:center;">[[ 警告：接近権限：拒絶 ]]</div>
-                <div id="sec-sub" style="color:#fff; font-size:12px; margin-bottom:10px; font-family:'Orbitron';">>> 暗号コードノ提示ヲ求ム</div>
+                <div id="sec-title" style="color:var(--forbidden-red); font-size:24px; font-weight:bold; letter-spacing:5px; margin-bottom:20px; text-align:center;">[[ 警告：接近権限・拒絶 ]]</div>
+                <div id="sec-sub" style="color:#fff; font-size:12px; margin-bottom:10px; font-family:'Orbitron';">>> 暗号鍵（コード）ノ提示ヲ求ム</div>
                 <input type="tel" id="passcode-input" maxlength="4" style="background:transparent; border:2px solid var(--forbidden-red); color:var(--forbidden-red); font-family:'Orbitron'; font-size:32px; width:150px; text-align:center; outline:none; letter-spacing:10px; margin-bottom:20px;">
                 <button id="sec-btn" onclick="handleSecurityInput()" style="background:var(--forbidden-red); color:#000; border:none; padding:10px 40px; font-family:'Orbitron'; font-weight:bold; cursor:pointer; clip-path: polygon(10% 0, 100% 0, 100% 70%, 90% 100%, 0 100%, 0 30%);">UNLOCK</button>
                 
@@ -524,13 +527,13 @@ body {
                 <div id="pass-reveal"></div>
 
                 <div id="hint-modal">
-                    <div class="hint-text">真実ハ<br>視界ノ右隅ニ<br>潜ム...</div>
+                    <div class="hint-text">真実ハ<br>視界ノ隅（ミギシタ）ニ<br>潜ム...</div>
                     <button class="arch-btn" style="font-size:10px;" onclick="closeHintModal()">CLOSE</button>
                 </div>
             </div>
 
             <div id="undo-toast" class="undo-toast">
-                <span>データヲ消去... 復元シマスカ？</span>
+                <span>データ消去... 復元シマスワ？</span>
                 <span class="undo-action" onclick="undoDelete()">UNDO</span>
             </div>
 
@@ -630,7 +633,7 @@ body {
             setTimeout(()=>document.getElementById('quest-clear-overlay').classList.remove('active'), 1500);
         }
 
-        // === LUNAR PHASE (NEW) ===
+        // === LUNAR PHASE + WEEKLY CALENDAR ===
         let moonReq;
         function getMoonAge(date) {
             const base = new Date(2000, 0, 6);
@@ -643,7 +646,7 @@ body {
             const ctx = cvs.getContext('2d');
             const now = new Date();
             const age = getMoonAge(now);
-            const phase = age / 29.53058867; // 0.0 - 1.0
+            const phase = age / 29.53058867; 
 
             document.getElementById('md-age').innerText = age.toFixed(2);
             let pName = "";
@@ -658,71 +661,104 @@ body {
             
             document.getElementById('moon-phase-name').innerText = pName;
             
-            // Illumination approx
             const illum = (1 - Math.cos(phase * 2 * Math.PI)) / 2 * 100;
             document.getElementById('md-illum').innerText = illum.toFixed(1) + "%";
 
-            // Anim Loop
+            // Main Animation
             let starOff = 0;
             function draw() {
                 moonReq = requestAnimationFrame(draw);
-                ctx.clearRect(0,0,200,200);
+                ctx.clearRect(0,0,220,220);
                 
                 // Stars
                 ctx.fillStyle = "#fff";
                 starOff += 0.2;
                 for(let i=0; i<30; i++) {
-                    const x = (Math.sin(i*13 + starOff*0.05) * 100 + 100) % 200;
-                    const y = (Math.cos(i*29 + starOff*0.02) * 100 + 100) % 200;
+                    const x = (Math.sin(i*13 + starOff*0.05) * 110 + 110) % 220;
+                    const y = (Math.cos(i*29 + starOff*0.02) * 110 + 110) % 220;
                     const s = Math.random() * 1.5;
                     ctx.globalAlpha = Math.random() * 0.8;
                     ctx.fillRect(x,y,s,s);
                 }
                 ctx.globalAlpha = 1.0;
 
-                // Moon Base
-                const cx = 100, cy = 100, r = 80;
-                ctx.beginPath(); arc(ctx, cx, cy, r);
-                ctx.fillStyle = "#111"; ctx.fill(); 
-
-                // Moon Lit part
-                ctx.save();
-                ctx.beginPath(); arc(ctx, cx, cy, r);
-                ctx.fillStyle = "#eef2f5";
-                ctx.shadowBlur = 20; ctx.shadowColor = "#eef2f5";
-                ctx.fill();
-                ctx.restore();
-
-                // Shadow logic
-                ctx.fillStyle = "rgba(10,14,20,0.95)";
-                let p = phase; 
-                if(p <= 0.5) {
-                    const w = r * Math.cos(p * 2 * Math.PI); 
-                    ctx.beginPath();
-                    if(p < 0.25) {
-                        ctx.arc(cx, cy, r, -Math.PI/2, Math.PI/2, true); 
-                        ctx.ellipse(cx, cy, Math.abs(w), r, 0, Math.PI/2, -Math.PI/2, true);
-                    } else {
-                        ctx.arc(cx, cy, r, -Math.PI/2, Math.PI/2, true); 
-                        ctx.ellipse(cx, cy, Math.abs(w), r, 0, -Math.PI/2, Math.PI/2, false); 
-                    }
-                    ctx.fill();
-                } else {
-                    const w = r * Math.cos(p * 2 * Math.PI);
-                    ctx.beginPath();
-                    if(p < 0.75) {
-                        ctx.arc(cx, cy, r, -Math.PI/2, Math.PI/2, false); 
-                        ctx.ellipse(cx, cy, Math.abs(w), r, 0, Math.PI/2, -Math.PI/2, false); 
-                    } else {
-                        ctx.arc(cx, cy, r, -Math.PI/2, Math.PI/2, false); 
-                        ctx.ellipse(cx, cy, Math.abs(w), r, 0, -Math.PI/2, Math.PI/2, true);
-                    }
-                    ctx.fill();
-                }
+                // Moon
+                const cx = 110, cy = 110, r = 85;
+                drawMoonBody(ctx, cx, cy, r, phase, true);
             }
             draw();
+
+            // Render Weekly
+            renderWeeklyMoon(now);
         }
-        function arc(ctx,x,y,r){ctx.arc(x,y,r,0,Math.PI*2);}
+
+        function drawMoonBody(ctx, cx, cy, r, phase, glow) {
+            // Dark Base
+            ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2);
+            ctx.fillStyle = "#111"; ctx.fill(); 
+
+            // Lit part
+            ctx.save();
+            ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2);
+            ctx.fillStyle = "#eef2f5";
+            if(glow) { ctx.shadowBlur = 20; ctx.shadowColor = "#eef2f5"; }
+            ctx.fill();
+            ctx.restore();
+
+            // Shadow
+            ctx.fillStyle = "rgba(10,14,20,0.95)";
+            let p = phase; 
+            if(p <= 0.5) {
+                const w = r * Math.cos(p * 2 * Math.PI); 
+                ctx.beginPath();
+                if(p < 0.25) {
+                    ctx.arc(cx, cy, r, -Math.PI/2, Math.PI/2, true); 
+                    ctx.ellipse(cx, cy, Math.abs(w), r, 0, Math.PI/2, -Math.PI/2, true);
+                } else {
+                    ctx.arc(cx, cy, r, -Math.PI/2, Math.PI/2, true); 
+                    ctx.ellipse(cx, cy, Math.abs(w), r, 0, -Math.PI/2, Math.PI/2, false); 
+                }
+                ctx.fill();
+            } else {
+                const w = r * Math.cos(p * 2 * Math.PI);
+                ctx.beginPath();
+                if(p < 0.75) {
+                    ctx.arc(cx, cy, r, -Math.PI/2, Math.PI/2, false); 
+                    ctx.ellipse(cx, cy, Math.abs(w), r, 0, Math.PI/2, -Math.PI/2, false); 
+                } else {
+                    ctx.arc(cx, cy, r, -Math.PI/2, Math.PI/2, false); 
+                    ctx.ellipse(cx, cy, Math.abs(w), r, 0, -Math.PI/2, Math.PI/2, true);
+                }
+                ctx.fill();
+            }
+        }
+
+        function renderWeeklyMoon(startDate) {
+            const container = document.getElementById('moon-weekly-grid');
+            container.innerHTML = "";
+            for(let i=0; i<7; i++) {
+                const d = new Date(startDate);
+                d.setDate(d.getDate() + i);
+                const age = getMoonAge(d);
+                const phase = age / 29.53058867;
+                
+                const dayDiv = document.createElement('div');
+                dayDiv.className = 'mw-day';
+                
+                // Mini Canvas
+                const cvs = document.createElement('canvas');
+                cvs.width = 24; cvs.height = 24;
+                const ctx = cvs.getContext('2d');
+                drawMoonBody(ctx, 12, 12, 10, phase, false); // No glow for small icons
+
+                dayDiv.innerHTML = `<div class="mw-date">${d.getMonth()+1}/${d.getDate()}</div>`;
+                const cw = document.createElement('div'); cw.className='mw-canvas-wrap';
+                cw.appendChild(cvs);
+                dayDiv.appendChild(cw);
+                container.appendChild(dayDiv);
+            }
+        }
+
         function stopMoonAnim() { cancelAnimationFrame(moonReq); }
 
 
