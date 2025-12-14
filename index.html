@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>AETHER CHRONICLE v7.0 (Glitch & Undo)</title>
+<title>AETHER CHRONICLE v8.0 (Trash & Chunibyo)</title>
 
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -43,9 +43,9 @@ body {
 }
 #transition-layer.active { opacity: 1; pointer-events: auto; }
 #transition-text {
-    font-family: 'Orbitron', monospace; color: var(--neon-cyan);
-    font-size: 18px; letter-spacing: 4px; text-align: center;
-    text-shadow: 0 0 10px var(--neon-cyan);
+    font-family: 'Zen Old Mincho', serif; color: var(--neon-cyan);
+    font-size: 20px; letter-spacing: 4px; text-align: center;
+    text-shadow: 0 0 10px var(--neon-cyan); white-space: nowrap;
 }
 .blink-caret { animation: blink 0.8s infinite; }
 
@@ -181,9 +181,14 @@ body {
 .modal.active { opacity: 1; pointer-events: auto; transform: scale(1); }
 .modal-header { padding: 15px 20px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.5); }
 .modal-title { font-size: 16px; color: var(--neon-cyan); letter-spacing: 2px; font-weight: bold; }
-.close-btn { font-size: 24px; color: #fff; cursor: pointer; }
-.settings-btn { font-size: 20px; color: #aaa; cursor: pointer; margin-right: 15px; transition:0.3s; }
-.settings-btn:hover { color: var(--neon-cyan); transform: rotate(90deg); }
+.close-btn { font-size: 24px; color: #fff; cursor: pointer; margin-left:15px; }
+
+.header-icons { display: flex; align-items: center; gap: 15px; }
+.head-icon { font-size: 20px; color: #aaa; cursor: pointer; transition:0.3s; position:relative; }
+.head-icon:hover { color: var(--neon-cyan); }
+.settings-btn:hover { transform: rotate(90deg); }
+.trash-btn:hover { color: var(--forbidden-red); transform: scale(1.1); }
+
 .modal-content { flex: 1; padding: 20px; overflow-y: auto; position: relative; }
 
 /* QUEST */
@@ -236,6 +241,19 @@ body {
 }
 .archive-editor { flex: 1; background: rgba(20, 0, 0, 0.3); border: 1px solid var(--forbidden-red); padding: 15px; color: #ccaaaa; font-family: 'Zen Old Mincho', serif; font-size: 14px; line-height: 1.8; outline: none; resize: none; width: 100%; box-sizing: border-box; }
 
+/* Trash View */
+#archive-trash-view { display: none; flex-direction: column; height: 100%; padding: 20px; }
+.trash-item {
+    background: rgba(0, 0, 0, 0.5); border: 1px solid #444; padding: 15px; margin-bottom: 8px;
+    display: flex; justify-content: space-between; align-items: center; color: #777;
+}
+.trash-actions { display: flex; gap: 8px; }
+.btn-restore { border:1px solid var(--safe-green); color:var(--safe-green); background:transparent; font-size:10px; cursor:pointer; padding:5px; }
+.btn-purge { border:1px solid var(--forbidden-red); color:var(--forbidden-red); background:transparent; font-size:10px; cursor:pointer; padding:5px; }
+.btn-restore:hover { background:var(--safe-green); color:#000; }
+.btn-purge:hover { background:var(--forbidden-red); color:#000; }
+.trash-empty { color: #555; text-align: center; margin-top: 50px; font-family: 'Orbitron'; }
+
 .arch-btn { background: transparent; border: 1px solid #555; color: #aaa; padding: 6px 12px; font-family: 'Orbitron'; font-size: 10px; cursor: pointer; transition: 0.2s; }
 .arch-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
 
@@ -246,19 +264,6 @@ body {
 #security-overlay { display:flex; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.98); z-index:999; flex-direction:column; justify-content:center; align-items:center; backdrop-filter:blur(10px); }
 .tiny-hint { position: absolute; bottom: 5px; right: 5px; font-size: 8px; color: #111; font-family: 'Orbitron'; user-select: none; }
 .tiny-hint:hover { color: #333; }
-
-/* Undo Toast */
-.undo-toast {
-    position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
-    background: #111; border: 1px solid var(--neon-cyan); color: var(--neon-cyan);
-    padding: 10px 30px; font-family: 'Orbitron'; font-size: 12px; letter-spacing: 1px;
-    box-shadow: 0 0 15px rgba(0,243,255,0.3); z-index: 1000;
-    display: none; align-items: center; justify-content: space-between; gap: 20px;
-    animation: slideUp 0.3s ease-out;
-}
-.undo-toast.active { display: flex; }
-@keyframes slideUp { from { transform: translate(-50%, 20px); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
-.undo-action { font-weight: bold; text-decoration: underline; cursor: pointer; color: #fff; }
 
 /* Disabled state */
 .btn-disabled { opacity: 0.3; cursor: not-allowed; border-color: #333 !important; color: #333 !important; pointer-events: none; }
@@ -315,16 +320,16 @@ body {
         </div>
         <div style="height:10px;"></div>
         <div class="app-grid">
-            <div class="app-card" onclick="triggerTransition('modal-quest', '>> INITIALIZING MISSION...')">
+            <div class="app-card" onclick="triggerTransition('modal-quest', '>> 因果律構造、解析中...')">
                 <div class="app-title">QUEST BOARD</div><div class="app-status">Active: <span id="m-count">0</span></div><div class="app-icon-bg">⚔</div>
             </div>
-            <div class="app-card" onclick="triggerTransition('modal-tuner', '>> DIVE INTO THE VOID...')">
+            <div class="app-card" onclick="triggerTransition('modal-tuner', '>> 虚数空間ヘ潜行...')">
                 <div class="app-title">NOISE TUNER</div><div class="app-status">Signal Wave</div><div class="app-icon-bg">📡</div>
             </div>
-            <div class="app-card" onclick="triggerTransition('modal-vital', '>> SYNCHRONIZING BIORHYTHMS...')">
+            <div class="app-card" onclick="triggerTransition('modal-vital', '>> 生命鼓動、同調...')">
                 <div class="app-title">VITAL KEEPER</div><div class="app-status">Life Support</div><div class="app-icon-bg">♥</div>
             </div>
-            <div class="app-card card-forbidden" onclick="triggerTransition('modal-archive', '>> DECRYPTING RESTRICTED DATA...')">
+            <div class="app-card card-forbidden" onclick="triggerTransition('modal-archive', '>> 封印サレシ記憶、解凍...')">
                 <div class="app-title">FORBIDDEN ARCHIVE</div><div class="app-status" style="color:#aa5555;">[[ LOCKED ]]</div><div class="app-icon-bg">👁</div>
             </div>
         </div>
@@ -369,8 +374,9 @@ body {
     <div id="modal-archive" class="modal">
         <div class="modal-header">
             <span class="modal-title">FORBIDDEN ARCHIVE</span>
-            <div style="display:flex; align-items:center;">
-                <div class="settings-btn" onclick="openSettings()">⚙</div>
+            <div class="header-icons">
+                <div class="head-icon trash-btn" onclick="openTrash()">🗑</div>
+                <div class="head-icon settings-btn" onclick="openSettings()">⚙</div>
                 <span class="close-btn" onclick="closeModal('modal-archive')">×</span>
             </div>
         </div>
@@ -393,17 +399,20 @@ body {
                 </div>
             </div>
 
+            <div id="archive-trash-view">
+                <div style="border-bottom:1px solid #333; padding-bottom:10px; margin-bottom:15px; display:flex; justify-content:space-between; align-items:center;">
+                    <span style="color:var(--forbidden-red); font-size:12px;">DELETED FILES</span>
+                    <button class="arch-btn" onclick="closeTrash()">← BACK</button>
+                </div>
+                <div id="archive-trash-container"></div>
+            </div>
+
             <div id="security-overlay" style="display:flex;">
                 <div id="sec-title" style="color:var(--forbidden-red); font-size:24px; font-weight:bold; letter-spacing:5px; margin-bottom:20px; text-align:center;">ACCESS DENIED</div>
                 <div id="sec-sub" style="color:#fff; font-size:12px; margin-bottom:10px; font-family:'Orbitron';">ENTER PASSCODE</div>
                 <input type="tel" id="passcode-input" maxlength="4" style="background:transparent; border:2px solid var(--forbidden-red); color:var(--forbidden-red); font-family:'Orbitron'; font-size:32px; width:150px; text-align:center; outline:none; letter-spacing:10px; margin-bottom:20px;">
                 <button id="sec-btn" onclick="handleSecurityInput()" style="background:var(--forbidden-red); color:#000; border:none; padding:10px 40px; font-family:'Orbitron'; font-weight:bold; cursor:pointer; clip-path: polygon(10% 0, 100% 0, 100% 70%, 90% 100%, 0 100%, 0 30%);">UNLOCK</button>
                 <div class="tiny-hint" id="tiny-pass-hint"></div>
-            </div>
-
-            <div id="undo-toast" class="undo-toast">
-                <span>ITEM DELETED</span>
-                <span class="undo-action" onclick="undoDelete()">UNDO</span>
             </div>
 
         </div>
@@ -559,17 +568,16 @@ body {
 
         // === ARCHIVE SYSTEM ===
         let archives = JSON.parse(localStorage.getItem('chronex_archives')) || [];
+        let trashArchives = JSON.parse(localStorage.getItem('chronex_trash')) || [];
         let currentEditId = null;
         let isSetupMode = false;
         
-        // Undo Variables
-        let lastDeletedItem = null;
-        let undoTimeout = null;
-
         const archiveEditor = document.getElementById('archive-editor-area');
         const titleInput = document.getElementById('archive-title-input');
         const listView = document.getElementById('archive-list-view');
         const editorView = document.getElementById('archive-editor-view');
+        const trashView = document.getElementById('archive-trash-view');
+        
         const overlay = document.getElementById('security-overlay');
         const passIn = document.getElementById('passcode-input');
         const secTitle = document.getElementById('sec-title');
@@ -584,7 +592,6 @@ body {
             archives.forEach(item => {
                 const div = document.createElement('div');
                 div.className = "archive-item";
-                // Add Delete button directly to the list item
                 div.innerHTML = `
                     <div style="flex:1;" onclick="openEditor(${item.id})">
                         <div class="ai-title">${item.title}</div>
@@ -592,7 +599,7 @@ body {
                     </div>
                     <div style="display:flex; align-items:center;">
                         <span style="color:var(--neon-cyan); font-size:10px; margin-right:10px;">>> OPEN</span>
-                        <button class="list-del-btn" onclick="deleteFromList(${item.id})">🗑</button>
+                        <button class="list-del-btn" onclick="moveToTrash(${item.id})">🗑</button>
                     </div>`;
                 container.appendChild(div);
             });
@@ -606,7 +613,6 @@ body {
             overlay.style.display = "flex"; 
 
             if (!storedPass) {
-                // Setup Mode
                 isSetupMode = true;
                 secTitle.innerText = "SYSTEM INITIALIZATION";
                 secTitle.style.color = "var(--neon-cyan)";
@@ -617,7 +623,6 @@ body {
                 passIn.style.color = "var(--neon-cyan)";
                 tinyHint.innerText = "";
             } else {
-                // Login Mode
                 isSetupMode = false;
                 secTitle.innerText = "ACCESS DENIED";
                 secTitle.style.color = "var(--forbidden-red)";
@@ -626,7 +631,6 @@ body {
                 secBtn.style.backgroundColor = "var(--forbidden-red)";
                 passIn.style.borderColor = "var(--forbidden-red)";
                 passIn.style.color = "var(--forbidden-red)";
-                // Requirement 1: Tiny Password Hint
                 tinyHint.innerText = storedPass; 
             }
         }
@@ -657,10 +661,7 @@ body {
             overlay.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(-10px)' }, { transform: 'translateX(10px)' }, { transform: 'translateX(0)' }], { duration: 200 });
         }
 
-        // Requirement 3: Change Password Setting
         function openSettings() {
-            // Can only change if already logged in (overlay is gone) or we can just ask for old pass.
-            // Since the button is inside the modal, the user has likely passed the check.
             const newPass = prompt("【SYSTEM SETTINGS】\n新しいパスワードを入力してください (4桁)");
             if(newPass && newPass.length === 4 && !isNaN(newPass)) {
                 localStorage.setItem('chronex_passcode', newPass);
@@ -668,6 +669,75 @@ body {
             } else if (newPass !== null) {
                 alert("INVALID FORMAT. UPDATE ABORTED.");
             }
+        }
+
+        // --- TRASH SYSTEM ---
+        function openTrash() {
+            renderTrashList();
+            switchView('trash');
+        }
+
+        function closeTrash() {
+            switchView('list');
+        }
+
+        function renderTrashList() {
+            const container = document.getElementById('archive-trash-container');
+            container.innerHTML = "";
+            if(trashArchives.length === 0) {
+                container.innerHTML = "<div class='trash-empty'>// NULL VOID //</div>";
+                return;
+            }
+            trashArchives.forEach(item => {
+                const div = document.createElement('div');
+                div.className = "trash-item";
+                div.innerHTML = `
+                    <div>
+                        <div style="font-size:14px; color:#999;">${item.title}</div>
+                        <div style="font-size:8px;">${item.date}</div>
+                    </div>
+                    <div class="trash-actions">
+                        <button class="btn-restore" onclick="restoreFromTrash(${item.id})">RESTORE</button>
+                        <button class="btn-purge" onclick="purgeFromTrash(${item.id})">PURGE</button>
+                    </div>`;
+                container.appendChild(div);
+            });
+        }
+
+        function moveToTrash(id) {
+            const idx = archives.findIndex(a => a.id === id);
+            if(idx !== -1) {
+                trashArchives.push(archives[idx]);
+                archives.splice(idx, 1);
+                updateStorage();
+                renderArchiveList();
+            }
+        }
+
+        function restoreFromTrash(id) {
+            const idx = trashArchives.findIndex(a => a.id === id);
+            if(idx !== -1) {
+                archives.push(trashArchives[idx]);
+                trashArchives.splice(idx, 1);
+                updateStorage();
+                renderTrashList();
+            }
+        }
+
+        function purgeFromTrash(id) {
+            if(confirm("PERMANENTLY DELETE? CANNOT BE UNDONE.")) {
+                const idx = trashArchives.findIndex(a => a.id === id);
+                if(idx !== -1) {
+                    trashArchives.splice(idx, 1);
+                    updateStorage();
+                    renderTrashList();
+                }
+            }
+        }
+
+        function updateStorage() {
+            localStorage.setItem('chronex_archives', JSON.stringify(archives));
+            localStorage.setItem('chronex_trash', JSON.stringify(trashArchives));
         }
 
         // --- EDITOR & GLITCH ---
@@ -684,7 +754,6 @@ body {
                 currentEditId = id;
                 titleInput.value = item.title;
                 switchView('editor');
-                // Requirement 4: Glitch Effect on Open
                 runDecryptAnim(item.content);
             }
         }
@@ -699,11 +768,9 @@ body {
             const timer = setInterval(() => {
                 step++; let display = "";
                 for(let i=0; i<len; i++) {
-                    // Gradually reveal real characters
                     if(i < (len * (step/stepsTotal))) {
                         display += realText.charAt(i);
                     } else {
-                        // Random glitch chars for the rest
                         display += glChars.charAt(Math.floor(Math.random()*glChars.length));
                     }
                 }
@@ -728,43 +795,9 @@ body {
                 archives.push({ id: newId, title, content, date });
                 currentEditId = newId; 
             }
-            localStorage.setItem('chronex_archives', JSON.stringify(archives));
+            updateStorage();
             alert("DATA SAVED.");
             closeEditor();
-        }
-
-        // Requirement 2: Delete from List with Undo
-        function deleteFromList(id) {
-            const idx = archives.findIndex(a => a.id === id);
-            if(idx !== -1) {
-                lastDeletedItem = archives[idx]; // Backup
-                archives.splice(idx, 1);
-                localStorage.setItem('chronex_archives', JSON.stringify(archives));
-                renderArchiveList();
-                showUndoToast();
-            }
-        }
-
-        function showUndoToast() {
-            const t = document.getElementById('undo-toast');
-            t.classList.add('active');
-            if(undoTimeout) clearTimeout(undoTimeout);
-            undoTimeout = setTimeout(() => {
-                t.classList.remove('active');
-                lastDeletedItem = null; // Clear backup
-            }, 4000); // 4 seconds window
-        }
-
-        function undoDelete() {
-            if(lastDeletedItem) {
-                archives.push(lastDeletedItem);
-                // Sort by ID to keep roughly in order or just push to end
-                archives.sort((a,b) => a.id - b.id);
-                localStorage.setItem('chronex_archives', JSON.stringify(archives));
-                renderArchiveList();
-                document.getElementById('undo-toast').classList.remove('active');
-                lastDeletedItem = null;
-            }
         }
 
         function closeEditor() {
@@ -773,12 +806,16 @@ body {
         }
 
         function switchView(view) {
+            listView.style.display = 'none';
+            editorView.style.display = 'none';
+            trashView.style.display = 'none';
+
             if(view === 'list') {
                 listView.style.display = 'flex';
-                editorView.style.display = 'none';
-            } else {
-                listView.style.display = 'none';
+            } else if (view === 'editor') {
                 editorView.style.display = 'flex';
+            } else if (view === 'trash') {
+                trashView.style.display = 'flex';
             }
         }
     </script>
