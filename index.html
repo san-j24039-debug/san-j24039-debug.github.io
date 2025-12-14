@@ -117,17 +117,38 @@ body {
 .c-ring-2 { width: 85%; height: 85%; border-left-color: var(--neon-cyan); border-right-color: var(--neon-cyan); animation: spin 10s linear infinite reverse; box-shadow: 0 0 10px rgba(0,243,255,0.2); }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-.glitch-wrapper { position: relative; z-index: 10; text-align: center; }
+.glitch-wrapper { position: relative; z-index: 10; text-align: center; width: 100%; }
+
+/* --- 修正: 時計の重なり・ズレ防止 --- */
 .time-display {
     display: flex; align-items: center; justify-content: center;
     font-family: 'Orbitron', monospace; color: #fff;
     text-shadow: 0 0 15px var(--neon-cyan);
-    font-size: 52px; font-weight: 900; letter-spacing: 2px;
-    width: 320px;
+    font-size: 45px; /* 重なり防止のため少し縮小 */
+    font-weight: 900; letter-spacing: 2px;
+    width: 100%;
+    font-variant-numeric: tabular-nums; /* 数字の幅を揃える */
 }
-#h-min { width: 170px; text-align: right; display: inline-block; }
-.time-colon { width: 20px; text-align: center; display: inline-block; animation: blink 1s infinite; margin-bottom: 5px; }
-#sec-text { width: 80px; text-align: left; display: inline-block; }
+
+/* 各パーツの幅を固定して左右に動かないようにする */
+#h-min { 
+    width: 160px; 
+    text-align: right; 
+    display: inline-block; 
+}
+.time-colon { 
+    width: 20px; 
+    text-align: center; 
+    display: inline-block; 
+    animation: blink 1s infinite; 
+    margin-bottom: 5px; 
+}
+#sec-text { 
+    width: 80px; 
+    text-align: left; 
+    display: inline-block; 
+}
+
 @keyframes blink { 50% { opacity: 0; } }
 
 .glitch-active .time-display { animation: glitch-skew 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both infinite; color: var(--neon-pink); text-shadow: 2px 0 var(--neon-cyan), -2px 0 var(--neon-gold); }
@@ -267,22 +288,23 @@ body {
 /* Security Overlay */
 #security-overlay { display:flex; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.98); z-index:999; flex-direction:column; justify-content:center; align-items:center; backdrop-filter:blur(10px); }
 
-/* 左上の「禁忌ノ書庫」 */
+/* --- 修正: 左上の文字を赤に変更 --- */
 .overlay-top-left {
     position: absolute; top: 20px; left: 20px;
-    color: var(--neon-cyan); font-family: 'Zen Old Mincho', serif;
+    color: var(--forbidden-red); /* 水色から赤に変更 */
+    font-family: 'Zen Old Mincho', serif;
     font-size: 18px; letter-spacing: 2px;
-    text-shadow: 0 0 5px var(--neon-cyan);
+    text-shadow: 0 0 5px var(--forbidden-red); /* 光彩も赤に変更 */
 }
 
 .tiny-hint { position: absolute; bottom: 5px; right: 5px; font-size: 8px; color: #111; font-family: 'Orbitron'; user-select: none; }
 .tiny-hint:hover { color: #333; }
 
-/* Forgot Password Link (修正: 色と視認性を向上) */
+/* Forgot Password Link */
 .forgot-link {
     margin-top: 20px; font-size: 10px; color: #ccc; cursor: pointer;
     font-family: 'Zen Old Mincho', serif; text-decoration: underline; transition: 0.3s;
-    text-shadow: 0 0 2px rgba(255, 255, 255, 0.3); /* 薄い発光を追加 */
+    text-shadow: 0 0 2px rgba(255, 255, 255, 0.3);
 }
 .forgot-link:hover { color: var(--neon-cyan); text-shadow: 0 0 8px var(--neon-cyan); }
 
@@ -294,12 +316,12 @@ body {
     display: none; flex-direction: column; align-items: center; text-align: center;
 }
 .hint-text {
-    color: #ccc; font-family: 'Zen Old Mincho', serif; font-size: 14px; margin-bottom: 15px; line-height: 1.6;
+    color: #fff; font-family: 'Zen Old Mincho', serif; font-size: 14px; margin-bottom: 15px; line-height: 1.6;
 }
 
-/* Bottom Right Pass Reveal (修正: iPhoneで見切れない位置へ調整) */
+/* Bottom Right Pass Reveal */
 #pass-reveal {
-    position: absolute; bottom: 40px; right: 50px; /* 位置を上と左に移動 */
+    position: absolute; bottom: 40px; right: 50px;
     font-size: 10px; color: rgba(255,255,255,0.2); font-family: 'Orbitron';
     pointer-events: none;
 }
@@ -465,22 +487,22 @@ body {
                 <div class="overlay-top-left">禁忌ノ書庫</div>
 
                 <div id="sec-title" style="color:var(--forbidden-red); font-size:24px; font-weight:bold; letter-spacing:5px; margin-bottom:20px; text-align:center;">[[ 警告：接近権限・拒絶 ]]</div>
-                <div id="sec-sub" style="color:#fff; font-size:12px; margin-bottom:10px; font-family:'Orbitron';">>> 暗号コード　ノ　提示ヲ求ム</div>
+                <div id="sec-sub" style="color:#fff; font-size:12px; margin-bottom:10px; font-family:'Orbitron';">>> 暗号鍵（コード）ノ提示ヲ求ム</div>
                 <input type="tel" id="passcode-input" maxlength="4" style="background:transparent; border:2px solid var(--forbidden-red); color:var(--forbidden-red); font-family:'Orbitron'; font-size:32px; width:150px; text-align:center; outline:none; letter-spacing:10px; margin-bottom:20px;">
                 <button id="sec-btn" onclick="handleSecurityInput()" style="background:var(--forbidden-red); color:#000; border:none; padding:10px 40px; font-family:'Orbitron'; font-weight:bold; cursor:pointer; clip-path: polygon(10% 0, 100% 0, 100% 70%, 90% 100%, 0 100%, 0 30%);">UNLOCK</button>
                 
-                <div class="forgot-link" onclick="openHintModal()">記憶ヲ 喪失セシ者...</div>
+                <div class="forgot-link" onclick="openHintModal()">記憶ヲ喪失セシ者</div>
 
                 <div id="pass-reveal"></div>
 
                 <div id="hint-modal">
-                    <div class="hint-text">真実ハ<br>視界ノ　右隅　ニ<br>潜ム...</div>
+                    <div class="hint-text">真実ハ<br>視界ノ隅（ミギシタ）ニ<br>潜ム...</div>
                     <button class="arch-btn" style="font-size:10px;" onclick="closeHintModal()">CLOSE</button>
                 </div>
             </div>
 
             <div id="undo-toast" class="undo-toast">
-                <span>データヲ消去... 復元シマスカ？</span>
+                <span>データ消去... 復元シマスワ？</span>
                 <span class="undo-action" onclick="undoDelete()">UNDO</span>
             </div>
 
@@ -699,7 +721,7 @@ body {
                 document.querySelector('.forgot-link').style.display = 'none';
             } else {
                 isSetupMode = false;
-                secTitle.innerText = "[[ 警告：接近権限：拒絶 ]]";
+                secTitle.innerText = "[[ 警告：接近権限・拒絶 ]]";
                 secTitle.style.color = "var(--forbidden-red)";
                 secSub.innerText = ">> 暗号鍵（コード）ノ提示ヲ求ム";
                 secBtn.innerText = "UNLOCK";
@@ -708,7 +730,6 @@ body {
                 passIn.style.color = "var(--forbidden-red)";
                 document.querySelector('.forgot-link').style.display = 'block';
                 
-                // 右下の隅に小さくパスワードを表示
                 passReveal.innerText = storedPass;
             }
         }
@@ -763,7 +784,7 @@ body {
         }
 
         function closeTrash() {
-            renderArchiveList(); // Re-render to show any restored items
+            renderArchiveList();
             switchView('list');
         }
 
@@ -793,9 +814,7 @@ body {
         function deleteFromList(id) {
             const idx = archives.findIndex(a => a.id === id);
             if(idx !== -1) {
-                lastDeletedItem = archives[idx]; // Backup for immediate Undo
-                
-                // Move to trash
+                lastDeletedItem = archives[idx]; 
                 trashArchives.push(archives[idx]);
                 archives.splice(idx, 1);
                 
@@ -817,9 +836,7 @@ body {
 
         function undoDelete() {
             if(lastDeletedItem) {
-                // Remove from trash first
                 trashArchives = trashArchives.filter(item => item.id !== lastDeletedItem.id);
-                // Add back to archives
                 archives.push(lastDeletedItem);
                 archives.sort((a,b) => a.id - b.id);
                 
