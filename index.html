@@ -213,7 +213,7 @@ body {
 /* === LUNAR PHASE & CALENDAR === */
 #modal-moon .modal-title { font-family: 'Zen Old Mincho', serif; letter-spacing: 3px; }
 
-/* LARGE MOON (TOP SECTION) */
+/* LARGE MOON (TOP SECTION) - Text Removed */
 #moon-visual-container {
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     margin-bottom: 25px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 25px;
@@ -225,10 +225,6 @@ body {
     animation: moonFloat 6s ease-in-out infinite alternate;
 }
 @keyframes moonFloat { 0%{transform:translateY(0);} 100%{transform:translateY(-10px);} }
-
-#moon-details { text-align: center; margin-top: 15px; }
-#md-age { font-size: 28px; color: var(--neon-cyan); font-weight: bold; text-shadow: 0 0 10px var(--neon-cyan); }
-#md-phase { font-size: 14px; color: #bbb; letter-spacing: 3px; font-family: 'Cinzel', serif; margin-top: 5px; }
 
 /* CALENDAR (BOTTOM SECTION) */
 .calendar-container {
@@ -471,10 +467,6 @@ body {
         <div class="modal-content">
             <div id="moon-visual-container">
                 <canvas id="moon-canvas" width="220" height="220"></canvas>
-                <div id="moon-details">
-                    <div id="md-age">AGE: --</div>
-                    <div id="md-phase">PHASE SCANNING...</div>
-                </div>
             </div>
 
             <div id="lunar-calendar-wrapper" class="calendar-container"></div>
@@ -709,22 +701,8 @@ body {
             const age = getMoonAge(today);
             const phase = age / 29.53058867;
             
-            // Draw Large Moon
+            // Draw Large Moon (Text removed)
             drawMoonBody(ctx, 110, 110, 100, phase, true);
-
-            // Update Text
-            document.getElementById('md-age').innerText = `AGE: ${age.toFixed(1)}`;
-            let phaseName = "";
-            if(age < 1.8) phaseName = "NEW MOON";
-            else if(age < 5.5) phaseName = "WAXING CRESCENT";
-            else if(age < 9.2) phaseName = "FIRST QUARTER";
-            else if(age < 12.9) phaseName = "WAXING GIBBOUS";
-            else if(age < 16.6) phaseName = "FULL MOON";
-            else if(age < 20.3) phaseName = "WANING GIBBOUS";
-            else if(age < 24.0) phaseName = "LAST QUARTER";
-            else if(age < 27.7) phaseName = "WANING CRESCENT";
-            else phaseName = "NEW MOON";
-            document.getElementById('md-phase').innerText = phaseName;
         }
 
         // --- CALENDAR LOGIC ---
