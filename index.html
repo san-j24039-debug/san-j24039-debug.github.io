@@ -249,34 +249,26 @@ body {
 .shooting-star {
     position: absolute;
     height: 1px; 
-    /* Tail (Cyan -> Transparent) */
-    /* linear-gradient direction should match movement perception */
     background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(0,243,255,0.8) 50%, #fff 100%);
-    width: 200px; /* Base length */
+    width: 200px; 
     opacity: 0; 
     z-index: 20; 
     pointer-events: none;
     border-radius: 999px;
     filter: drop-shadow(0 0 3px rgba(0, 243, 255, 0.8));
-    /* The animation will handle translation */
 }
 
-/* Head (Glowing Core) */
 .shooting-star::before {
     content: ''; 
     position: absolute; 
-    right: 0; top: 50%; /* Right end is the head in our gradient logic */
+    right: 0; top: 50%;
     transform: translateY(-50%);
     width: 6px; height: 6px;
     background: #fff; 
     border-radius: 50%;
-    box-shadow: 
-        0 0 10px #fff, 
-        0 0 20px rgba(0, 243, 255, 1),
-        0 0 40px rgba(0, 243, 255, 0.8);
+    box-shadow: 0 0 10px #fff, 0 0 20px rgba(0, 243, 255, 1), 0 0 40px rgba(0, 243, 255, 0.8);
 }
 
-/* Cross flare (Sparkle) */
 .shooting-star::after {
     content: '';
     position: absolute;
@@ -289,19 +281,10 @@ body {
     opacity: 0.8;
 }
 
-/* Fall animation: Top-Right to Bottom-Left */
 @keyframes shootAnim {
-    0% { 
-        /* Start off-screen Top-Right */
-        transform: translateX(0) translateY(0) rotate(135deg) scale(0.8); 
-        opacity: 0; 
-    }
+    0% { transform: translateX(0) translateY(0) rotate(135deg) scale(0.8); opacity: 0; }
     10% { opacity: 1; transform: translateX(-50px) translateY(50px) rotate(135deg) scale(1); }
-    100% { 
-        /* End off-screen Bottom-Left */
-        transform: translateX(-600px) translateY(600px) rotate(135deg) scale(1); 
-        opacity: 0; 
-    }
+    100% { transform: translateX(-600px) translateY(600px) rotate(135deg) scale(1); opacity: 0; }
 }
 
 /* Moon & Orbits */
@@ -786,26 +769,31 @@ body {
             setTimeout(()=>document.getElementById('quest-clear-overlay').classList.remove('active'), 1500);
         }
 
-        // === LUNAR LOGIC (UPGRADED) ===
+        // === LUNAR LOGIC (High Accuracy) ===
+        // 基準日: 2025年1月29日 21:36 (新月)
+        // 平均朔望月: 29.530589日
         function getMoonAge(date) {
-            const base = new Date(2000, 0, 6);
-            const diff = date - base;
-            const days = diff / (1000*60*60*24);
-            return Math.abs(days % 29.53058867);
+            const baseDate = new Date(2025, 0, 29, 21, 36); // 2025/1/29 21:36
+            const diffTime = date.getTime() - baseDate.getTime();
+            const synodicMonth = 29.530589 * 24 * 60 * 60 * 1000; // ms
+            
+            let phase = (diffTime % synodicMonth) / synodicMonth;
+            if (phase < 0) phase += 1;
+            
+            return phase * 29.530589; // Age in days
         }
 
-        // New Logic: Draw white glowing moon then overlay shadows
         function drawMoonBody(ctx, cx, cy, r, phase, glow) {
             ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
-            // 1. White Base (Full Moon)
+            // 1. Draw White Moon Base (Glowing)
             ctx.save();
             ctx.beginPath();
             ctx.arc(cx, cy, r, 0, Math.PI * 2);
-            ctx.fillStyle = "#fff";
+            ctx.fillStyle = "#fff"; // Pure White
             
             if (glow) {
-                // More glow near Full Moon (0.5)
+                // Glow stronger near Full Moon (0.5)
                 const fullness = 1 - Math.abs(phase - 0.5) * 2; 
                 const glowPower = 20 + (fullness * 40);
                 ctx.shadowBlur = glowPower;
@@ -814,23 +802,28 @@ body {
             ctx.fill();
             ctx.restore();
 
-            // 2. Shadow Logic
-            ctx.fillStyle = "rgba(5, 5, 10, 0.95)"; // Deep dark shadow
+            // 2. Draw Shadow (Overlay)
+            ctx.fillStyle = "rgba(5, 5, 10, 0.95)"; // Dark shadow color
             ctx.beginPath();
 
             if (phase < 0.5) {
                 // Waxing (New -> Full): Shadow retreats to the left
+                // Draw right half circle
                 ctx.arc(cx, cy, r, -Math.PI / 2, Math.PI / 2, true);
+                // Calculate bulge
                 const w = r * Math.cos(phase * 2 * Math.PI);
+                // Cutout ellipse
                 ctx.ellipse(cx, cy, Math.abs(w), r, 0, Math.PI / 2, -Math.PI / 2, true);
             } else {
-                // Waning (Full -> New): Shadow encroaches from the right
+                // Waning (Full -> New): Shadow grows from the right
+                // Draw left half circle
                 ctx.arc(cx, cy, r, -Math.PI / 2, Math.PI / 2, false);
                 const w = r * Math.cos(phase * 2 * Math.PI);
                 ctx.ellipse(cx, cy, Math.abs(w), r, 0, -Math.PI / 2, Math.PI / 2, true);
             }
             
-            // Skip shadow near perfect Full Moon to avoid artifacts
+            // Only draw shadow if not very close to Full Moon (0.5)
+            // This ensures perfect white circle at Full Moon
             if (Math.abs(phase - 0.5) > 0.02) {
                 ctx.fill();
             }
@@ -873,7 +866,7 @@ body {
         function startShootingStars() {
             if (shootingStarInterval) clearTimeout(shootingStarInterval);
             
-            // Random burst loop
+            // Loop for bursts of stars
             const loop = () => {
                 const nextDelay = Math.random() * 3000 + 2000; // 2s to 5s interval
                 shootingStarInterval = setTimeout(() => {
@@ -1007,6 +1000,9 @@ body {
 
             for (let d = 1; d <= totalDays; d++) {
                 const currentDate = new Date(year, month, d);
+                // Set to noon to avoid timezone edge cases
+                currentDate.setHours(12, 0, 0, 0);
+                
                 const dayOfWeek = currentDate.getDay();
                 const cell = document.createElement('div');
                 cell.className = 'calendar-cell';
@@ -1025,12 +1021,14 @@ body {
                 cell.appendChild(dateNum);
 
                 const age = getMoonAge(currentDate);
-                const phase = age / 29.53058867;
+                const phase = age / 29.53058867; // 0..1
                 const cvs = document.createElement('canvas');
                 cvs.width = 24; cvs.height = 24;
                 cvs.className = 'cal-moon-icon';
                 const ctx = cvs.getContext('2d');
-                drawMoonBody(ctx, 12, 12, 10, phase, false); // No Glow for small icons
+                
+                // For small icons, we don't need glow
+                drawMoonBody(ctx, 12, 12, 10, phase, false); 
                 cell.appendChild(cvs);
 
                 grid.appendChild(cell);
