@@ -248,31 +248,56 @@ body {
 /* REALISTIC SHOOTING STAR (Top-Right to Bottom-Left) */
 .shooting-star {
     position: absolute;
-    height: 2px;
-    /* Tail (Cyan -> Transparent) */
-    background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(0,243,255,0.8) 50%, #fff 100%);
-    width: 150px;
-    opacity: 0; z-index: 2;
+    height: 1px; /* 少し細く */
+    /* Tail (Head=White -> Tail=Transparent) */
+    /* rotate(135deg) applies, so 'to right' is the flow direction along the element */
+    background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.5) 50%, #fff 100%);
+    width: 200px; /* 長く */
+    opacity: 0; 
+    z-index: 20; 
     pointer-events: none;
-    transform-origin: right center; /* Rotate around the head */
-}
-/* Head (Glowing Orb) */
-.shooting-star::before {
-    content: ''; position: absolute; right: 0; top: 50%;
-    width: 4px; height: 4px;
-    background: #fff; border-radius: 50%;
-    transform: translateY(-50%);
-    box-shadow: 0 0 10px #fff, 0 0 20px var(--neon-cyan);
+    border-radius: 999px;
+    filter: drop-shadow(0 0 3px rgba(0, 243, 255, 0.8)); /* Glow */
 }
 
-/* Fall animation from Top-Right to Bottom-Left */
+/* Head (Glowing Core) */
+.shooting-star::before {
+    content: ''; 
+    position: absolute; 
+    right: 0; top: 50%;
+    transform: translateY(-50%);
+    width: 6px; height: 6px;
+    background: #fff; 
+    border-radius: 50%;
+    box-shadow: 
+        0 0 10px #fff, 
+        0 0 20px rgba(0, 243, 255, 1),
+        0 0 40px rgba(0, 243, 255, 0.8);
+}
+
+/* Cross flare (キラッとする光) */
+.shooting-star::after {
+    content: '';
+    position: absolute;
+    right: -2px; top: 50%;
+    transform: translateY(-50%) rotate(45deg);
+    width: 14px; height: 2px;
+    background: #fff;
+    box-shadow: 0 0 5px #fff;
+    border-radius: 50%;
+    opacity: 0.8;
+}
+
 @keyframes shootAnim {
     0% { 
-        transform: translateX(0) translateY(0) rotate(215deg); 
-        opacity: 1; 
+        /* Start: Top Right */
+        transform: translateX(0) translateY(0) rotate(135deg) scale(0.8); 
+        opacity: 0; 
     }
+    10% { opacity: 1; transform: translateX(-30px) translateY(30px) rotate(135deg) scale(1); }
     100% { 
-        transform: translateX(-400px) translateY(400px) rotate(215deg); 
+        /* End: Bottom Left */
+        transform: translateX(-500px) translateY(500px) rotate(135deg) scale(1); 
         opacity: 0; 
     }
 }
