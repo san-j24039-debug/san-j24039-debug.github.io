@@ -188,7 +188,7 @@ body {
     display: flex; flex-direction: column;
 }
 .modal.active { opacity: 1; pointer-events: auto; transform: scale(1); }
-.modal-header { padding: 15px 20px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.5); }
+.modal-header { padding: 15px 20px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.5); z-index: 5; }
 .modal-title { font-size: 16px; color: var(--neon-cyan); letter-spacing: 2px; font-weight: bold; }
 .close-btn { font-size: 24px; color: #fff; cursor: pointer; margin-left:15px; }
 
@@ -210,38 +210,65 @@ body {
 #quest-rank-sel { background: #000; color: #fff; border: 1px solid var(--neon-cyan); font-family: 'Orbitron'; }
 #quest-add-btn { background: var(--neon-cyan); color: #000; border: none; padding: 0 15px; font-weight: bold; cursor: pointer; }
 
-/* === MOON (LUNAR PHASE) STYLES === */
-.moon-container {
-    width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;
-    padding: 20px 0; position: relative;
-}
-.moon-viz { width: 220px; height: 220px; position: relative; margin-bottom: 20px; }
-#moon-canvas { width: 100%; height: 100%; }
-.moon-info { text-align: center; color: #fff; font-family: 'Orbitron'; width: 100%; }
-.moon-phase-name {
-    color: var(--silver-metal); font-family: 'Zen Old Mincho', serif; font-size: 20px;
-    margin-bottom: 5px; letter-spacing: 2px; text-shadow: 0 0 10px rgba(255,255,255,0.3);
-}
-.moon-data-grid {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; max-width: 300px; margin: 10px auto;
-}
-.md-item { background: rgba(255,255,255,0.05); padding: 8px; border: 1px solid #333; font-size: 10px; color: #aaa; }
-.md-val { color: var(--neon-cyan); font-size: 14px; font-weight: bold; display: block; margin-top: 3px; }
+/* === LUNAR PHASE & CALENDAR === */
+#modal-moon .modal-title { font-family: 'Zen Old Mincho', serif; letter-spacing: 3px; }
 
-/* WEEKLY MOON CALENDAR (NEW) */
-.moon-weekly-container {
-    width: 100%; max-width: 350px; margin-top: 25px; border-top: 1px solid #333; padding-top: 15px;
+/* LARGE MOON (TOP SECTION) */
+#moon-visual-container {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    margin-bottom: 25px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 25px;
 }
-.mw-title { font-size: 10px; color: var(--neon-cyan); letter-spacing: 2px; margin-bottom: 12px; text-align: left; }
-.mw-grid { display: flex; justify-content: space-between; gap: 4px; overflow-x: auto; padding-bottom: 5px; }
-.mw-day {
-    min-width: 40px; display: flex; flex-direction: column; align-items: center;
+#moon-canvas {
+    width: 220px; height: 220px;
+    border-radius: 50%;
+    filter: drop-shadow(0 0 20px rgba(255,255,255,0.2));
+    animation: moonFloat 6s ease-in-out infinite alternate;
+}
+@keyframes moonFloat { 0%{transform:translateY(0);} 100%{transform:translateY(-10px);} }
+
+#moon-details { text-align: center; margin-top: 15px; }
+#md-age { font-size: 28px; color: var(--neon-cyan); font-weight: bold; text-shadow: 0 0 10px var(--neon-cyan); }
+#md-phase { font-size: 14px; color: #bbb; letter-spacing: 3px; font-family: 'Cinzel', serif; margin-top: 5px; }
+
+/* CALENDAR (BOTTOM SECTION) */
+.calendar-container {
+    width: 100%; max-width: 350px; margin: 0 auto;
+    font-family: 'Orbitron', sans-serif;
+}
+.calendar-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 15px;
+    color: var(--neon-cyan); font-size: 18px; letter-spacing: 2px;
+}
+.cal-nav-btn { background: transparent; border: none; color: #aaa; font-size: 18px; cursor: pointer; padding: 5px 10px; }
+.cal-nav-btn:hover { color: #fff; }
+
+.calendar-grid {
+    display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px;
+    text-align: center;
+}
+.weekday-header { font-size: 10px; color: #888; padding-bottom: 5px; }
+.wh-sun { color: var(--forbidden-red); }
+.wh-sat { color: var(--neon-cyan); }
+
+.calendar-cell {
+    aspect-ratio: 1 / 1;
     background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1);
-    padding: 6px 2px; border-radius: 4px; transition: 0.2s;
+    border-radius: 4px;
+    display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+    padding-top: 5px; position: relative;
 }
-.mw-day:hover { background: rgba(255,255,255,0.08); border-color: var(--neon-cyan); }
-.mw-date { font-size: 9px; color: #888; margin-bottom: 6px; font-family: 'Orbitron'; }
-.mw-canvas-wrap { width: 24px; height: 24px; display: flex; justify-content: center; align-items: center; }
+.cal-date-num { font-size: 12px; margin-bottom: 5px; }
+.cal-moon-icon { width: 24px; height: 24px; }
+
+/* Date Colors */
+.date-sun, .date-holiday { color: var(--forbidden-red); }
+.date-sat { color: var(--neon-cyan); }
+.date-weekday { color: #fff; }
+/* Today highlight */
+.date-today { border-color: var(--neon-cyan); background: rgba(0, 243, 255, 0.05); }
+/* Other month days */
+.date-other-month { opacity: 0.3; }
 
 /* VITAL */
 .vital-pod { width: 220px; height: 220px; border-radius: 50%; border: 4px solid #222; margin: 20px auto; display: flex; justify-content: center; align-items: center; position: relative; background: #000; }
@@ -437,28 +464,20 @@ body {
     </div>
 
     <div id="modal-moon" class="modal">
-        <div class="modal-header"><span class="modal-title">LUNAR OBSERVATORY</span><span class="close-btn" onclick="closeModal('modal-moon')">×</span></div>
+        <div class="modal-header">
+            <span class="modal-title">月読ノ暦</span>
+            <span class="close-btn" onclick="closeModal('modal-moon')">×</span>
+        </div>
         <div class="modal-content">
-            <div class="moon-container">
-                <div class="moon-viz">
-                    <canvas id="moon-canvas" width="220" height="220"></canvas>
+            <div id="moon-visual-container">
+                <canvas id="moon-canvas" width="220" height="220"></canvas>
+                <div id="moon-details">
+                    <div id="md-age">AGE: --</div>
+                    <div id="md-phase">PHASE SCANNING...</div>
                 </div>
-                <div class="moon-info">
-                    <div class="moon-phase-name" id="moon-phase-name">Analyzing...</div>
-                    <div class="moon-data-grid">
-                        <div class="md-item">MOON AGE<span class="md-val" id="md-age">--</span></div>
-                        <div class="md-item">ILLUMINATION<span class="md-val" id="md-illum">--%</span></div>
-                        <div class="md-item">DISTANCE<span class="md-val">384,400km</span></div>
-                        <div class="md-item">CYCLE<span class="md-val">29.53 Days</span></div>
-                    </div>
-                </div>
-                
-                <div class="moon-weekly-container">
-                    <div class="mw-title">>> WEEKLY TRAJECTORY (7 DAYS)</div>
-                    <div class="mw-grid" id="moon-weekly-grid"></div>
-                </div>
-
             </div>
+
+            <div id="lunar-calendar-wrapper" class="calendar-container"></div>
         </div>
     </div>
 
@@ -491,7 +510,7 @@ body {
         <div class="modal-content" style="position:relative; padding:0; height:100%; display:flex; flex-direction:column;">
             
             <div id="archive-list-view" style="padding:20px;">
-                <button class="arch-btn btn-new" onclick="createNewMemo()">+ 虚無ヨリ創造を綴レ...</button>
+                <button class="arch-btn btn-new" onclick="createNewMemo()">+ 虚無ヨリノ創造を綴レ...</button>
                 <div id="archive-list-container"></div>
             </div>
 
@@ -517,8 +536,8 @@ body {
             <div id="security-overlay" style="display:flex;">
                 <div class="overlay-top-left">禁忌ノ書庫</div>
 
-                <div id="sec-title" style="color:var(--forbidden-red); font-size:24px; font-weight:bold; letter-spacing:5px; margin-bottom:20px; text-align:center;">[[ 警告：接近権限：拒絶 ]]</div>
-                <div id="sec-sub" style="color:#fff; font-size:12px; margin-bottom:10px; font-family:'Orbitron';">>> 暗号コードノ提示ヲ求ム</div>
+                <div id="sec-title" style="color:var(--forbidden-red); font-size:24px; font-weight:bold; letter-spacing:5px; margin-bottom:20px; text-align:center;">[[ 警告：接近権限・拒絶 ]]</div>
+                <div id="sec-sub" style="color:#fff; font-size:12px; margin-bottom:10px; font-family:'Orbitron';">>> 暗号鍵（コード）ノ提示ヲ求ム</div>
                 <input type="tel" id="passcode-input" maxlength="4" style="background:transparent; border:2px solid var(--forbidden-red); color:var(--forbidden-red); font-family:'Orbitron'; font-size:32px; width:150px; text-align:center; outline:none; letter-spacing:10px; margin-bottom:20px;">
                 <button id="sec-btn" onclick="handleSecurityInput()" style="background:var(--forbidden-red); color:#000; border:none; padding:10px 40px; font-family:'Orbitron'; font-weight:bold; cursor:pointer; clip-path: polygon(10% 0, 100% 0, 100% 70%, 90% 100%, 0 100%, 0 30%);">UNLOCK</button>
                 
@@ -527,13 +546,13 @@ body {
                 <div id="pass-reveal"></div>
 
                 <div id="hint-modal">
-                    <div class="hint-text">真実ハ<br>視界ノ右隅ニ<br>潜ム...</div>
+                    <div class="hint-text">真実ハ<br>視界ノ隅（ミギシタ）ニ<br>潜ム...</div>
                     <button class="arch-btn" style="font-size:10px;" onclick="closeHintModal()">CLOSE</button>
                 </div>
             </div>
 
             <div id="undo-toast" class="undo-toast">
-                <span>データヲ消去... 復元シマスカ？</span>
+                <span>データ消去... 復元シマスワ？</span>
                 <span class="undo-action" onclick="undoDelete()">UNDO</span>
             </div>
 
@@ -599,7 +618,10 @@ body {
         }
         function openModal(id) { 
             document.getElementById(id).classList.add('active'); 
-            if(id==='modal-moon') initMoonView();
+            if(id==='modal-moon') {
+                initLargeMoon(); // Initialize Large Moon Animation
+                initLunarCalendar(); // Initialize Calendar
+            }
             if(id==='modal-archive') { 
                 initArchiveSecurity(); 
                 renderArchiveList();   
@@ -607,7 +629,6 @@ body {
         }
         function closeModal(id) { 
             document.getElementById(id).classList.remove('active'); 
-            if(id==='modal-moon') stopMoonAnim();
             if(id==='modal-archive') document.getElementById('passcode-input').value = "";
         }
 
@@ -633,79 +654,26 @@ body {
             setTimeout(()=>document.getElementById('quest-clear-overlay').classList.remove('active'), 1500);
         }
 
-        // === LUNAR PHASE + WEEKLY CALENDAR ===
-        let moonReq;
+        // === LUNAR LOGIC ===
         function getMoonAge(date) {
             const base = new Date(2000, 0, 6);
             const diff = date - base;
             const days = diff / (1000*60*60*24);
             return Math.abs(days % 29.53058867);
         }
-        function initMoonView() {
-            const cvs = document.getElementById('moon-canvas');
-            const ctx = cvs.getContext('2d');
-            const now = new Date();
-            const age = getMoonAge(now);
-            const phase = age / 29.53058867; 
-
-            document.getElementById('md-age').innerText = age.toFixed(2);
-            let pName = "";
-            if(age < 1.8) pName="New Moon (新月)";
-            else if(age < 5.5) pName="Waxing Crescent (三日月)";
-            else if(age < 9.2) pName="First Quarter (上弦)";
-            else if(age < 12.9) pName="Waxing Gibbous (十三夜)";
-            else if(age < 16.6) pName="Full Moon (満月)";
-            else if(age < 20.3) pName="Waning Gibbous (寝待月)";
-            else if(age < 24.0) pName="Last Quarter (下弦)";
-            else pName="Waning Crescent (有明月)";
-            
-            document.getElementById('moon-phase-name').innerText = pName;
-            
-            const illum = (1 - Math.cos(phase * 2 * Math.PI)) / 2 * 100;
-            document.getElementById('md-illum').innerText = illum.toFixed(1) + "%";
-
-            // Main Animation
-            let starOff = 0;
-            function draw() {
-                moonReq = requestAnimationFrame(draw);
-                ctx.clearRect(0,0,220,220);
-                
-                // Stars
-                ctx.fillStyle = "#fff";
-                starOff += 0.2;
-                for(let i=0; i<30; i++) {
-                    const x = (Math.sin(i*13 + starOff*0.05) * 110 + 110) % 220;
-                    const y = (Math.cos(i*29 + starOff*0.02) * 110 + 110) % 220;
-                    const s = Math.random() * 1.5;
-                    ctx.globalAlpha = Math.random() * 0.8;
-                    ctx.fillRect(x,y,s,s);
-                }
-                ctx.globalAlpha = 1.0;
-
-                // Moon
-                const cx = 110, cy = 110, r = 85;
-                drawMoonBody(ctx, cx, cy, r, phase, true);
-            }
-            draw();
-
-            // Render Weekly
-            renderWeeklyMoon(now);
-        }
 
         function drawMoonBody(ctx, cx, cy, r, phase, glow) {
-            // Dark Base
+            ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
             ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2);
             ctx.fillStyle = "#111"; ctx.fill(); 
 
-            // Lit part
             ctx.save();
             ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2);
             ctx.fillStyle = "#eef2f5";
-            if(glow) { ctx.shadowBlur = 20; ctx.shadowColor = "#eef2f5"; }
+            if(glow) { ctx.shadowBlur = 30; ctx.shadowColor = "rgba(238,242,245,0.6)"; }
             ctx.fill();
             ctx.restore();
 
-            // Shadow
             ctx.fillStyle = "rgba(10,14,20,0.95)";
             let p = phase; 
             if(p <= 0.5) {
@@ -733,34 +701,149 @@ body {
             }
         }
 
-        function renderWeeklyMoon(startDate) {
-            const container = document.getElementById('moon-weekly-grid');
-            container.innerHTML = "";
-            for(let i=0; i<7; i++) {
-                const d = new Date(startDate);
-                d.setDate(d.getDate() + i);
-                const age = getMoonAge(d);
-                const phase = age / 29.53058867;
-                
-                const dayDiv = document.createElement('div');
-                dayDiv.className = 'mw-day';
-                
-                // Mini Canvas
-                const cvs = document.createElement('canvas');
-                cvs.width = 24; cvs.height = 24;
-                const ctx = cvs.getContext('2d');
-                drawMoonBody(ctx, 12, 12, 10, phase, false); // No glow for small icons
+        // --- LARGE MOON RENDERER ---
+        function initLargeMoon() {
+            const cvs = document.getElementById('moon-canvas');
+            const ctx = cvs.getContext('2d');
+            const today = new Date();
+            const age = getMoonAge(today);
+            const phase = age / 29.53058867;
+            
+            // Draw Large Moon
+            drawMoonBody(ctx, 110, 110, 100, phase, true);
 
-                dayDiv.innerHTML = `<div class="mw-date">${d.getMonth()+1}/${d.getDate()}</div>`;
-                const cw = document.createElement('div'); cw.className='mw-canvas-wrap';
-                cw.appendChild(cvs);
-                dayDiv.appendChild(cw);
-                container.appendChild(dayDiv);
-            }
+            // Update Text
+            document.getElementById('md-age').innerText = `AGE: ${age.toFixed(1)}`;
+            let phaseName = "";
+            if(age < 1.8) phaseName = "NEW MOON";
+            else if(age < 5.5) phaseName = "WAXING CRESCENT";
+            else if(age < 9.2) phaseName = "FIRST QUARTER";
+            else if(age < 12.9) phaseName = "WAXING GIBBOUS";
+            else if(age < 16.6) phaseName = "FULL MOON";
+            else if(age < 20.3) phaseName = "WANING GIBBOUS";
+            else if(age < 24.0) phaseName = "LAST QUARTER";
+            else if(age < 27.7) phaseName = "WANING CRESCENT";
+            else phaseName = "NEW MOON";
+            document.getElementById('md-phase').innerText = phaseName;
         }
 
-        function stopMoonAnim() { cancelAnimationFrame(moonReq); }
+        // --- CALENDAR LOGIC ---
+        let currentCalDate = new Date();
 
+        function initLunarCalendar() {
+            renderLunarCalendar(currentCalDate);
+        }
+
+        function prevMonth() {
+            currentCalDate.setMonth(currentCalDate.getMonth() - 1);
+            renderLunarCalendar(currentCalDate);
+        }
+
+        function nextMonth() {
+            currentCalDate.setMonth(currentCalDate.getMonth() + 1);
+            renderLunarCalendar(currentCalDate);
+        }
+
+        function isHoliday(date) {
+            const y = date.getFullYear();
+            const m = date.getMonth() + 1;
+            const d = date.getDate();
+            if (m === 1 && d === 1) return true; 
+            if (m === 2 && d === 11) return true; 
+            if (m === 2 && d === 23) return true; 
+            if (m === 3 && d === 20) return true; 
+            if (m === 4 && d === 29) return true; 
+            if (m === 5 && d === 3) return true; 
+            if (m === 5 && d === 4) return true; 
+            if (m === 5 && d === 5) return true; 
+            if (m === 8 && d === 11) return true; 
+            if (m === 9 && d === 23) return true; 
+            if (m === 11 && d === 3) return true; 
+            if (m === 11 && d === 23) return true; 
+            function isHappyMonday(month, weekNum) {
+                if (m !== month) return false;
+                const firstDayOfWeek = new Date(y, m - 1, 1).getDay();
+                const targetDay = 1 + (weekNum - 1) * 7 + (1 - firstDayOfWeek + 7) % 7;
+                return d === targetDay;
+            }
+            if (isHappyMonday(1, 2)) return true; 
+            if (isHappyMonday(7, 3)) return true; 
+            if (isHappyMonday(9, 3)) return true; 
+            if (isHappyMonday(10, 2)) return true; 
+            return false;
+        }
+
+        function renderLunarCalendar(baseDate) {
+            const container = document.getElementById('lunar-calendar-wrapper');
+            container.innerHTML = "";
+
+            const year = baseDate.getFullYear();
+            const month = baseDate.getMonth();
+            const today = new Date();
+
+            const header = document.createElement('div');
+            header.className = 'calendar-header';
+            header.innerHTML = `
+                <button class="cal-nav-btn" onclick="prevMonth()"><</button>
+                <span>${year} . ${String(month + 1).padStart(2, '0')}</span>
+                <button class="cal-nav-btn" onclick="nextMonth()">></button>
+            `;
+            container.appendChild(header);
+
+            const grid = document.createElement('div');
+            grid.className = 'calendar-grid';
+
+            const weekdays = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+            weekdays.forEach((day, i) => {
+                const wh = document.createElement('div');
+                wh.className = `weekday-header ${i === 0 ? 'wh-sun' : (i === 6 ? 'wh-sat' : '')}`;
+                wh.innerText = day;
+                grid.appendChild(wh);
+            });
+
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const startingDayOfWeek = firstDay.getDay();
+            const totalDays = lastDay.getDate();
+
+            for (let i = 0; i < startingDayOfWeek; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'calendar-cell date-other-month';
+                grid.appendChild(cell);
+            }
+
+            for (let d = 1; d <= totalDays; d++) {
+                const currentDate = new Date(year, month, d);
+                const dayOfWeek = currentDate.getDay();
+                const cell = document.createElement('div');
+                cell.className = 'calendar-cell';
+
+                let dateClass = 'date-weekday';
+                if (isHoliday(currentDate) || dayOfWeek === 0) dateClass = 'date-sun';
+                else if (dayOfWeek === 6) dateClass = 'date-sat';
+
+                if (currentDate.toDateString() === today.toDateString()) {
+                    cell.classList.add('date-today');
+                }
+
+                const dateNum = document.createElement('div');
+                dateNum.className = `cal-date-num ${dateClass}`;
+                dateNum.innerText = d;
+                cell.appendChild(dateNum);
+
+                const age = getMoonAge(currentDate);
+                const phase = age / 29.53058867;
+                const cvs = document.createElement('canvas');
+                cvs.width = 24; cvs.height = 24;
+                cvs.className = 'cal-moon-icon';
+                const ctx = cvs.getContext('2d');
+                drawMoonBody(ctx, 12, 12, 10, phase, false); 
+                cell.appendChild(cvs);
+
+                grid.appendChild(cell);
+            }
+            container.appendChild(grid);
+        }
 
         // === VITAL KEEPER ===
         let vitalInt, vitalTime=25*60;
@@ -1073,5 +1156,3 @@ body {
     </script>
 </body>
 </html>
-
-
