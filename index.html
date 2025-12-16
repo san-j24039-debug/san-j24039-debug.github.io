@@ -261,7 +261,7 @@ body {
     /* The animation will handle translation */
 }
 
-/* Head (Glowing Core) - Left/Bottom side of the bar? No, head is at 100% of gradient */
+/* Head (Glowing Core) */
 .shooting-star::before {
     content: ''; 
     position: absolute; 
@@ -786,7 +786,7 @@ body {
             setTimeout(()=>document.getElementById('quest-clear-overlay').classList.remove('active'), 1500);
         }
 
-        // === LUNAR LOGIC ===
+        // === LUNAR LOGIC (UPGRADED) ===
         function getMoonAge(date) {
             const base = new Date(2000, 0, 6);
             const diff = date - base;
@@ -794,41 +794,44 @@ body {
             return Math.abs(days % 29.53058867);
         }
 
+        // New Logic: Draw white glowing moon then overlay shadows
         function drawMoonBody(ctx, cx, cy, r, phase, glow) {
             ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-            ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2);
-            ctx.fillStyle = "#111"; ctx.fill(); 
 
+            // 1. White Base (Full Moon)
             ctx.save();
-            ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2);
-            ctx.fillStyle = "#eef2f5";
-            if(glow) { ctx.shadowBlur = 30; ctx.shadowColor = "rgba(238,242,245,0.6)"; }
+            ctx.beginPath();
+            ctx.arc(cx, cy, r, 0, Math.PI * 2);
+            ctx.fillStyle = "#fff";
+            
+            if (glow) {
+                // More glow near Full Moon (0.5)
+                const fullness = 1 - Math.abs(phase - 0.5) * 2; 
+                const glowPower = 20 + (fullness * 40);
+                ctx.shadowBlur = glowPower;
+                ctx.shadowColor = "rgba(255, 255, 255, 0.9)";
+            }
             ctx.fill();
             ctx.restore();
 
-            ctx.fillStyle = "rgba(10,14,20,0.95)";
-            let p = phase; 
-            if(p <= 0.5) {
-                const w = r * Math.cos(p * 2 * Math.PI); 
-                ctx.beginPath();
-                if(p < 0.25) {
-                    ctx.arc(cx, cy, r, -Math.PI/2, Math.PI/2, true); 
-                    ctx.ellipse(cx, cy, Math.abs(w), r, 0, Math.PI/2, -Math.PI/2, true);
-                } else {
-                    ctx.arc(cx, cy, r, -Math.PI/2, Math.PI/2, true); 
-                    ctx.ellipse(cx, cy, Math.abs(w), r, 0, -Math.PI/2, Math.PI/2, false); 
-                }
-                ctx.fill();
+            // 2. Shadow Logic
+            ctx.fillStyle = "rgba(5, 5, 10, 0.95)"; // Deep dark shadow
+            ctx.beginPath();
+
+            if (phase < 0.5) {
+                // Waxing (New -> Full): Shadow retreats to the left
+                ctx.arc(cx, cy, r, -Math.PI / 2, Math.PI / 2, true);
+                const w = r * Math.cos(phase * 2 * Math.PI);
+                ctx.ellipse(cx, cy, Math.abs(w), r, 0, Math.PI / 2, -Math.PI / 2, true);
             } else {
-                const w = r * Math.cos(p * 2 * Math.PI);
-                ctx.beginPath();
-                if(p < 0.75) {
-                    ctx.arc(cx, cy, r, -Math.PI/2, Math.PI/2, false); 
-                    ctx.ellipse(cx, cy, Math.abs(w), r, 0, Math.PI/2, -Math.PI/2, false); 
-                } else {
-                    ctx.arc(cx, cy, r, -Math.PI/2, Math.PI/2, false); 
-                    ctx.ellipse(cx, cy, Math.abs(w), r, 0, -Math.PI/2, Math.PI/2, true);
-                }
+                // Waning (Full -> New): Shadow encroaches from the right
+                ctx.arc(cx, cy, r, -Math.PI / 2, Math.PI / 2, false);
+                const w = r * Math.cos(phase * 2 * Math.PI);
+                ctx.ellipse(cx, cy, Math.abs(w), r, 0, -Math.PI / 2, Math.PI / 2, true);
+            }
+            
+            // Skip shadow near perfect Full Moon to avoid artifacts
+            if (Math.abs(phase - 0.5) > 0.02) {
                 ctx.fill();
             }
         }
@@ -870,7 +873,7 @@ body {
         function startShootingStars() {
             if (shootingStarInterval) clearTimeout(shootingStarInterval);
             
-            // Loop for bursts of stars
+            // Random burst loop
             const loop = () => {
                 const nextDelay = Math.random() * 3000 + 2000; // 2s to 5s interval
                 shootingStarInterval = setTimeout(() => {
@@ -878,7 +881,6 @@ body {
                     loop();
                 }, nextDelay);
             };
-            
             loop(); 
         }
 
@@ -901,22 +903,15 @@ body {
             star.className = 'shooting-star';
             
             // Random start position (Top-Right area)
-            // Starts off-screen top/right, so we position it relatively high and right
             star.style.top = (Math.random() * 30) + '%';
-            star.style.left = (Math.random() * 40 + 60) + '%'; // 60% to 100% width
+            star.style.left = (Math.random() * 40 + 60) + '%'; 
 
-            // Randomize size/speed
+            // Randomize speed & scale
             const duration = Math.random() * 1 + 1; // 1s to 2s
             star.style.animationDuration = duration + 's';
             
-            // Randomize scale
-            const scale = Math.random() * 0.5 + 0.5; // 0.5 to 1.0 scale
-            
-            // We set animation directly in CSS but we can modify duration here
+            // Apply animation class (defined in CSS now)
             star.style.animation = `shootAnim ${duration}s linear forwards`;
-            star.style.transform = `scale(${scale})`; // Base scale, animation overrides transform though.
-            // Better to use a wrapper or just let CSS animation handle scale if complex.
-            // Let's rely on CSS animation logic which includes scale.
 
             container.appendChild(star);
 
@@ -1035,7 +1030,7 @@ body {
                 cvs.width = 24; cvs.height = 24;
                 cvs.className = 'cal-moon-icon';
                 const ctx = cvs.getContext('2d');
-                drawMoonBody(ctx, 12, 12, 10, phase, false); 
+                drawMoonBody(ctx, 12, 12, 10, phase, false); // No Glow for small icons
                 cell.appendChild(cvs);
 
                 grid.appendChild(cell);
