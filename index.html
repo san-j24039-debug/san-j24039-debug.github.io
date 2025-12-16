@@ -245,23 +245,39 @@ body {
 }
 @keyframes particleTwinkle { 0%, 100% { opacity: 0; transform: scale(0.5); } 50% { opacity: 0.8; transform: scale(1.2); } }
 
-/* Shooting Star */
+/* REALISTIC SHOOTING STAR (Top-Right to Bottom-Left) */
 .shooting-star {
     position: absolute;
-    width: 100px; height: 2px;
-    background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0) 100%);
-    filter: drop-shadow(0 0 5px #fff);
+    height: 2px;
+    /* Tail (Cyan -> Transparent) */
+    background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(0,243,255,0.8) 50%, #fff 100%);
+    width: 150px;
     opacity: 0; z-index: 2;
     pointer-events: none;
+    transform-origin: right center; /* Rotate around the head */
 }
-@keyframes shootAnim {
-    0% { transform: translateX(0) translateY(0) rotate(-30deg); opacity: 0; }
-    10% { opacity: 1; }
-    90% { opacity: 1; }
-    100% { transform: translateX(300px) translateY(150px) rotate(-30deg); opacity: 0; }
+/* Head (Glowing Orb) */
+.shooting-star::before {
+    content: ''; position: absolute; right: 0; top: 50%;
+    width: 4px; height: 4px;
+    background: #fff; border-radius: 50%;
+    transform: translateY(-50%);
+    box-shadow: 0 0 10px #fff, 0 0 20px var(--neon-cyan);
 }
 
-/* Moon & Orbits (Existing) */
+/* Fall animation from Top-Right to Bottom-Left */
+@keyframes shootAnim {
+    0% { 
+        transform: translateX(0) translateY(0) rotate(215deg); 
+        opacity: 1; 
+    }
+    100% { 
+        transform: translateX(-400px) translateY(400px) rotate(215deg); 
+        opacity: 0; 
+    }
+}
+
+/* Moon & Orbits */
 #moon-canvas {
     z-index: 10;
     width: 200px; height: 200px;
@@ -839,21 +855,17 @@ body {
             const star = document.createElement('div');
             star.className = 'shooting-star';
             
-            // Random start position (top or left side)
-            if (Math.random() > 0.5) {
-                star.style.top = Math.random() * 50 + '%';
-                star.style.left = '-100px';
-            } else {
-                star.style.top = '-50px';
-                star.style.left = Math.random() * 100 + '%';
-            }
+            // Start from Top-Right area
+            // top: -10% to 40%, left: 80% to 120%
+            star.style.top = (Math.random() * 50 - 20) + '%';
+            star.style.left = (Math.random() * 40 + 80) + '%';
 
             star.style.animation = 'shootAnim 2s linear forwards';
             container.appendChild(star);
 
             // Remove after animation
             setTimeout(() => {
-                star.remove();
+                if(star && star.parentNode) star.remove();
             }, 2200);
         }
 
