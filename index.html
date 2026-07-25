@@ -108,6 +108,35 @@ body {
 .icon-symbol { font-size: 18px; margin-bottom: 4px; color: var(--silver-metal); transition: 0.3s; }
 .icon-btn:hover .icon-symbol { color: #fff; text-shadow: 0 0 10px #fff; }
 .icon-label { font-size: 8px; color: #aaa; letter-spacing: 0.5px; }
+.ai-menu { position: relative; }
+.ai-menu summary { list-style: none; cursor: pointer; }
+.ai-menu summary::-webkit-details-marker { display: none; }
+.ai-menu[open] .icon-btn {
+    border-color: var(--neon-cyan);
+    background: rgba(0, 243, 255, 0.1);
+    box-shadow: 0 0 15px var(--neon-cyan), 0 0 30px rgba(0, 243, 255, 0.4);
+    transform: scale(1.05);
+}
+.ai-menu[open] .icon-symbol { color: #fff; text-shadow: 0 0 10px #fff; }
+.ai-options {
+    position: absolute; top: 72px; left: 50%; transform: translateX(-50%);
+    width: 126px; padding: 6px;
+    background: rgba(0, 0, 0, 0.92); border: 1px solid var(--neon-cyan); border-radius: 8px;
+    box-shadow: 0 0 18px rgba(0, 243, 255, 0.28); backdrop-filter: blur(10px);
+    display: flex; flex-direction: column; gap: 4px;
+}
+.ai-options::before {
+    content: ""; position: absolute; top: -5px; left: 50%; width: 8px; height: 8px;
+    background: #000; border-left: 1px solid var(--neon-cyan); border-top: 1px solid var(--neon-cyan);
+    transform: translateX(-50%) rotate(45deg);
+}
+.ai-option {
+    display: flex; align-items: center; gap: 8px; min-height: 30px; padding: 0 8px;
+    color: #ddd; text-decoration: none; font-size: 9px; letter-spacing: 0.7px;
+    border-radius: 5px; transition: 0.2s;
+}
+.ai-option:hover { background: rgba(0, 243, 255, 0.15); color: #fff; }
+.ai-option-mark { width: 15px; color: var(--neon-cyan); text-align: center; font-size: 11px; }
 
 /* === CLOCK & SEARCH === */
 .main-section { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; position: relative; }
@@ -510,7 +539,26 @@ body {
 
     <div class="top-dock">
         <a class="icon-btn" href="https://youtube.com"><div class="icon-symbol">▶</div><div class="icon-label">YOUTUBE</div></a>
-        <a class="icon-btn" href="https://gemini.google.com"><div class="icon-symbol">✦</div><div class="icon-label">GEMINI</div></a>
+        <details class="ai-menu">
+            <summary class="icon-btn" aria-label="AI tools">
+                <div class="icon-symbol">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M12 3v4"></path>
+                        <path d="M12 17v4"></path>
+                        <path d="M3 12h4"></path>
+                        <path d="M17 12h4"></path>
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"></circle>
+                    </svg>
+                </div>
+                <div class="icon-label">AI TOOL</div>
+            </summary>
+            <div class="ai-options">
+                <a class="ai-option" href="https://gemini.google.com"><span class="ai-option-mark">G</span><span>GEMINI</span></a>
+                <a class="ai-option" href="https://chatgpt.com"><span class="ai-option-mark">C</span><span>CHATGPT</span></a>
+                <a class="ai-option" href="https://claude.ai"><span class="ai-option-mark">A</span><span>CLAUDE</span></a>
+            </div>
+        </details>
         <a class="icon-btn" href="https://music.apple.com"><div class="icon-symbol">♫</div><div class="icon-label">MUSIC</div></a>
         <a class="icon-btn" href="https://maps.google.com">
             <div class="icon-symbol"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg></div>
