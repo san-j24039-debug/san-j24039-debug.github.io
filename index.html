@@ -138,7 +138,7 @@ body {
 .ai-option:hover { background: rgba(0, 243, 255, 0.15); color: #fff; }
 .ai-option-mark { width: 15px; color: var(--neon-cyan); text-align: center; font-size: 11px; }
 .shortcut-menu {
-    position: fixed; right: 8px; top: 50%; transform: translateY(-50%); z-index: 30;
+    position: fixed; right: 0; top: 10px; z-index: 30;
 }
 .shortcut-menu[open], .ai-menu[open] { z-index: 30; }
 .shortcut-menu summary { list-style: none; cursor: pointer; }
@@ -157,8 +157,8 @@ body {
     box-shadow: 0 0 12px rgba(0, 243, 255, 0.35);
 }
 .shortcut-options {
-    position: absolute; right: 52px; top: 50%; transform: translateY(-50%);
-    width: min(260px, calc(100vw - 72px)); max-height: 60vh; overflow: hidden; padding: 8px;
+    position: absolute; right: 0; top: 72px;
+    width: min(260px, calc(100vw - 16px)); max-height: 60vh; overflow: hidden; padding: 8px;
     background: rgba(0, 0, 0, 0.94); border: 1px solid var(--neon-cyan); border-radius: 8px;
     box-shadow: 0 0 18px rgba(0, 243, 255, 0.28); backdrop-filter: blur(10px);
     box-sizing: border-box;
@@ -220,9 +220,8 @@ body {
     .icon-btn { width: 56px; height: 56px; border-radius: 10px; }
     .ai-options { top: 66px; left: auto; right: -32px; transform: none; }
     .ai-options::before { left: auto; right: 48px; transform: rotate(45deg); }
-    .shortcut-menu { right: 5px; }
     .shortcut-tab { width: 40px; height: 58px; }
-    .shortcut-options { right: 47px; width: min(260px, calc(100vw - 62px)); }
+    .shortcut-options { top: 126px; width: min(260px, calc(100vw - 12px)); }
     .dock-editor.active { grid-template-columns: 1fr; }
 }
 
