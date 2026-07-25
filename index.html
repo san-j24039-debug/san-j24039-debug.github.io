@@ -150,6 +150,25 @@ body {
 }
 .dock-editor select { grid-column: 1 / -1; color: var(--neon-cyan); }
 .dock-editor button { min-height: 32px; }
+.shortcut-manager {
+    grid-column: 1 / -1; display: grid; gap: 6px; margin-top: 2px;
+    border-top: 1px solid var(--border); padding-top: 8px;
+}
+#shortcut-manager-list { display: grid; gap: 6px; }
+.shortcut-manager-title { color: #aaa; font-size: 9px; letter-spacing: 0.8px; }
+.shortcut-manager-empty { color: #777; font-size: 10px; padding: 4px 0; }
+.shortcut-manager-row {
+    display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 6px; align-items: center;
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); padding: 6px;
+}
+.shortcut-manager-info { min-width: 0; }
+.shortcut-manager-label { color: #fff; font-size: 10px; }
+.shortcut-manager-url {
+    color: #888; font-size: 9px; margin-top: 2px; white-space: nowrap;
+    overflow: hidden; text-overflow: ellipsis;
+}
+.shortcut-manager-row button { min-height: 28px; padding: 0 8px; font-size: 9px; }
+.shortcut-manager-row .delete-shortcut { color: var(--forbidden-red); border-color: rgba(255,0,85,0.45); }
 .shortcut-remove { position: absolute; top: 2px; right: 3px; font-size: 11px; color: var(--forbidden-red); display: none; }
 .edit-mode .shortcut-remove { display: block; }
 @media (max-width: 420px) {
@@ -630,7 +649,11 @@ body.theme-ember { --neon-cyan: #ff8a3d; --neon-pink: #ff3333; --neon-purple: #f
         </select>
         <input type="text" id="shortcut-label-input" maxlength="10" placeholder="表示名">
         <input type="url" id="shortcut-url-input" placeholder="URL（わかる人用）">
-        <button class="arch-btn" type="button" onclick="addShortcut()">ADD</button>
+        <button class="arch-btn" id="shortcut-save-button" type="button" onclick="saveShortcut()">追加</button>
+        <div class="shortcut-manager">
+            <div class="shortcut-manager-title">登録済みショートカット</div>
+            <div id="shortcut-manager-list"></div>
+        </div>
     </div>
 
     <div class="main-section">
@@ -832,6 +855,7 @@ body.theme-ember { --neon-cyan: #ff8a3d; --neon-pink: #ff3333; --neon-purple: #f
         document.body.classList.add(themeList[currentThemeIndex]);
 
         let customShortcuts = JSON.parse(localStorage.getItem('chronex_shortcuts') || '[]');
+        let editingShortcutIndex = -1;
         renderShortcuts();
 
         document.addEventListener('click', (event) => {
@@ -852,7 +876,7 @@ body.theme-ember { --neon-cyan: #ff8a3d; --neon-pink: #ff3333; --neon-purple: #f
             document.getElementById('shortcut-url-input').value = url;
         }
 
-        function addShortcut() {
+        function saveShortcut() {
             const labelInput = document.getElementById('shortcut-label-input');
             const urlInput = document.getElementById('shortcut-url-input');
             const presetInput = document.getElementById('shortcut-preset-select');
@@ -860,18 +884,42 @@ body.theme-ember { --neon-cyan: #ff8a3d; --neon-pink: #ff3333; --neon-purple: #f
             let url = urlInput.value.trim();
             if(!label || !url) return;
             if(!/^https?:\/\//i.test(url)) url = 'https://' + url;
-            customShortcuts.push({ label, url });
+            if(editingShortcutIndex >= 0) {
+                customShortcuts[editingShortcutIndex] = { label, url };
+            } else {
+                customShortcuts.push({ label, url });
+            }
             localStorage.setItem('chronex_shortcuts', JSON.stringify(customShortcuts));
             labelInput.value = "";
             urlInput.value = "";
             presetInput.value = "";
+            editingShortcutIndex = -1;
+            document.getElementById('shortcut-save-button').textContent = '追加';
             renderShortcuts();
         }
 
         function removeShortcut(index) {
+            if(!confirm(`「${customShortcuts[index].label}」を削除しますか？`)) return;
             customShortcuts.splice(index, 1);
             localStorage.setItem('chronex_shortcuts', JSON.stringify(customShortcuts));
+            if(editingShortcutIndex === index) {
+                editingShortcutIndex = -1;
+                document.getElementById('shortcut-label-input').value = "";
+                document.getElementById('shortcut-url-input').value = "";
+                document.getElementById('shortcut-save-button').textContent = '追加';
+            } else if(editingShortcutIndex > index) {
+                editingShortcutIndex--;
+            }
             renderShortcuts();
+        }
+
+        function editShortcut(index) {
+            const item = customShortcuts[index];
+            editingShortcutIndex = index;
+            document.getElementById('shortcut-label-input').value = item.label;
+            document.getElementById('shortcut-url-input').value = item.url;
+            document.getElementById('shortcut-preset-select').value = "";
+            document.getElementById('shortcut-save-button').textContent = '保存';
         }
 
         function renderShortcuts() {
@@ -885,6 +933,25 @@ body.theme-ember { --neon-cyan: #ff8a3d; --neon-pink: #ff3333; --neon-purple: #f
                 link.innerHTML = `<span class="shortcut-remove" onclick="event.preventDefault(); removeShortcut(${index})">×</span><div class="icon-symbol">◆</div><div class="icon-label">${escapeHtml(item.label)}</div>`;
                 holder.appendChild(link);
             });
+
+            const manager = document.getElementById('shortcut-manager-list');
+            if(!manager) return;
+            if(customShortcuts.length === 0) {
+                manager.innerHTML = '<div class="shortcut-manager-empty">まだ追加されていません</div>';
+                return;
+            }
+            manager.innerHTML = customShortcuts.map((item, index) => {
+                let host = item.url;
+                try { host = new URL(item.url).hostname; } catch(error) {}
+                return `<div class="shortcut-manager-row">
+                    <div class="shortcut-manager-info">
+                        <div class="shortcut-manager-label">${escapeHtml(item.label)}</div>
+                        <div class="shortcut-manager-url">${escapeHtml(host)}</div>
+                    </div>
+                    <button class="arch-btn" type="button" onclick="editShortcut(${index})">編集</button>
+                    <button class="arch-btn delete-shortcut" type="button" onclick="removeShortcut(${index})">削除</button>
+                </div>`;
+            }).join('');
         }
 
         function cycleTheme() {
