@@ -144,10 +144,11 @@ body {
     padding: 10px; box-sizing: border-box; z-index: 12;
 }
 .dock-editor.active { display: grid; gap: 8px; grid-template-columns: 1fr 1fr auto; }
-.dock-editor input {
+.dock-editor input, .dock-editor select {
     min-width: 0; background: rgba(255,255,255,0.05); border: 1px solid var(--border);
     color: #fff; font-family: 'Orbitron'; font-size: 10px; padding: 8px; outline: none;
 }
+.dock-editor select { grid-column: 1 / -1; color: var(--neon-cyan); }
 .dock-editor button { min-height: 32px; }
 .shortcut-remove { position: absolute; top: 2px; right: 3px; font-size: 11px; color: var(--forbidden-red); display: none; }
 .edit-mode .shortcut-remove { display: block; }
@@ -616,8 +617,19 @@ body.theme-ember { --neon-cyan: #ff8a3d; --neon-pink: #ff3333; --neon-purple: #f
         <button class="icon-btn" type="button" onclick="cycleTheme()" aria-label="Change theme"><div class="icon-symbol">◐</div><div class="icon-label">THEME</div></button>
     </div>
     <div class="dock-editor" id="dock-editor">
-        <input type="text" id="shortcut-label-input" maxlength="10" placeholder="LABEL">
-        <input type="url" id="shortcut-url-input" placeholder="https://...">
+        <select id="shortcut-preset-select" onchange="applyShortcutPreset()">
+            <option value="">よく使うサイトから選ぶ</option>
+            <option value="GMAIL|https://mail.google.com">Gmail</option>
+            <option value="CLASS|https://classroom.google.com">Google Classroom</option>
+            <option value="DRIVE|https://drive.google.com">Google Drive</option>
+            <option value="CALENDAR|https://calendar.google.com">Google Calendar</option>
+            <option value="X|https://x.com">X</option>
+            <option value="INSTAGRAM|https://www.instagram.com">Instagram</option>
+            <option value="DISCORD|https://discord.com/app">Discord</option>
+            <option value="CANVA|https://www.canva.com">Canva</option>
+        </select>
+        <input type="text" id="shortcut-label-input" maxlength="10" placeholder="表示名">
+        <input type="url" id="shortcut-url-input" placeholder="URL（わかる人用）">
         <button class="arch-btn" type="button" onclick="addShortcut()">ADD</button>
     </div>
 
@@ -832,9 +844,18 @@ body.theme-ember { --neon-cyan: #ff8a3d; --neon-pink: #ff3333; --neon-purple: #f
             document.getElementById('dock-editor').classList.toggle('active');
         }
 
+        function applyShortcutPreset() {
+            const preset = document.getElementById('shortcut-preset-select').value;
+            if(!preset) return;
+            const [label, url] = preset.split('|');
+            document.getElementById('shortcut-label-input').value = label;
+            document.getElementById('shortcut-url-input').value = url;
+        }
+
         function addShortcut() {
             const labelInput = document.getElementById('shortcut-label-input');
             const urlInput = document.getElementById('shortcut-url-input');
+            const presetInput = document.getElementById('shortcut-preset-select');
             const label = labelInput.value.trim().toUpperCase().slice(0, 10);
             let url = urlInput.value.trim();
             if(!label || !url) return;
@@ -843,6 +864,7 @@ body.theme-ember { --neon-cyan: #ff8a3d; --neon-pink: #ff3333; --neon-purple: #f
             localStorage.setItem('chronex_shortcuts', JSON.stringify(customShortcuts));
             labelInput.value = "";
             urlInput.value = "";
+            presetInput.value = "";
             renderShortcuts();
         }
 
