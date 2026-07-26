@@ -32,12 +32,14 @@
 
 body {
     margin: 0; background-color: var(--bg-void); color: #fff;
-    font-family: 'Orbitron', sans-serif; overflow: hidden;
-    height: 100vh; width: 100vw;
+    font-family: 'Orbitron', sans-serif; overflow-x: hidden; overflow-y: auto;
+    min-height: 100vh; min-height: 100svh; width: 100%;
     -webkit-touch-callout: none; user-select: none;
+    -webkit-overflow-scrolling: touch; touch-action: pan-y;
     display: flex; flex-direction: column; align-items: center;
     transition: background 1s ease;
 }
+input, textarea, select { user-select: text; }
 
 /* === TRANSITION LAYER === */
 #transition-layer {
@@ -93,7 +95,7 @@ body {
 .flash-overlay { position: absolute; width:100%; height:100%; background: rgba(255,255,255,0.15); opacity:0; pointer-events:none; }
 @keyframes flashAnim { 0%,100%{opacity:0;} 2%{opacity:0.4;} 4%{opacity:0;} }
 
-.grid-floor { position: absolute; width: 200%; height: 200%; background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px); background-size: 40px 40px; transform: perspective(500px) rotateX(60deg) translateY(-100px) translateZ(-200px); bottom: -50%; left: -50%; z-index: -1; }
+.grid-floor { position: fixed; width: 200%; height: 200%; background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px); background-size: 40px 40px; transform: perspective(500px) rotateX(60deg) translateY(-100px) translateZ(-200px); bottom: -50%; left: -50%; z-index: -1; pointer-events: none; }
 
 /* === TOP SHORTCUTS === */
 .top-dock {
@@ -292,7 +294,7 @@ body.theme-ember { --neon-cyan: #ff8a3d; --neon-pink: #ff3333; --neon-purple: #f
 #search-input:focus { border-color: var(--neon-cyan); box-shadow: 0 0 10px rgba(0, 243, 255, 0.3); width: 240px; background: rgba(0, 243, 255, 0.05); }
 
 /* === MODULES GRID === */
-.modules-container { width: 100%; max-width: 450px; padding: 0 20px 30px 20px; display: flex; flex-direction: column; gap: 12px; box-sizing: border-box; z-index: 10; }
+.modules-container { width: 100%; max-width: 450px; padding: 0 20px calc(40px + env(safe-area-inset-bottom)) 20px; display: flex; flex-direction: column; gap: 12px; box-sizing: border-box; z-index: 10; }
 
 .weather-card {
     width: 100%; height: 60px;
@@ -324,7 +326,7 @@ body.theme-ember { --neon-cyan: #ff8a3d; --neon-pink: #ff3333; --neon-purple: #f
 
 /* === MODALS === */
 .modal {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%; height: 100dvh;
     background: rgba(5, 5, 8, 0.98); backdrop-filter: blur(15px);
     z-index: 200; opacity: 0; pointer-events: none; transform: scale(1.1);
     transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
@@ -347,11 +349,25 @@ body.theme-ember { --neon-cyan: #ff8a3d; --neon-pink: #ff3333; --neon-purple: #f
 #modal-quest.active .modal-content { animation: questOpen 0.5s ease-out forwards; }
 @keyframes questOpen { from { transform: rotateX(20deg) translateY(50px); opacity: 0; } to { transform: rotateX(0) translateY(0); opacity: 1; } }
 .quest-card { background: rgba(0, 0, 0, 0.9); border: 1px solid #333; margin-bottom: 8px; padding: 12px; display: flex; justify-content: space-between; align-items: center; border-left-width: 4px; }
+.quest-card.done { opacity: 0.55; }
+.quest-card.done .quest-text { text-decoration: line-through; }
 .qc-s { border-left-color: #ffcc00; } .qc-a { border-left-color: #ff0055; } .qc-b { border-left-color: #00f3ff; } .qc-c { border-left-color: #888; }
 .quest-input-area { display: flex; gap: 5px; margin-bottom: 15px; background: rgba(0,20,30,0.8); padding: 10px; border: 1px solid var(--neon-cyan); }
-#quest-in-text { flex: 1; background: #000; border: none; color: #fff; padding: 5px; outline: none; }
+#quest-in-text { flex: 1; min-width: 0; background: #000; border: none; color: #fff; padding: 5px; outline: none; }
 #quest-rank-sel { background: #000; color: #fff; border: 1px solid var(--neon-cyan); font-family: 'Orbitron'; }
 #quest-add-btn { background: var(--neon-cyan); color: #000; border: none; padding: 0 15px; font-weight: bold; cursor: pointer; }
+.quest-toolbar { display: flex; gap: 6px; align-items: center; margin-bottom: 12px; flex-wrap: wrap; }
+.quest-filter { padding: 6px 9px; }
+.quest-filter.active { color: #000; background: var(--neon-cyan); border-color: var(--neon-cyan); }
+.quest-spacer { flex: 1; }
+.quest-text { flex: 1; min-width: 0; padding: 0 10px; overflow-wrap: anywhere; font-family: sans-serif; }
+.quest-check, .quest-delete {
+    width: 32px; height: 32px; flex: 0 0 32px; background: transparent; cursor: pointer;
+    border: 1px solid #555; color: #aaa; font-size: 14px;
+}
+.quest-check:hover { border-color: var(--safe-green); color: var(--safe-green); }
+.quest-delete:hover { border-color: var(--forbidden-red); color: var(--forbidden-red); }
+.quest-empty { color: #666; text-align: center; padding: 40px 10px; font-size: 11px; }
 
 /* === LUNAR PHASE & CALENDAR === */
 #modal-moon .modal-title { font-family: 'Zen Old Mincho', serif; letter-spacing: 3px; }
@@ -494,6 +510,8 @@ body.theme-ember { --neon-cyan: #ff8a3d; --neon-pink: #ff3333; --neon-purple: #f
     margin-bottom: 15px;
     color: var(--neon-cyan); font-size: 18px; letter-spacing: 2px;
 }
+.calendar-header-main { display: flex; align-items: center; gap: 8px; }
+.calendar-today-btn { padding: 5px 7px; font-size: 8px; }
 .cal-nav-btn { background: transparent; border: none; color: #aaa; font-size: 18px; cursor: pointer; padding: 5px 10px; }
 .cal-nav-btn:hover { color: #fff; }
 
@@ -512,8 +530,17 @@ body.theme-ember { --neon-cyan: #ff8a3d; --neon-pink: #ff3333; --neon-purple: #f
     display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
     padding-top: 5px; position: relative;
 }
+.calendar-cell { color: inherit; font-family: inherit; cursor: pointer; }
+.calendar-cell.date-selected { border-color: var(--neon-gold); box-shadow: inset 0 0 0 1px rgba(255,204,0,0.35); }
 .cal-date-num { font-size: 12px; margin-bottom: 5px; }
 .cal-moon-icon { width: 24px; height: 24px; }
+.moon-summary {
+    width: min(350px, 100%); margin: -8px auto 18px; padding: 10px 12px; box-sizing: border-box;
+    display: flex; justify-content: space-between; gap: 12px; align-items: center;
+    border: 1px solid var(--border); background: rgba(255,255,255,0.03);
+}
+.moon-summary-date { color: #fff; font-size: 11px; }
+.moon-summary-phase { color: var(--neon-cyan); font-size: 10px; text-align: right; }
 
 /* Date Colors */
 .date-sun, .date-holiday { color: var(--forbidden-red); }
@@ -527,7 +554,13 @@ body.theme-ember { --neon-cyan: #ff8a3d; --neon-pink: #ff3333; --neon-purple: #f
 /* VITAL */
 .vital-pod { width: 220px; height: 220px; border-radius: 50%; border: 4px solid #222; margin: 20px auto; display: flex; justify-content: center; align-items: center; position: relative; background: #000; }
 .vital-ring { position: absolute; width: 100%; height: 100%; border-radius: 50%; border-top: 4px solid var(--neon-pink); border-right: 4px solid transparent; animation: spin 2s linear infinite; }
+.vital-ring.paused { animation-play-state: paused; opacity: 0.45; }
 #vital-timer { font-size: 48px; font-weight: bold; color: #fff; text-shadow: 0 0 10px var(--neon-pink); z-index: 10; font-family: 'Orbitron'; }
+.vital-modes { display: flex; gap: 6px; margin-top: 5px; }
+.vital-mode.active { color: #000; background: var(--neon-pink); border-color: var(--neon-pink); }
+.vital-status { color: #888; font-size: 10px; margin-top: 10px; text-align: center; }
+.vital-actions { display: flex; gap: 12px; margin-top: 15px; }
+.vital-sessions { color: var(--neon-cyan); font-size: 10px; margin-top: 12px; }
 
 /* NOISE SWITCH */
 .switch-box { display: flex; align-items: center; gap: 10px; margin-top: 15px; background: rgba(255,255,255,0.05); padding: 5px 15px; border-radius: 20px; border: 1px solid #333; }
@@ -573,6 +606,8 @@ body.theme-ember { --neon-cyan: #ff8a3d; --neon-pink: #ff3333; --neon-purple: #f
     font-family: 'Orbitron'; font-size: 10px; padding: 8px 10px; margin-bottom: 10px; outline: none; width: 100%; box-sizing: border-box;
 }
 .archive-editor { flex: 1; background: rgba(20, 0, 0, 0.3); border: 1px solid var(--forbidden-red); padding: 15px; color: #ccaaaa; font-family: 'Zen Old Mincho', serif; font-size: 14px; line-height: 1.8; outline: none; resize: none; width: 100%; box-sizing: border-box; }
+.memo-editor-meta { display: flex; justify-content: space-between; gap: 12px; color: #777; font-size: 9px; margin-top: 7px; }
+.memo-save-status.saved { color: var(--safe-green); }
 
 /* Trash View */
 #archive-trash-view { display: none; flex-direction: column; height: 100%; padding: 20px; }
@@ -777,11 +812,11 @@ body.theme-ember { --neon-cyan: #ff8a3d; --neon-pink: #ff3333; --neon-purple: #f
                 <div class="app-title">LUNAR PHASE</div><div class="app-status">Moon: <span id="idx-moon-age">--</span></div><div class="app-icon-bg">☾</div>
             </div>
             <div class="app-card" onclick="triggerTransition('modal-vital', '>> 生命鼓動、同調...')">
-                <div class="app-title">VITAL KEEPER</div><div class="app-status">Life Support</div><div class="app-icon-bg">♥</div>
+                <div class="app-title">VITAL KEEPER</div><div class="app-status" id="vital-card-status">FOCUS 25:00</div><div class="app-icon-bg">♥</div>
             </div>
             <div class="app-card card-forbidden" onclick="triggerTransition('modal-archive', '>> 封印サレシ記憶、解凍...')">
                 <div class="app-title">FORBIDDEN ARCHIVE</div>
-                <div class="app-status" style="color:#aa5555;">[[ LOCKED ]]</div>
+                <div class="app-status" style="color:#aa5555;">Memos: <span id="a-count">0</span></div>
                 <div class="app-icon-bg">👁</div>
             </div>
         </div>
@@ -792,8 +827,15 @@ body.theme-ember { --neon-cyan: #ff8a3d; --neon-pink: #ff3333; --neon-purple: #f
         <div class="modal-content">
             <div class="quest-input-area">
                 <select id="quest-rank-sel"><option value="S">S</option><option value="A">A</option><option value="B">B</option><option value="C" selected>C</option></select>
-                <input type="text" id="quest-in-text" placeholder="Mission Name...">
+                <input type="text" id="quest-in-text" placeholder="やることを入力" onkeydown="if(event.key==='Enter') addQuest()">
                 <button id="quest-add-btn" onclick="addQuest()">ADD</button>
+            </div>
+            <div class="quest-toolbar">
+                <button class="arch-btn quest-filter active" data-filter="active" onclick="setQuestFilter('active')">未完了</button>
+                <button class="arch-btn quest-filter" data-filter="all" onclick="setQuestFilter('all')">すべて</button>
+                <button class="arch-btn quest-filter" data-filter="done" onclick="setQuestFilter('done')">完了</button>
+                <span class="quest-spacer"></span>
+                <button class="arch-btn" onclick="clearCompletedQuests()">完了を削除</button>
             </div>
             <div id="quest-list"></div>
         </div>
@@ -816,7 +858,10 @@ body.theme-ember { --neon-cyan: #ff8a3d; --neon-pink: #ff3333; --neon-purple: #f
                 <div class="moon-orbit m-orbit-3"></div>
                 <canvas id="moon-canvas" width="220" height="220"></canvas>
             </div>
-
+            <div class="moon-summary">
+                <span class="moon-summary-date" id="moon-selected-date">----</span>
+                <span class="moon-summary-phase" id="moon-selected-phase">----</span>
+            </div>
             <div id="lunar-calendar-wrapper" class="calendar-container"></div>
         </div>
     </div>
@@ -824,22 +869,29 @@ body.theme-ember { --neon-cyan: #ff8a3d; --neon-pink: #ff3333; --neon-purple: #f
     <div id="modal-vital" class="modal">
         <div class="modal-header"><span class="modal-title">VITAL KEEPER</span><span class="close-btn" onclick="closeModal('modal-vital')">×</span></div>
         <div class="modal-content" style="display:flex; flex-direction:column; align-items:center;">
+            <div class="vital-modes">
+                <button class="arch-btn vital-mode active" data-mode="focus" onclick="setVitalMode('focus')">集中 25</button>
+                <button class="arch-btn vital-mode" data-mode="short" onclick="setVitalMode('short')">休憩 5</button>
+                <button class="arch-btn vital-mode" data-mode="long" onclick="setVitalMode('long')">長休憩 15</button>
+            </div>
             <div class="vital-pod"><div class="vital-ring"></div><div id="vital-timer">25:00</div></div>
-            <div style="display:flex; gap:20px; margin-top:20px;">
+            <div class="vital-status" id="vital-status">準備完了</div>
+            <div class="vital-actions">
                 <button class="arch-btn" style="border-color:var(--neon-pink); color:var(--neon-pink);" onclick="startVital()">START</button>
-                <button class="arch-btn" style="border-color:#fff; color:#fff;" onclick="pauseVital()">STOP</button>
+                <button class="arch-btn" style="border-color:#fff; color:#fff;" onclick="pauseVital()">PAUSE</button>
                 <button class="arch-btn" onclick="resetVital()">RESET</button>
             </div>
+            <div class="vital-sessions">今日の集中: <span id="vital-session-count">0</span> 回</div>
             <div class="switch-box">
                 <input type="checkbox" id="vital-noise-toggle" class="toggle-chk" checked>
-                <span class="switch-label">NOISE LINK</span>
+                <span class="switch-label">終了音</span>
             </div>
         </div>
     </div>
 
     <div id="modal-archive" class="modal">
         <div class="modal-header">
-            <span class="modal-title" style="font-family: 'Zen Old Mincho', serif;">禁忌ノ書庫</span>
+            <span class="modal-title" style="font-family: 'Zen Old Mincho', serif;">禁忌ノ書庫 / メモ帳</span>
             <div class="header-icons">
                 <div class="head-icon trash-btn" onclick="openTrash()">🗑</div>
                 <div class="head-icon settings-btn" onclick="openSettings()">⚙</div>
@@ -850,21 +902,22 @@ body.theme-ember { --neon-cyan: #ff8a3d; --neon-pink: #ff3333; --neon-purple: #f
         <div class="modal-content" style="position:relative; padding:0; height:100%; display:flex; flex-direction:column;">
             
             <div id="archive-list-view" style="padding:20px;">
-                <button class="arch-btn btn-new" onclick="createNewMemo()">+ 虚無ヨリノ創造を綴レ...</button>
+                <button class="arch-btn btn-new" onclick="createNewMemo()">+ 新しいメモ</button>
                 <div class="archive-tools">
-                    <input type="text" id="archive-search-input" placeholder="SEARCH / TAG..." oninput="renderArchiveList()">
+                    <input type="text" id="archive-search-input" placeholder="メモ・タグを検索" oninput="renderArchiveList()">
                 </div>
                 <div id="archive-list-container"></div>
             </div>
 
             <div id="archive-editor-view" style="padding:20px;">
-                <input type="text" id="archive-title-input" placeholder="汝ノ真名ヲ此処ニ刻メ...">
-                <input type="text" id="archive-tag-input" placeholder="TAG / CATEGORY...">
-                <textarea id="archive-editor-area" class="archive-editor" placeholder="新ナ記憶の断片ヲ記録セヨ..."></textarea>
+                <input type="text" id="archive-title-input" placeholder="タイトル" oninput="scheduleMemoAutosave()">
+                <input type="text" id="archive-tag-input" placeholder="タグ（任意）" oninput="scheduleMemoAutosave()">
+                <textarea id="archive-editor-area" class="archive-editor" placeholder="メモを入力..." oninput="scheduleMemoAutosave()"></textarea>
+                <div class="memo-editor-meta"><span id="memo-char-count">0文字</span><span class="memo-save-status" id="memo-save-status">未保存</span></div>
                 <div style="display:flex; justify-content:space-between; margin-top:10px;">
-                    <button class="arch-btn" onclick="closeEditor()">← BACK</button>
+                    <button class="arch-btn" onclick="closeEditor()">← 一覧へ</button>
                     <div style="display:flex; gap:10px;">
-                        <button id="btn-save" class="arch-btn" style="color:var(--neon-cyan); border-color:var(--neon-cyan);" onclick="saveCurrentMemo()">SAVE DATA</button>
+                        <button id="btn-save" class="arch-btn" style="color:var(--neon-cyan); border-color:var(--neon-cyan);" onclick="saveCurrentMemo()">保存</button>
                     </div>
                 </div>
             </div>
@@ -1176,25 +1229,89 @@ body.theme-ember { --neon-cyan: #ff8a3d; --neon-pink: #ff3333; --neon-purple: #f
         }
 
         // === QUEST BOARD ===
-        let quests = JSON.parse(localStorage.getItem('quests_v3')) || [];
+        let questFilter = 'active';
+        let quests = (JSON.parse(localStorage.getItem('quests_v3')) || []).map((quest, index) => ({
+            ...quest,
+            id: quest.id || Date.now() + index,
+            done: Boolean(quest.done)
+        }));
         renderQuests();
-        function addQuest() {
-            const t = document.getElementById('quest-in-text').value;
-            if(t) { quests.push({t:t, r:document.getElementById('quest-rank-sel').value}); localStorage.setItem('quests_v3', JSON.stringify(quests)); renderQuests(); document.getElementById('quest-in-text').value=""; }
+
+        function saveQuests() {
+            localStorage.setItem('quests_v3', JSON.stringify(quests));
         }
+
+        function addQuest() {
+            const input = document.getElementById('quest-in-text');
+            const text = input.value.trim();
+            if(!text) return;
+            quests.unshift({ id: Date.now(), t: text, r: document.getElementById('quest-rank-sel').value, done: false });
+            saveQuests();
+            input.value = "";
+            questFilter = 'active';
+            renderQuests();
+        }
+
         function renderQuests() {
-            const el = document.getElementById('quest-list'); el.innerHTML = "";
-            quests.forEach((q,i) => {
-                const d = document.createElement('div'); d.className = `quest-card qc-${q.r.toLowerCase()}`;
-                d.innerHTML = `<div class="rank-badge">${q.r}</div><div>${q.t}</div><span class="check-btn" onclick="completeQuest(${i})">✔</span>`;
+            const el = document.getElementById('quest-list');
+            el.innerHTML = "";
+            const visible = quests.filter(quest =>
+                questFilter === 'all' || (questFilter === 'done' ? quest.done : !quest.done)
+            );
+
+            document.querySelectorAll('.quest-filter').forEach(button => {
+                button.classList.toggle('active', button.dataset.filter === questFilter);
+            });
+
+            if(visible.length === 0) {
+                el.innerHTML = '<div class="quest-empty">該当するTODOはありません</div>';
+            }
+
+            visible.forEach(q => {
+                const index = quests.findIndex(item => item.id === q.id);
+                const d = document.createElement('div');
+                d.className = `quest-card qc-${q.r.toLowerCase()} ${q.done ? 'done' : ''}`;
+                d.innerHTML = `
+                    <div class="rank-badge">${escapeHtml(q.r)}</div>
+                    <button class="quest-check" type="button" onclick="toggleQuest(${index})" aria-label="${q.done ? '未完了に戻す' : '完了にする'}">${q.done ? '↶' : '✓'}</button>
+                    <div class="quest-text">${escapeHtml(q.t)}</div>
+                    <button class="quest-delete" type="button" onclick="deleteQuest(${index})" aria-label="削除">×</button>
+                `;
                 el.appendChild(d);
             });
-            document.getElementById('m-count').innerText = quests.length;
+            document.getElementById('m-count').innerText = quests.filter(quest => !quest.done).length;
         }
-        function completeQuest(i) {
-            document.getElementById('quest-clear-overlay').classList.add('active');
-            quests.splice(i,1); localStorage.setItem('quests_v3', JSON.stringify(quests)); renderQuests();
-            setTimeout(()=>document.getElementById('quest-clear-overlay').classList.remove('active'), 1500);
+
+        function setQuestFilter(filter) {
+            questFilter = filter;
+            renderQuests();
+        }
+
+        function toggleQuest(index) {
+            const quest = quests[index];
+            if(!quest) return;
+            quest.done = !quest.done;
+            saveQuests();
+            if(quest.done) {
+                document.getElementById('quest-clear-overlay').classList.add('active');
+                setTimeout(() => document.getElementById('quest-clear-overlay').classList.remove('active'), 700);
+            }
+            renderQuests();
+        }
+
+        function deleteQuest(index) {
+            if(!quests[index] || !confirm(`「${quests[index].t}」を削除しますか？`)) return;
+            quests.splice(index, 1);
+            saveQuests();
+            renderQuests();
+        }
+
+        function clearCompletedQuests() {
+            if(!quests.some(quest => quest.done)) return;
+            if(!confirm('完了したTODOを削除しますか？')) return;
+            quests = quests.filter(quest => !quest.done);
+            saveQuests();
+            renderQuests();
         }
 
         // === LUNAR LOGIC (High Accuracy) ===
@@ -1263,20 +1380,35 @@ body.theme-ember { --neon-cyan: #ff8a3d; --neon-pink: #ff3333; --neon-purple: #f
 
         // --- LARGE MOON RENDERER & EFFECTS ---
         let shootingStarInterval;
+        let selectedMoonDate = new Date();
 
         function initLargeMoon() {
+            renderSelectedMoon(selectedMoonDate);
+            initParticles();
+            startShootingStars();
+        }
+
+        function getMoonPhaseName(age) {
+            if(age < 1.5 || age >= 28.5) return '新月';
+            if(age < 6.5) return '満ちていく月';
+            if(age < 8.5) return '上弦の月';
+            if(age < 13.5) return '満ちていく月';
+            if(age < 16.5) return '満月';
+            if(age < 21.5) return '欠けていく月';
+            if(age < 23.5) return '下弦の月';
+            return '欠けていく月';
+        }
+
+        function renderSelectedMoon(date) {
             const cvs = document.getElementById('moon-canvas');
             const ctx = cvs.getContext('2d');
-            const today = new Date();
-            const age = getMoonAge(today);
+            const age = getMoonAge(date);
             const phase = age / 29.53058867;
-            
             drawMoonBody(ctx, 110, 110, 100, phase, true);
-
-            // Initialize Background Particles
-            initParticles();
-            // Start Shooting Stars
-            startShootingStars();
+            document.getElementById('moon-selected-date').textContent =
+                `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
+            document.getElementById('moon-selected-phase').textContent =
+                `${getMoonPhaseName(age)} / 月齢 ${age.toFixed(1)}`;
         }
 
         function initParticles() {
@@ -1353,12 +1485,27 @@ body.theme-ember { --neon-cyan: #ff8a3d; --neon-pink: #ff3333; --neon-purple: #f
         }
 
         function prevMonth() {
+            currentCalDate.setDate(1);
             currentCalDate.setMonth(currentCalDate.getMonth() - 1);
             renderLunarCalendar(currentCalDate);
         }
 
         function nextMonth() {
+            currentCalDate.setDate(1);
             currentCalDate.setMonth(currentCalDate.getMonth() + 1);
+            renderLunarCalendar(currentCalDate);
+        }
+
+        function goToToday() {
+            currentCalDate = new Date();
+            selectedMoonDate = new Date();
+            renderSelectedMoon(selectedMoonDate);
+            renderLunarCalendar(currentCalDate);
+        }
+
+        function selectMoonDate(timestamp) {
+            selectedMoonDate = new Date(timestamp);
+            renderSelectedMoon(selectedMoonDate);
             renderLunarCalendar(currentCalDate);
         }
 
@@ -1403,7 +1550,10 @@ body.theme-ember { --neon-cyan: #ff8a3d; --neon-pink: #ff3333; --neon-purple: #f
             header.className = 'calendar-header';
             header.innerHTML = `
                 <button class="cal-nav-btn" onclick="prevMonth()"><</button>
-                <span>${year} . ${String(month + 1).padStart(2, '0')}</span>
+                <div class="calendar-header-main">
+                    <span>${year} . ${String(month + 1).padStart(2, '0')}</span>
+                    <button class="arch-btn calendar-today-btn" onclick="goToToday()">今日</button>
+                </div>
                 <button class="cal-nav-btn" onclick="nextMonth()">></button>
             `;
             container.appendChild(header);
@@ -1436,8 +1586,10 @@ body.theme-ember { --neon-cyan: #ff8a3d; --neon-pink: #ff3333; --neon-purple: #f
                 currentDate.setHours(12, 0, 0, 0);
                 
                 const dayOfWeek = currentDate.getDay();
-                const cell = document.createElement('div');
+                const cell = document.createElement('button');
+                cell.type = 'button';
                 cell.className = 'calendar-cell';
+                cell.onclick = () => selectMoonDate(currentDate.getTime());
 
                 let dateClass = 'date-weekday';
                 if (isHoliday(currentDate) || dayOfWeek === 0) dateClass = 'date-sun';
@@ -1445,6 +1597,9 @@ body.theme-ember { --neon-cyan: #ff8a3d; --neon-pink: #ff3333; --neon-purple: #f
 
                 if (currentDate.toDateString() === today.toDateString()) {
                     cell.classList.add('date-today');
+                }
+                if (currentDate.toDateString() === selectedMoonDate.toDateString()) {
+                    cell.classList.add('date-selected');
                 }
 
                 const dateNum = document.createElement('div');
@@ -1469,19 +1624,117 @@ body.theme-ember { --neon-cyan: #ff8a3d; --neon-pink: #ff3333; --neon-purple: #f
         }
 
         // === VITAL KEEPER ===
-        let vitalInt, vitalTime=25*60;
-        function startVital(){ 
-            if(!vitalInt) {
-                vitalInt=setInterval(()=>{ vitalTime--; updateVital(); if(vitalTime<=0)resetVital(); },1000); 
+        const vitalDurations = { focus: 25 * 60, short: 5 * 60, long: 15 * 60 };
+        const vitalLabels = { focus: '集中', short: '短い休憩', long: '長い休憩' };
+        const vitalNow = new Date();
+        const vitalTodayKey = `${vitalNow.getFullYear()}-${String(vitalNow.getMonth() + 1).padStart(2, '0')}-${String(vitalNow.getDate()).padStart(2, '0')}`;
+        const savedVitalRecord = JSON.parse(localStorage.getItem('chronex_pomodoro_record') || '{}');
+        let vitalSessions = savedVitalRecord.date === vitalTodayKey ? Number(savedVitalRecord.count || 0) : 0;
+        let vitalMode = 'focus';
+        let vitalTime = vitalDurations.focus;
+        let vitalEndAt = null;
+        let vitalInt = null;
+
+        function setVitalMode(mode) {
+            if(!vitalDurations[mode]) return;
+            pauseVital();
+            vitalMode = mode;
+            vitalTime = vitalDurations[mode];
+            document.getElementById('vital-status').textContent = '準備完了';
+            updateVital();
+        }
+
+        function startVital() {
+            if(vitalInt) return;
+            vitalEndAt = Date.now() + vitalTime * 1000;
+            vitalInt = setInterval(tickVital, 250);
+            document.getElementById('vital-status').textContent = `${vitalLabels[vitalMode]}中`;
+            updateVital();
+        }
+
+        function tickVital() {
+            if(!vitalEndAt) return;
+            vitalTime = Math.max(0, Math.ceil((vitalEndAt - Date.now()) / 1000));
+            if(vitalTime <= 0) {
+                completeVital();
+                return;
             }
+            updateVital();
         }
-        function pauseVital(){ 
-            clearInterval(vitalInt); vitalInt=null; 
+
+        function pauseVital() {
+            if(vitalEndAt) vitalTime = Math.max(0, Math.ceil((vitalEndAt - Date.now()) / 1000));
+            clearInterval(vitalInt);
+            vitalInt = null;
+            vitalEndAt = null;
+            const status = document.getElementById('vital-status');
+            if(status && vitalTime > 0) status.textContent = '一時停止';
+            updateVital();
         }
-        function resetVital(){ 
-            pauseVital(); vitalTime=25*60; updateVital(); 
+
+        function resetVital() {
+            clearInterval(vitalInt);
+            vitalInt = null;
+            vitalEndAt = null;
+            vitalTime = vitalDurations[vitalMode];
+            document.getElementById('vital-status').textContent = '準備完了';
+            updateVital();
         }
-        function updateVital(){ document.getElementById('vital-timer').innerText = `${Math.floor(vitalTime/60).toString().padStart(2,'0')}:${(vitalTime%60).toString().padStart(2,'0')}`; }
+
+        function completeVital() {
+            clearInterval(vitalInt);
+            vitalInt = null;
+            vitalEndAt = null;
+            const completedMode = vitalMode;
+            if(completedMode === 'focus') {
+                vitalSessions++;
+                localStorage.setItem('chronex_pomodoro_record', JSON.stringify({ date: vitalTodayKey, count: vitalSessions }));
+                vitalMode = 'short';
+            } else {
+                vitalMode = 'focus';
+            }
+            vitalTime = vitalDurations[vitalMode];
+            playVitalSound();
+            updateVital();
+            document.getElementById('vital-status').textContent =
+                completedMode === 'focus' ? '集中完了。休憩しましょう' : '休憩完了。集中できます';
+        }
+
+        function playVitalSound() {
+            const toggle = document.getElementById('vital-noise-toggle');
+            if(toggle && !toggle.checked) return;
+            try {
+                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                const audioContext = new AudioContextClass();
+                const oscillator = audioContext.createOscillator();
+                const gain = audioContext.createGain();
+                oscillator.frequency.value = 660;
+                gain.gain.setValueAtTime(0.12, audioContext.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.5);
+                oscillator.connect(gain);
+                gain.connect(audioContext.destination);
+                oscillator.start();
+                oscillator.stop(audioContext.currentTime + 0.5);
+            } catch(error) {}
+        }
+
+        function updateVital() {
+            const minutes = Math.floor(vitalTime / 60).toString().padStart(2, '0');
+            const seconds = (vitalTime % 60).toString().padStart(2, '0');
+            document.getElementById('vital-timer').textContent = `${minutes}:${seconds}`;
+            document.getElementById('vital-card-status').textContent =
+                `${vitalMode === 'focus' ? 'FOCUS' : 'BREAK'} ${minutes}:${seconds}`;
+            document.getElementById('vital-session-count').textContent = vitalSessions;
+            document.querySelectorAll('.vital-mode').forEach(button => {
+                button.classList.toggle('active', button.dataset.mode === vitalMode);
+            });
+            document.querySelector('.vital-ring').classList.toggle('paused', !vitalInt);
+        }
+
+        document.addEventListener('visibilitychange', () => {
+            if(!document.hidden && vitalInt) tickVital();
+        });
+        updateVital();
 
         // === ARCHIVE SYSTEM ===
         let archives = JSON.parse(localStorage.getItem('chronex_archives')) || [];
@@ -1785,13 +2038,18 @@ body.theme-ember { --neon-cyan: #ff8a3d; --neon-pink: #ff3333; --neon-purple: #f
             const filter = (searchInput ? searchInput.value : "").trim().toLowerCase();
             container.innerHTML = "";
 
-            archives
+            const visibleArchives = archives
                 .filter(item => {
                     const haystack = `${item.title || ""} ${item.content || ""} ${item.tag || ""}`.toLowerCase();
                     return !filter || haystack.includes(filter);
                 })
-                .sort((a,b) => Number(!!b.pinned) - Number(!!a.pinned) || b.id - a.id)
-                .forEach(item => {
+                .sort((a,b) => Number(!!b.pinned) - Number(!!a.pinned) || b.id - a.id);
+
+            if(visibleArchives.length === 0) {
+                container.innerHTML = `<div class="trash-empty">${filter ? '一致するメモがありません' : 'まだメモがありません'}</div>`;
+            }
+
+            visibleArchives.forEach(item => {
                     const div = document.createElement('div');
                     div.className = "archive-item";
                     div.innerHTML = `
@@ -1809,6 +2067,7 @@ body.theme-ember { --neon-cyan: #ff8a3d; --neon-pink: #ff3333; --neon-purple: #f
                         </div>`;
                     container.appendChild(div);
                 });
+            updateArchiveCount();
         }
 
         function togglePin(id) {
@@ -1825,7 +2084,10 @@ body.theme-ember { --neon-cyan: #ff8a3d; --neon-pink: #ff3333; --neon-purple: #f
             titleInput.value = "";
             tagInput.value = "";
             archiveEditor.value = "";
+            memoDirty = false;
+            updateMemoMeta('未保存');
             switchView('editor');
+            titleInput.focus();
         }
 
         function openEditor(id) {
@@ -1836,14 +2098,45 @@ body.theme-ember { --neon-cyan: #ff8a3d; --neon-pink: #ff3333; --neon-purple: #f
                 tagInput.value = item.tag || "";
                 switchView('editor');
                 runDecryptAnim(item.content || "");
+                memoDirty = false;
+                updateMemoMeta('保存済み', true, item.content || "");
             }
         }
 
-        function saveCurrentMemo() {
-            const title = titleInput.value || "UNTITLED_FILE";
+        let memoAutosaveTimer = null;
+        let memoDirty = false;
+
+        function updateArchiveCount() {
+            const count = document.getElementById('a-count');
+            if(count) count.textContent = archives.length;
+        }
+
+        function updateMemoMeta(statusText, saved = false, contentOverride = null) {
+            const content = contentOverride === null ? archiveEditor.value : contentOverride;
+            document.getElementById('memo-char-count').textContent = `${content.length}文字`;
+            const status = document.getElementById('memo-save-status');
+            status.textContent = statusText;
+            status.classList.toggle('saved', saved);
+        }
+
+        function scheduleMemoAutosave() {
+            memoDirty = true;
+            updateMemoMeta('保存中...');
+            clearTimeout(memoAutosaveTimer);
+            memoAutosaveTimer = setTimeout(() => saveCurrentMemo(true), 700);
+        }
+
+        function saveCurrentMemo(silent = false) {
+            clearTimeout(memoAutosaveTimer);
+            const rawTitle = titleInput.value.trim();
             const tag = tagInput.value.trim();
             const content = archiveEditor.value;
-            const date = new Date().toLocaleDateString();
+            if(!rawTitle && !tag && !content && !currentEditId) {
+                updateMemoMeta('入力待ち');
+                return;
+            }
+            const title = rawTitle || "無題のメモ";
+            const date = new Date().toLocaleString();
             if(currentEditId) {
                 const idx = archives.findIndex(a => a.id === currentEditId);
                 if(idx !== -1) archives[idx] = { ...archives[idx], id: currentEditId, title, tag, content, date };
@@ -1853,9 +2146,29 @@ body.theme-ember { --neon-cyan: #ff8a3d; --neon-pink: #ff3333; --neon-purple: #f
                 currentEditId = newId;
             }
             updateStorage();
-            alert("DATA SAVED.");
-            closeEditor();
+            memoDirty = false;
+            updateArchiveCount();
+            updateMemoMeta('保存済み', true);
+            if(!silent) {
+                switchView('list');
+                renderArchiveList();
+            }
         }
+
+        function closeEditor() {
+            clearTimeout(memoAutosaveTimer);
+            if(memoDirty) saveCurrentMemo(true);
+            switchView('list');
+            renderArchiveList();
+        }
+
+        document.addEventListener('keydown', event => {
+            if((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's' && editorView.style.display === 'flex') {
+                event.preventDefault();
+                saveCurrentMemo();
+            }
+        });
+        updateArchiveCount();
 
         // === PWA UPDATE NOTICE ===
         let waitingServiceWorker = null;
