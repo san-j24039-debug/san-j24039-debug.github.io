@@ -30,12 +30,16 @@
     --border-strong: rgba(255, 255, 255, 0.35);
 }
 
+html {
+    width: 100%; max-width: 100%; overflow-x: hidden; overscroll-behavior-x: none;
+    touch-action: pan-y;
+}
 body {
     margin: 0; background-color: var(--bg-void); color: #fff;
     font-family: 'Orbitron', sans-serif; overflow-x: hidden; overflow-y: auto;
-    min-height: 100vh; min-height: 100svh; width: 100%;
+    min-height: 100vh; min-height: 100svh; width: 100%; max-width: 100%;
     -webkit-touch-callout: none; user-select: none;
-    -webkit-overflow-scrolling: touch; touch-action: pan-y;
+    -webkit-overflow-scrolling: touch; touch-action: pan-y; overscroll-behavior-x: none;
     display: flex; flex-direction: column; align-items: center;
     transition: background 1s ease;
 }
@@ -154,7 +158,7 @@ input, textarea, select { user-select: text; }
 .shortcut-favicon { width: 20px; height: 20px; object-fit: contain; border-radius: 3px; }
 .shortcut-fallback { display: none; color: var(--silver-metal); }
 .edge-tool {
-    position: fixed; top: 10px; width: 44px; height: 48px; z-index: 30;
+    position: absolute; top: 10px; width: 44px; height: 48px; z-index: 30;
     display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 3px;
     padding: 0; color: #aaa; background: rgba(0, 0, 0, 0.82);
     border: 1px solid var(--border); backdrop-filter: blur(8px); cursor: pointer;
@@ -162,12 +166,12 @@ input, textarea, select { user-select: text; }
 .edge-tool svg, .edge-tool .edge-symbol { color: var(--neon-cyan); }
 .edge-tool > span:not(.edge-symbol) { font-family: 'Orbitron'; font-size: 7px; letter-spacing: 0.5px; }
 .edge-tool .edge-symbol { font-size: 16px; line-height: 1; }
-.edge-edit { right: 46px; border-radius: 8px 0 0 8px; }
-.edge-theme { left: 0; border-radius: 0; }
-.edge-data { left: 46px; border-radius: 0 8px 8px 0; }
+.edge-theme { right: 138px; border-radius: 8px 0 0 8px; }
+.edge-data { right: 92px; border-radius: 0; }
+.edge-edit { right: 46px; border-radius: 0; }
 .edge-tool:hover { border-color: var(--neon-cyan); background: rgba(0, 243, 255, 0.1); }
 .data-panel {
-    position: fixed; top: 68px; left: 8px; z-index: 31;
+    position: absolute; top: 68px; right: 8px; z-index: 31;
     width: min(230px, calc(100vw - 16px)); display: none; grid-template-columns: 1fr 1fr; gap: 8px;
     padding: 10px; box-sizing: border-box; background: rgba(0,0,0,0.95);
     border: 1px solid var(--neon-cyan); border-radius: 8px; box-shadow: 0 0 16px rgba(0,243,255,0.2);
@@ -178,8 +182,29 @@ input, textarea, select { user-select: text; }
     font-size: 13px; font-weight: 700;
 }
 .data-panel button { min-height: 38px; font-family: Arial, 'Noto Sans JP', sans-serif; font-size: 12px; }
+.help-tool {
+    position: absolute; top: 14px; left: 10px; z-index: 30;
+    width: 40px; height: 40px; padding: 0; border-radius: 50%;
+    color: var(--neon-cyan); background: rgba(0,0,0,0.82); border: 1px solid var(--neon-cyan);
+    font-family: Arial, sans-serif; font-size: 20px; font-weight: 700; cursor: pointer;
+}
+.help-panel {
+    position: absolute; top: 64px; left: 8px; z-index: 32;
+    width: min(360px, calc(100vw - 16px)); max-height: calc(100svh - 78px);
+    display: none; overflow-y: auto; overscroll-behavior: contain; padding: 12px;
+    box-sizing: border-box; background: rgba(0,0,0,0.97);
+    border: 1px solid var(--neon-cyan); border-radius: 8px; box-shadow: 0 0 18px rgba(0,243,255,0.22);
+    font-family: Arial, 'Noto Sans JP', sans-serif;
+}
+.help-panel.active { display: block; }
+.help-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.help-title { color: #fff; font-size: 15px; font-weight: 700; }
+.help-close { width: 32px; height: 32px; padding: 0; color: #fff; background: transparent; border: 1px solid #555; font-size: 20px; }
+.help-row { padding: 10px 2px; border-top: 1px solid rgba(255,255,255,0.12); }
+.help-name { color: var(--neon-cyan); font-size: 12px; font-weight: 700; }
+.help-description { color: #ddd; font-size: 12px; line-height: 1.6; margin-top: 3px; }
 .shortcut-menu {
-    position: fixed; right: 0; top: 10px; z-index: 30;
+    position: absolute; right: 0; top: 10px; z-index: 30;
 }
 .shortcut-menu[open], .ai-menu[open] { z-index: 30; }
 .shortcut-menu summary { list-style: none; cursor: pointer; }
@@ -782,6 +807,24 @@ body.theme-ember { --neon-cyan: #ff8a3d; --neon-pink: #ff3333; --neon-purple: #f
         </a>
         <div class="app-custom-slots" id="app-custom-slots"></div>
     </div>
+    <button class="help-tool" type="button" onclick="toggleHelpPanel()" aria-label="使い方を開く">?</button>
+    <div class="help-panel" id="help-panel">
+        <div class="help-header">
+            <span class="help-title">機能ガイド</span>
+            <button class="help-close" type="button" onclick="closeHelpPanel()" aria-label="閉じる">×</button>
+        </div>
+        <div class="help-row"><div class="help-name">アプリ欄</div><div class="help-description">よく使うサイトを8枠に配置できます。空いている「追加」を押すと登録できます。</div></div>
+        <div class="help-row"><div class="help-name">QUEST BOARD</div><div class="help-description">やることを登録し、未完了・完了に分けて管理できるTo-Doリストです。</div></div>
+        <div class="help-row"><div class="help-name">LUNAR PHASE</div><div class="help-description">今日や選んだ日付の月齢・月相を確認できる月カレンダーです。</div></div>
+        <div class="help-row"><div class="help-name">VITAL KEEPER</div><div class="help-description">25分の集中と休憩を切り替えて使うポモドーロタイマーです。</div></div>
+        <div class="help-row"><div class="help-name">FORBIDDEN ARCHIVE</div><div class="help-description">自動保存、検索、タグ、ピン留め、ゴミ箱に対応したメモ帳です。</div></div>
+        <div class="help-row"><div class="help-name">検索欄</div><div class="help-description">通常のGoogle検索に加え、yt・map・gptなどの入力で検索先を切り替えられます。</div></div>
+        <div class="help-row"><div class="help-name">AI TOOL</div><div class="help-description">Gemini、ChatGPT、Claudeから利用するAIを選べます。</div></div>
+        <div class="help-row"><div class="help-name">LINKS</div><div class="help-description">アプリ欄に収まらないショートカットを一覧で開けるブックマーク欄です。</div></div>
+        <div class="help-row"><div class="help-name">EDIT</div><div class="help-description">ショートカットの追加・編集・削除と、アプリ枠5〜8への配置交換ができます。</div></div>
+        <div class="help-row"><div class="help-name">THEME</div><div class="help-description">画面の配色テーマを切り替えます。</div></div>
+        <div class="help-row"><div class="help-name">DATA</div><div class="help-description">設定、ショートカット、To-Do、メモなどをまとめてバックアップ・復元します。</div></div>
+    </div>
     <button class="edge-tool edge-theme" type="button" onclick="cycleTheme()" aria-label="テーマを変更">
         <span class="edge-symbol">◐</span><span>THEME</span>
     </button>
@@ -1124,7 +1167,27 @@ body.theme-ember { --neon-cyan: #ff8a3d; --neon-pink: #ff3333; --neon-purple: #f
             if(dataPanel.classList.contains('active') && !dataPanel.contains(event.target) && !dataTrigger) {
                 closeDataPanel();
             }
+            const helpPanel = document.getElementById('help-panel');
+            const helpTrigger = event.target.closest('.help-tool');
+            if(helpPanel.classList.contains('active') && !helpPanel.contains(event.target) && !helpTrigger) {
+                closeHelpPanel();
+            }
         });
+
+        function toggleHelpPanel() {
+            const panel = document.getElementById('help-panel');
+            if(panel.classList.contains('active')) {
+                closeHelpPanel();
+            } else {
+                closeDockEditor();
+                closeDataPanel();
+                panel.classList.add('active');
+            }
+        }
+
+        function closeHelpPanel() {
+            document.getElementById('help-panel').classList.remove('active');
+        }
 
         function toggleDataPanel() {
             const panel = document.getElementById('data-panel');
@@ -1164,6 +1227,7 @@ body.theme-ember { --neon-cyan: #ff8a3d; --neon-pink: #ff3333; --neon-purple: #f
             if(event.key !== 'Escape') return;
             closeDockEditor();
             closeDataPanel();
+            closeHelpPanel();
             const aiMenu = document.querySelector('.ai-menu');
             const shortcutMenu = document.querySelector('.shortcut-menu');
             if(aiMenu) aiMenu.open = false;
