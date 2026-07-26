@@ -163,8 +163,21 @@ input, textarea, select { user-select: text; }
 .edge-tool > span:not(.edge-symbol) { font-family: 'Orbitron'; font-size: 7px; letter-spacing: 0.5px; }
 .edge-tool .edge-symbol { font-size: 16px; line-height: 1; }
 .edge-edit { right: 46px; border-radius: 8px 0 0 8px; }
-.edge-theme { left: 0; border-radius: 0 8px 8px 0; }
+.edge-theme { left: 0; border-radius: 0; }
+.edge-data { left: 46px; border-radius: 0 8px 8px 0; }
 .edge-tool:hover { border-color: var(--neon-cyan); background: rgba(0, 243, 255, 0.1); }
+.data-panel {
+    position: fixed; top: 68px; left: 8px; z-index: 31;
+    width: min(230px, calc(100vw - 16px)); display: none; grid-template-columns: 1fr 1fr; gap: 8px;
+    padding: 10px; box-sizing: border-box; background: rgba(0,0,0,0.95);
+    border: 1px solid var(--neon-cyan); border-radius: 8px; box-shadow: 0 0 16px rgba(0,243,255,0.2);
+}
+.data-panel.active { display: grid; }
+.data-panel-title {
+    grid-column: 1 / -1; color: #fff; font-family: Arial, 'Noto Sans JP', sans-serif;
+    font-size: 13px; font-weight: 700;
+}
+.data-panel button { min-height: 38px; font-family: Arial, 'Noto Sans JP', sans-serif; font-size: 12px; }
 .shortcut-menu {
     position: fixed; right: 0; top: 10px; z-index: 30;
 }
@@ -209,7 +222,7 @@ input, textarea, select { user-select: text; }
 .shortcut-option-url { color: #777; font-size: 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 2px; }
 .shortcut-options-empty { color: #888; font-size: 9px; padding: 10px 8px; text-align: center; }
 .dock-editor {
-    width: min(390px, calc(100vw - 24px)); margin: 0 auto; display: none;
+    width: min(350px, calc(100vw - 24px)); margin: 0 auto; display: none;
     background: rgba(0,0,0,0.94); border: 1px solid rgba(255,255,255,0.28); border-radius: 8px;
     padding: 12px; box-sizing: border-box; z-index: 12;
 }
@@ -254,11 +267,6 @@ input, textarea, select { user-select: text; }
 .shortcut-position-button:disabled { opacity: 0.25; cursor: default; }
 .shortcut-manager-row button { min-height: 28px; padding: 0 8px; font-size: 9px; }
 .shortcut-manager-row .delete-shortcut { color: var(--forbidden-red); border-color: rgba(255,0,85,0.45); }
-.data-tools {
-    grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
-    border-top: 1px solid var(--border); padding-top: 8px;
-}
-.data-tools-title { grid-column: 1 / -1; color: #ddd; font-family: Arial, 'Noto Sans JP', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 0; }
 @media (max-width: 600px) {
     .top-dock {
         grid-template-columns: repeat(4, 56px);
@@ -777,6 +785,15 @@ body.theme-ember { --neon-cyan: #ff8a3d; --neon-pink: #ff3333; --neon-purple: #f
     <button class="edge-tool edge-theme" type="button" onclick="cycleTheme()" aria-label="テーマを変更">
         <span class="edge-symbol">◐</span><span>THEME</span>
     </button>
+    <button class="edge-tool edge-data" type="button" onclick="toggleDataPanel()" aria-label="データ管理">
+        <span class="edge-symbol">⇩</span><span>DATA</span>
+    </button>
+    <div class="data-panel" id="data-panel">
+        <div class="data-panel-title">データ管理</div>
+        <button class="arch-btn" type="button" onclick="exportAppData()">バックアップ作成</button>
+        <button class="arch-btn" type="button" onclick="document.getElementById('backup-file-input').click()">バックアップ復元</button>
+        <input id="backup-file-input" type="file" accept="application/json,.json" hidden onchange="importAppData(event)">
+    </div>
     <button class="edge-tool edge-edit" type="button" onclick="toggleDockEditor()" aria-label="ショートカットを編集">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
             <path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4z"></path>
@@ -813,12 +830,6 @@ body.theme-ember { --neon-cyan: #ff8a3d; --neon-pink: #ff3333; --neon-purple: #f
         <div class="shortcut-manager">
             <div class="shortcut-manager-title">登録済み（アプリ枠5〜8 / ブックマーク）</div>
             <div id="shortcut-manager-list"></div>
-        </div>
-        <div class="data-tools">
-            <div class="data-tools-title">データのバックアップ</div>
-            <button class="arch-btn" type="button" onclick="exportAppData()">保存</button>
-            <button class="arch-btn" type="button" onclick="document.getElementById('backup-file-input').click()">復元</button>
-            <input id="backup-file-input" type="file" accept="application/json,.json" hidden onchange="importAppData(event)">
         </div>
     </div>
 
@@ -1108,7 +1119,26 @@ body.theme-ember { --neon-cyan: #ff8a3d; --neon-pink: #ff3333; --neon-purple: #f
             if(dockEditor.classList.contains('active') && !dockEditor.contains(event.target) && !editorTrigger) {
                 closeDockEditor();
             }
+            const dataPanel = document.getElementById('data-panel');
+            const dataTrigger = event.target.closest('.edge-data');
+            if(dataPanel.classList.contains('active') && !dataPanel.contains(event.target) && !dataTrigger) {
+                closeDataPanel();
+            }
         });
+
+        function toggleDataPanel() {
+            const panel = document.getElementById('data-panel');
+            if(panel.classList.contains('active')) {
+                closeDataPanel();
+            } else {
+                closeDockEditor();
+                panel.classList.add('active');
+            }
+        }
+
+        function closeDataPanel() {
+            document.getElementById('data-panel').classList.remove('active');
+        }
 
         function toggleDockEditor() {
             const dockEditor = document.getElementById('dock-editor');
@@ -1133,6 +1163,7 @@ body.theme-ember { --neon-cyan: #ff8a3d; --neon-pink: #ff3333; --neon-purple: #f
         document.addEventListener('keydown', event => {
             if(event.key !== 'Escape') return;
             closeDockEditor();
+            closeDataPanel();
             const aiMenu = document.querySelector('.ai-menu');
             const shortcutMenu = document.querySelector('.shortcut-menu');
             if(aiMenu) aiMenu.open = false;
