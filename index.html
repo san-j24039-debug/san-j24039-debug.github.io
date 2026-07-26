@@ -143,10 +143,16 @@ input, textarea, select { user-select: text; }
 .ai-option:hover { background: rgba(0, 243, 255, 0.15); color: #fff; }
 .ai-option-mark { width: 15px; color: var(--neon-cyan); text-align: center; font-size: 11px; }
 .app-custom-slots { display: contents; }
+.app-slot-number {
+    position: absolute; top: 3px; left: 5px; color: #555;
+    font-size: 7px; line-height: 1; pointer-events: none;
+}
 .empty-app-slot {
     border-style: dashed; color: #777; cursor: pointer;
 }
 .empty-app-slot .icon-symbol { color: #777; }
+.shortcut-favicon { width: 20px; height: 20px; object-fit: contain; border-radius: 3px; }
+.shortcut-fallback { display: none; color: var(--silver-metal); }
 .edge-tool {
     position: fixed; top: 10px; width: 44px; height: 48px; z-index: 30;
     display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 3px;
@@ -197,6 +203,7 @@ input, textarea, select { user-select: text; }
 }
 .shortcut-option:hover { background: rgba(0, 243, 255, 0.15); color: #fff; }
 .shortcut-option-mark { color: var(--neon-cyan); text-align: center; font-size: 10px; }
+.shortcut-option-mark .shortcut-favicon { width: 16px; height: 16px; }
 .shortcut-option-text { min-width: 0; }
 .shortcut-option-label { font-size: 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .shortcut-option-url { color: #777; font-size: 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 2px; }
@@ -230,13 +237,20 @@ input, textarea, select { user-select: text; }
     color: #888; font-size: 9px; margin-top: 2px; white-space: nowrap;
     overflow: hidden; text-overflow: ellipsis;
 }
-.shortcut-position-select {
-    width: 100%; margin-top: 5px; padding: 4px; color: var(--neon-cyan);
-    background: rgba(255,255,255,0.05); border: 1px solid var(--border);
-    font-family: 'Orbitron'; font-size: 8px;
+.shortcut-position-buttons { display: flex; gap: 4px; margin-top: 6px; flex-wrap: wrap; }
+.shortcut-position-button {
+    min-width: 27px; min-height: 25px !important; padding: 0 5px !important;
+    color: #888; border: 1px solid #444; background: transparent; cursor: pointer;
 }
+.shortcut-position-button.active { color: #000; background: var(--neon-cyan); border-color: var(--neon-cyan); }
+.shortcut-position-button:disabled { opacity: 0.25; cursor: default; }
 .shortcut-manager-row button { min-height: 28px; padding: 0 8px; font-size: 9px; }
 .shortcut-manager-row .delete-shortcut { color: var(--forbidden-red); border-color: rgba(255,0,85,0.45); }
+.data-tools {
+    grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
+    border-top: 1px solid var(--border); padding-top: 8px;
+}
+.data-tools-title { grid-column: 1 / -1; color: #aaa; font-size: 9px; letter-spacing: 0.8px; }
 @media (max-width: 600px) {
     .top-dock {
         grid-template-columns: repeat(4, 56px);
@@ -344,6 +358,20 @@ body.theme-ember { --neon-cyan: #ff8a3d; --neon-pink: #ff3333; --neon-purple: #f
 .trash-btn:hover { color: var(--forbidden-red); transform: scale(1.1); }
 
 .modal-content { flex: 1; padding: 20px; overflow-y: auto; position: relative; }
+@keyframes moduleBootIn {
+    0% { opacity: 0; transform: translateY(24px); filter: blur(8px); }
+    55% { opacity: 1; filter: blur(0); }
+    100% { transform: translateY(0); }
+}
+@keyframes vitalWake {
+    0% { opacity: 0; transform: scale(0.72) rotate(-12deg); }
+    70% { opacity: 1; transform: scale(1.04) rotate(2deg); }
+    100% { transform: scale(1) rotate(0); }
+}
+#modal-moon.active .modal-content,
+#modal-vital.active .modal-content,
+#modal-archive.active .modal-content { animation: moduleBootIn 0.75s ease-out both; }
+#modal-vital.active .vital-pod { animation: vitalWake 0.9s 0.18s ease-out both; }
 
 /* QUEST */
 #modal-quest.active .modal-content { animation: questOpen 0.5s ease-out forwards; }
@@ -708,9 +736,10 @@ body.theme-ember { --neon-cyan: #ff8a3d; --neon-pink: #ff3333; --neon-purple: #f
     <div class="grid-floor"></div>
 
     <div class="top-dock">
-        <a class="icon-btn" href="https://youtube.com"><div class="icon-symbol">▶</div><div class="icon-label">YOUTUBE</div></a>
+        <a class="icon-btn" href="https://youtube.com"><span class="app-slot-number">1</span><div class="icon-symbol">▶</div><div class="icon-label">YOUTUBE</div></a>
         <details class="ai-menu">
             <summary class="icon-btn" aria-label="AI tools">
+                <span class="app-slot-number">2</span>
                 <div class="icon-symbol">
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <path d="M12 3v4"></path>
@@ -729,8 +758,9 @@ body.theme-ember { --neon-cyan: #ff8a3d; --neon-pink: #ff3333; --neon-purple: #f
                 <a class="ai-option" href="https://claude.ai"><span class="ai-option-mark">A</span><span>CLAUDE</span></a>
             </div>
         </details>
-        <a class="icon-btn" href="https://music.apple.com"><div class="icon-symbol">♫</div><div class="icon-label">MUSIC</div></a>
+        <a class="icon-btn" href="https://music.apple.com"><span class="app-slot-number">3</span><div class="icon-symbol">♫</div><div class="icon-label">MUSIC</div></a>
         <a class="icon-btn" href="https://maps.google.com">
+            <span class="app-slot-number">4</span>
             <div class="icon-symbol"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg></div>
             <div class="icon-label">MAPS</div>
         </a>
@@ -775,6 +805,12 @@ body.theme-ember { --neon-cyan: #ff8a3d; --neon-pink: #ff3333; --neon-purple: #f
         <div class="shortcut-manager">
             <div class="shortcut-manager-title">登録済み（アプリ枠5〜8 / ブックマーク）</div>
             <div id="shortcut-manager-list"></div>
+        </div>
+        <div class="data-tools">
+            <div class="data-tools-title">データのバックアップ</div>
+            <button class="arch-btn" type="button" onclick="exportAppData()">保存</button>
+            <button class="arch-btn" type="button" onclick="document.getElementById('backup-file-input').click()">復元</button>
+            <input id="backup-file-input" type="file" accept="application/json,.json" hidden onchange="importAppData(event)">
         </div>
     </div>
 
@@ -989,6 +1025,61 @@ body.theme-ember { --neon-cyan: #ff8a3d; --neon-pink: #ff3333; --neon-purple: #f
             }[ch]));
         }
 
+        function getFaviconUrl(value) {
+            try {
+                return new URL('/favicon.ico', value).href;
+            } catch(error) {
+                return "";
+            }
+        }
+
+        function exportAppData() {
+            const storage = {};
+            for(let index = 0; index < localStorage.length; index++) {
+                const key = localStorage.key(index);
+                storage[key] = localStorage.getItem(key);
+            }
+            const backup = {
+                app: 'CHRONEX',
+                version: 1,
+                exportedAt: new Date().toISOString(),
+                storage
+            };
+            const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            const date = new Date();
+            const dateLabel = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+            link.href = url;
+            link.download = `chronex-backup-${dateLabel}.json`;
+            link.addEventListener('click', event => event.stopPropagation());
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+        }
+
+        async function importAppData(event) {
+            const input = event.target;
+            const file = input.files && input.files[0];
+            input.value = "";
+            if(!file) return;
+            try {
+                const backup = JSON.parse(await file.text());
+                if(backup.app !== 'CHRONEX' || backup.version !== 1 || !backup.storage || Array.isArray(backup.storage)) {
+                    throw new Error('invalid backup');
+                }
+                if(!confirm('現在のデータをバックアップ内容で置き換えますか？')) return;
+                localStorage.clear();
+                Object.entries(backup.storage).forEach(([key, value]) => {
+                    if(typeof value === 'string') localStorage.setItem(key, value);
+                });
+                window.location.reload();
+            } catch(error) {
+                alert('バックアップファイルを読み込めませんでした。');
+            }
+        }
+
         // === TOP DOCK EXTRAS ===
         const themeList = ['theme-cyan', 'theme-gold', 'theme-moon', 'theme-ember'];
         let currentThemeIndex = Math.max(0, themeList.indexOf(localStorage.getItem('chronex_theme') || 'theme-cyan'));
@@ -1116,15 +1207,20 @@ body.theme-ember { --neon-cyan: #ff8a3d; --neon-pink: #ff3333; --neon-purple: #f
             const appHolder = document.getElementById('app-custom-slots');
             if(appHolder) {
                 const appShortcuts = customShortcuts.slice(0, APP_SHORTCUT_CAPACITY);
-                appHolder.innerHTML = appShortcuts.map(item => `
+                appHolder.innerHTML = appShortcuts.map((item, index) => `
                     <a class="icon-btn" href="${escapeHtml(item.url)}">
-                        <div class="icon-symbol">◆</div>
+                        <span class="app-slot-number">${index + 5}</span>
+                        <div class="icon-symbol">
+                            <img class="shortcut-favicon" src="${escapeHtml(getFaviconUrl(item.url))}" alt="" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline'">
+                            <span class="shortcut-fallback">◆</span>
+                        </div>
                         <div class="icon-label">${escapeHtml(item.label)}</div>
                     </a>
                 `).join('');
                 for(let index = appShortcuts.length; index < APP_SHORTCUT_CAPACITY; index++) {
                     appHolder.insertAdjacentHTML('beforeend', `
                         <button class="icon-btn empty-app-slot" type="button" onclick="openDockEditor()" aria-label="ショートカットを追加">
+                            <span class="app-slot-number">${index + 5}</span>
                             <div class="icon-symbol">＋</div>
                             <div class="icon-label">追加</div>
                         </button>
@@ -1142,7 +1238,10 @@ body.theme-ember { --neon-cyan: #ff8a3d; --neon-pink: #ff3333; --neon-purple: #f
                     let host = item.url;
                     try { host = new URL(item.url).hostname; } catch(error) {}
                     return `<a class="shortcut-option" href="${escapeHtml(item.url)}">
-                        <span class="shortcut-option-mark">◆</span>
+                        <span class="shortcut-option-mark">
+                            <img class="shortcut-favicon" src="${escapeHtml(getFaviconUrl(item.url))}" alt="" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline'">
+                            <span class="shortcut-fallback">◆</span>
+                        </span>
                         <span class="shortcut-option-text">
                             <span class="shortcut-option-label">${escapeHtml(item.label)}</span>
                             <span class="shortcut-option-url">${escapeHtml(host)}</span>
@@ -1164,12 +1263,18 @@ body.theme-ember { --neon-cyan: #ff8a3d; --neon-pink: #ff3333; --neon-purple: #f
                     <div class="shortcut-manager-info">
                         <div class="shortcut-manager-label">${escapeHtml(item.label)}</div>
                         <div class="shortcut-manager-url">${escapeHtml(host)}</div>
-                        <select class="shortcut-position-select" aria-label="${escapeHtml(item.label)}の配置" onchange="moveShortcut(${index}, Number(this.value))">
+                        <div class="shortcut-position-buttons" aria-label="${escapeHtml(item.label)}の配置">
                             ${Array.from({ length: APP_SHORTCUT_CAPACITY }, (_, slot) =>
-                                `<option value="${slot}" ${index === slot ? 'selected' : ''} ${slot >= customShortcuts.length ? 'disabled' : ''}>アプリ ${slot + 5}</option>`
+                                `<button class="shortcut-position-button ${index === slot ? 'active' : ''}" type="button"
+                                    onclick="moveShortcut(${index}, ${slot})"
+                                    ${slot >= customShortcuts.length ? 'disabled' : ''}
+                                    aria-label="アプリ枠${slot + 5}へ移動">${slot + 5}</button>`
                             ).join('')}
-                            <option value="-1" ${index >= APP_SHORTCUT_CAPACITY ? 'selected' : ''} ${customShortcuts.length <= APP_SHORTCUT_CAPACITY ? 'disabled' : ''}>ブックマーク</option>
-                        </select>
+                            <button class="shortcut-position-button ${index >= APP_SHORTCUT_CAPACITY ? 'active' : ''}" type="button"
+                                onclick="moveShortcut(${index}, -1)"
+                                ${customShortcuts.length <= APP_SHORTCUT_CAPACITY ? 'disabled' : ''}
+                                aria-label="ブックマークへ移動">B</button>
+                        </div>
                     </div>
                     <button class="arch-btn" type="button" onclick="editShortcut(${index})">編集</button>
                     <button class="arch-btn delete-shortcut" type="button" onclick="removeShortcut(${index})">削除</button>
@@ -1652,11 +1757,25 @@ body.theme-ember { --neon-cyan: #ff8a3d; --neon-pink: #ff3333; --neon-purple: #f
         const vitalNow = new Date();
         const vitalTodayKey = `${vitalNow.getFullYear()}-${String(vitalNow.getMonth() + 1).padStart(2, '0')}-${String(vitalNow.getDate()).padStart(2, '0')}`;
         const savedVitalRecord = JSON.parse(localStorage.getItem('chronex_pomodoro_record') || '{}');
+        const savedVitalState = JSON.parse(localStorage.getItem('chronex_pomodoro_state') || '{}');
         let vitalSessions = savedVitalRecord.date === vitalTodayKey ? Number(savedVitalRecord.count || 0) : 0;
-        let vitalMode = 'focus';
-        let vitalTime = vitalDurations.focus;
-        let vitalEndAt = null;
+        let vitalMode = vitalDurations[savedVitalState.mode] ? savedVitalState.mode : 'focus';
+        let vitalTime = Number.isFinite(Number(savedVitalState.time))
+            ? Math.max(0, Number(savedVitalState.time))
+            : vitalDurations[vitalMode];
+        let vitalEndAt = savedVitalState.running && Number(savedVitalState.endAt)
+            ? Number(savedVitalState.endAt)
+            : null;
         let vitalInt = null;
+
+        function saveVitalState() {
+            localStorage.setItem('chronex_pomodoro_state', JSON.stringify({
+                mode: vitalMode,
+                time: vitalTime,
+                endAt: vitalEndAt,
+                running: Boolean(vitalInt && vitalEndAt)
+            }));
+        }
 
         function setVitalMode(mode) {
             if(!vitalDurations[mode]) return;
@@ -1665,6 +1784,7 @@ body.theme-ember { --neon-cyan: #ff8a3d; --neon-pink: #ff3333; --neon-purple: #f
             vitalTime = vitalDurations[mode];
             document.getElementById('vital-status').textContent = '準備完了';
             updateVital();
+            saveVitalState();
         }
 
         function startVital() {
@@ -1673,6 +1793,7 @@ body.theme-ember { --neon-cyan: #ff8a3d; --neon-pink: #ff3333; --neon-purple: #f
             vitalInt = setInterval(tickVital, 250);
             document.getElementById('vital-status').textContent = `${vitalLabels[vitalMode]}中`;
             updateVital();
+            saveVitalState();
         }
 
         function tickVital() {
@@ -1693,6 +1814,7 @@ body.theme-ember { --neon-cyan: #ff8a3d; --neon-pink: #ff3333; --neon-purple: #f
             const status = document.getElementById('vital-status');
             if(status && vitalTime > 0) status.textContent = '一時停止';
             updateVital();
+            saveVitalState();
         }
 
         function resetVital() {
@@ -1702,6 +1824,7 @@ body.theme-ember { --neon-cyan: #ff8a3d; --neon-pink: #ff3333; --neon-purple: #f
             vitalTime = vitalDurations[vitalMode];
             document.getElementById('vital-status').textContent = '準備完了';
             updateVital();
+            saveVitalState();
         }
 
         function completeVital() {
@@ -1717,6 +1840,7 @@ body.theme-ember { --neon-cyan: #ff8a3d; --neon-pink: #ff3333; --neon-purple: #f
                 vitalMode = 'focus';
             }
             vitalTime = vitalDurations[vitalMode];
+            saveVitalState();
             playVitalSound();
             updateVital();
             document.getElementById('vital-status').textContent =
@@ -1757,7 +1881,29 @@ body.theme-ember { --neon-cyan: #ff8a3d; --neon-pink: #ff3333; --neon-purple: #f
         document.addEventListener('visibilitychange', () => {
             if(!document.hidden && vitalInt) tickVital();
         });
-        updateVital();
+
+        function restoreVitalState() {
+            if(vitalEndAt) {
+                vitalTime = Math.max(0, Math.ceil((vitalEndAt - Date.now()) / 1000));
+                if(vitalTime <= 0) {
+                    completeVital();
+                    return;
+                }
+                vitalInt = setInterval(tickVital, 250);
+                document.getElementById('vital-status').textContent = `${vitalLabels[vitalMode]}中`;
+            } else {
+                document.getElementById('vital-status').textContent =
+                    vitalTime < vitalDurations[vitalMode] ? '一時停止' : '準備完了';
+            }
+            updateVital();
+            saveVitalState();
+        }
+
+        window.addEventListener('pagehide', () => {
+            if(vitalEndAt) vitalTime = Math.max(0, Math.ceil((vitalEndAt - Date.now()) / 1000));
+            saveVitalState();
+        });
+        restoreVitalState();
 
         // === ARCHIVE SYSTEM ===
         let archives = JSON.parse(localStorage.getItem('chronex_archives')) || [];
