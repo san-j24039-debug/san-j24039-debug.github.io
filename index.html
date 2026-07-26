@@ -1004,11 +1004,20 @@ body.theme-ember { --neon-cyan: #ff8a3d; --neon-pink: #ff3333; --neon-purple: #f
             if(aiMenu && aiMenu.open && !aiMenu.contains(event.target)) aiMenu.open = false;
             const shortcutMenu = document.querySelector('.shortcut-menu');
             if(shortcutMenu && shortcutMenu.open && !shortcutMenu.contains(event.target)) shortcutMenu.open = false;
+            const dockEditor = document.getElementById('dock-editor');
+            const editorTrigger = event.target.closest('.edge-edit, .empty-app-slot');
+            if(dockEditor.classList.contains('active') && !dockEditor.contains(event.target) && !editorTrigger) {
+                closeDockEditor();
+            }
         });
 
         function toggleDockEditor() {
-            document.body.classList.toggle('edit-mode');
-            document.getElementById('dock-editor').classList.toggle('active');
+            const dockEditor = document.getElementById('dock-editor');
+            if(dockEditor.classList.contains('active')) {
+                closeDockEditor();
+            } else {
+                openDockEditor();
+            }
         }
 
         function openDockEditor() {
@@ -1016,6 +1025,20 @@ body.theme-ember { --neon-cyan: #ff8a3d; --neon-pink: #ff3333; --neon-purple: #f
             document.getElementById('dock-editor').classList.add('active');
             document.getElementById('shortcut-preset-select').focus();
         }
+
+        function closeDockEditor() {
+            document.body.classList.remove('edit-mode');
+            document.getElementById('dock-editor').classList.remove('active');
+        }
+
+        document.addEventListener('keydown', event => {
+            if(event.key !== 'Escape') return;
+            closeDockEditor();
+            const aiMenu = document.querySelector('.ai-menu');
+            const shortcutMenu = document.querySelector('.shortcut-menu');
+            if(aiMenu) aiMenu.open = false;
+            if(shortcutMenu) shortcutMenu.open = false;
+        });
 
         function applyShortcutPreset() {
             const preset = document.getElementById('shortcut-preset-select').value;
