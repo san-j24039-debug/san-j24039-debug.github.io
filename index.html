@@ -96,7 +96,10 @@ body {
 .grid-floor { position: absolute; width: 200%; height: 200%; background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px); background-size: 40px 40px; transform: perspective(500px) rotateX(60deg) translateY(-100px) translateZ(-200px); bottom: -50%; left: -50%; z-index: -1; }
 
 /* === TOP SHORTCUTS === */
-.top-dock { width: 100%; padding: 15px 0; display: flex; justify-content: center; gap: 12px; z-index: 10; flex-wrap: wrap; }
+.top-dock {
+    width: 100%; padding: 76px 0 15px; display: grid;
+    grid-template-columns: repeat(4, 60px); justify-content: center; gap: 12px; z-index: 10;
+}
 .icon-btn {
     width: 60px; height: 60px; background: rgba(255, 255, 255, 0.05);
     border: 1px solid var(--border); border-radius: 12px;
@@ -137,6 +140,23 @@ body {
 }
 .ai-option:hover { background: rgba(0, 243, 255, 0.15); color: #fff; }
 .ai-option-mark { width: 15px; color: var(--neon-cyan); text-align: center; font-size: 11px; }
+.app-custom-slots { display: contents; }
+.empty-app-slot {
+    border-style: dashed; color: #777; cursor: pointer;
+}
+.empty-app-slot .icon-symbol { color: #777; }
+.edge-tool {
+    position: fixed; top: 10px; width: 44px; height: 48px; z-index: 30;
+    display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 3px;
+    padding: 0; color: #aaa; background: rgba(0, 0, 0, 0.82);
+    border: 1px solid var(--border); backdrop-filter: blur(8px); cursor: pointer;
+}
+.edge-tool svg, .edge-tool .edge-symbol { color: var(--neon-cyan); }
+.edge-tool > span:not(.edge-symbol) { font-family: 'Orbitron'; font-size: 7px; letter-spacing: 0.5px; }
+.edge-tool .edge-symbol { font-size: 16px; line-height: 1; }
+.edge-edit { right: 46px; border-radius: 8px 0 0 8px; }
+.edge-theme { left: 0; border-radius: 0 8px 8px 0; }
+.edge-tool:hover { border-color: var(--neon-cyan); background: rgba(0, 243, 255, 0.1); }
 .shortcut-menu {
     position: fixed; right: 0; top: 10px; z-index: 30;
 }
@@ -144,9 +164,9 @@ body {
 .shortcut-menu summary { list-style: none; cursor: pointer; }
 .shortcut-menu summary::-webkit-details-marker { display: none; }
 .shortcut-tab {
-    width: 44px; height: 64px; display: flex; flex-direction: column; align-items: center;
+    width: 44px; height: 48px; display: flex; flex-direction: column; align-items: center;
     justify-content: center; gap: 5px; padding: 0; color: #aaa; cursor: pointer;
-    background: rgba(0, 0, 0, 0.82); border: 1px solid var(--border); border-radius: 8px 0 0 8px;
+    background: rgba(0, 0, 0, 0.82); border: 1px solid var(--border); border-radius: 0;
     backdrop-filter: blur(8px); transition: 0.2s;
 }
 .shortcut-tab svg { color: var(--neon-cyan); }
@@ -157,7 +177,7 @@ body {
     box-shadow: 0 0 12px rgba(0, 243, 255, 0.35);
 }
 .shortcut-options {
-    position: absolute; right: 0; top: 72px;
+    position: absolute; right: 0; top: 58px;
     width: min(260px, calc(100vw - 16px)); max-height: 60vh; overflow: hidden; padding: 8px;
     background: rgba(0, 0, 0, 0.94); border: 1px solid var(--neon-cyan); border-radius: 8px;
     box-shadow: 0 0 18px rgba(0, 243, 255, 0.28); backdrop-filter: blur(10px);
@@ -208,20 +228,22 @@ body {
     color: #888; font-size: 9px; margin-top: 2px; white-space: nowrap;
     overflow: hidden; text-overflow: ellipsis;
 }
+.shortcut-position-select {
+    width: 100%; margin-top: 5px; padding: 4px; color: var(--neon-cyan);
+    background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+    font-family: 'Orbitron'; font-size: 8px;
+}
 .shortcut-manager-row button { min-height: 28px; padding: 0 8px; font-size: 9px; }
 .shortcut-manager-row .delete-shortcut { color: var(--forbidden-red); border-color: rgba(255,0,85,0.45); }
-.shortcut-remove { position: absolute; top: 2px; right: 3px; font-size: 11px; color: var(--forbidden-red); display: none; }
-.edit-mode .shortcut-remove { display: block; }
 @media (max-width: 600px) {
     .top-dock {
-        display: grid; grid-template-columns: repeat(3, 56px); justify-content: center;
-        gap: 8px; padding: 10px 8px; box-sizing: border-box;
+        grid-template-columns: repeat(4, 56px);
+        gap: 8px; padding: 72px 8px 10px; box-sizing: border-box;
     }
     .icon-btn { width: 56px; height: 56px; border-radius: 10px; }
     .ai-options { top: 66px; left: auto; right: -32px; transform: none; }
     .ai-options::before { left: auto; right: 48px; transform: rotate(45deg); }
-    .shortcut-tab { width: 40px; height: 58px; }
-    .shortcut-options { top: 126px; width: min(260px, calc(100vw - 12px)); }
+    .shortcut-options { width: min(260px, calc(100vw - 12px)); }
     .dock-editor.active { grid-template-columns: 1fr; }
 }
 
@@ -677,9 +699,17 @@ body.theme-ember { --neon-cyan: #ff8a3d; --neon-pink: #ff3333; --neon-purple: #f
             <div class="icon-symbol"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg></div>
             <div class="icon-label">MAPS</div>
         </a>
-        <button class="icon-btn" type="button" onclick="toggleDockEditor()" aria-label="Edit shortcuts"><div class="icon-symbol">+</div><div class="icon-label">EDIT</div></button>
-        <button class="icon-btn" type="button" onclick="cycleTheme()" aria-label="Change theme"><div class="icon-symbol">◐</div><div class="icon-label">THEME</div></button>
+        <div class="app-custom-slots" id="app-custom-slots"></div>
     </div>
+    <button class="edge-tool edge-theme" type="button" onclick="cycleTheme()" aria-label="テーマを変更">
+        <span class="edge-symbol">◐</span><span>THEME</span>
+    </button>
+    <button class="edge-tool edge-edit" type="button" onclick="toggleDockEditor()" aria-label="ショートカットを編集">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4z"></path>
+        </svg>
+        <span>EDIT</span>
+    </button>
     <details class="shortcut-menu">
         <summary class="shortcut-tab" aria-label="ブックマークを開く">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
@@ -708,7 +738,7 @@ body.theme-ember { --neon-cyan: #ff8a3d; --neon-pink: #ff3333; --neon-purple: #f
         <input type="url" id="shortcut-url-input" placeholder="URL（わかる人用）">
         <button class="arch-btn" id="shortcut-save-button" type="button" onclick="saveShortcut()">追加</button>
         <div class="shortcut-manager">
-            <div class="shortcut-manager-title">登録済みショートカット</div>
+            <div class="shortcut-manager-title">登録済み（アプリ枠5〜8 / ブックマーク）</div>
             <div id="shortcut-manager-list"></div>
         </div>
     </div>
@@ -911,6 +941,7 @@ body.theme-ember { --neon-cyan: #ff8a3d; --neon-pink: #ff3333; --neon-purple: #f
         let currentThemeIndex = Math.max(0, themeList.indexOf(localStorage.getItem('chronex_theme') || 'theme-cyan'));
         document.body.classList.add(themeList[currentThemeIndex]);
 
+        const APP_SHORTCUT_CAPACITY = 4;
         let customShortcuts = JSON.parse(localStorage.getItem('chronex_shortcuts') || '[]');
         let editingShortcutIndex = -1;
         renderShortcuts();
@@ -927,18 +958,33 @@ body.theme-ember { --neon-cyan: #ff8a3d; --neon-pink: #ff3333; --neon-purple: #f
             document.getElementById('dock-editor').classList.toggle('active');
         }
 
+        function openDockEditor() {
+            document.body.classList.add('edit-mode');
+            document.getElementById('dock-editor').classList.add('active');
+            document.getElementById('shortcut-preset-select').focus();
+        }
+
         function applyShortcutPreset() {
             const preset = document.getElementById('shortcut-preset-select').value;
             if(!preset) return;
             const [label, url] = preset.split('|');
+            editingShortcutIndex = -1;
+            document.getElementById('shortcut-save-button').textContent = '追加';
             document.getElementById('shortcut-label-input').value = label;
             document.getElementById('shortcut-url-input').value = url;
+        }
+
+        function resetShortcutEditor() {
+            editingShortcutIndex = -1;
+            document.getElementById('shortcut-label-input').value = "";
+            document.getElementById('shortcut-url-input').value = "";
+            document.getElementById('shortcut-preset-select').value = "";
+            document.getElementById('shortcut-save-button').textContent = '追加';
         }
 
         function saveShortcut() {
             const labelInput = document.getElementById('shortcut-label-input');
             const urlInput = document.getElementById('shortcut-url-input');
-            const presetInput = document.getElementById('shortcut-preset-select');
             const label = labelInput.value.trim().toUpperCase().slice(0, 10);
             let url = urlInput.value.trim();
             if(!label || !url) return;
@@ -949,11 +995,7 @@ body.theme-ember { --neon-cyan: #ff8a3d; --neon-pink: #ff3333; --neon-purple: #f
                 customShortcuts.push({ label, url });
             }
             localStorage.setItem('chronex_shortcuts', JSON.stringify(customShortcuts));
-            labelInput.value = "";
-            urlInput.value = "";
-            presetInput.value = "";
-            editingShortcutIndex = -1;
-            document.getElementById('shortcut-save-button').textContent = '追加';
+            resetShortcutEditor();
             renderShortcuts();
         }
 
@@ -962,10 +1004,7 @@ body.theme-ember { --neon-cyan: #ff8a3d; --neon-pink: #ff3333; --neon-purple: #f
             customShortcuts.splice(index, 1);
             localStorage.setItem('chronex_shortcuts', JSON.stringify(customShortcuts));
             if(editingShortcutIndex === index) {
-                editingShortcutIndex = -1;
-                document.getElementById('shortcut-label-input').value = "";
-                document.getElementById('shortcut-url-input').value = "";
-                document.getElementById('shortcut-save-button').textContent = '追加';
+                resetShortcutEditor();
             } else if(editingShortcutIndex > index) {
                 editingShortcutIndex--;
             }
@@ -975,19 +1014,55 @@ body.theme-ember { --neon-cyan: #ff8a3d; --neon-pink: #ff3333; --neon-purple: #f
         function editShortcut(index) {
             const item = customShortcuts[index];
             editingShortcutIndex = index;
+            openDockEditor();
             document.getElementById('shortcut-label-input').value = item.label;
             document.getElementById('shortcut-url-input').value = item.url;
             document.getElementById('shortcut-preset-select').value = "";
             document.getElementById('shortcut-save-button').textContent = '保存';
         }
 
+        function moveShortcut(index, target) {
+            if(index < 0 || index >= customShortcuts.length) return;
+            if(target === -1) {
+                if(index >= APP_SHORTCUT_CAPACITY || customShortcuts.length <= APP_SHORTCUT_CAPACITY) return;
+                [customShortcuts[index], customShortcuts[APP_SHORTCUT_CAPACITY]] =
+                    [customShortcuts[APP_SHORTCUT_CAPACITY], customShortcuts[index]];
+            } else {
+                if(target < 0 || target >= APP_SHORTCUT_CAPACITY || target >= customShortcuts.length || target === index) return;
+                [customShortcuts[index], customShortcuts[target]] = [customShortcuts[target], customShortcuts[index]];
+            }
+            resetShortcutEditor();
+            localStorage.setItem('chronex_shortcuts', JSON.stringify(customShortcuts));
+            renderShortcuts();
+        }
+
         function renderShortcuts() {
+            const appHolder = document.getElementById('app-custom-slots');
+            if(appHolder) {
+                const appShortcuts = customShortcuts.slice(0, APP_SHORTCUT_CAPACITY);
+                appHolder.innerHTML = appShortcuts.map(item => `
+                    <a class="icon-btn" href="${escapeHtml(item.url)}">
+                        <div class="icon-symbol">◆</div>
+                        <div class="icon-label">${escapeHtml(item.label)}</div>
+                    </a>
+                `).join('');
+                for(let index = appShortcuts.length; index < APP_SHORTCUT_CAPACITY; index++) {
+                    appHolder.insertAdjacentHTML('beforeend', `
+                        <button class="icon-btn empty-app-slot" type="button" onclick="openDockEditor()" aria-label="ショートカットを追加">
+                            <div class="icon-symbol">＋</div>
+                            <div class="icon-label">追加</div>
+                        </button>
+                    `);
+                }
+            }
+
             const holder = document.getElementById('custom-shortcuts');
             if(!holder) return;
-            if(customShortcuts.length === 0) {
+            const bookmarkShortcuts = customShortcuts.slice(APP_SHORTCUT_CAPACITY);
+            if(bookmarkShortcuts.length === 0) {
                 holder.innerHTML = '<div class="shortcut-options-empty">EDITからリンクを追加できます</div>';
             } else {
-                holder.innerHTML = customShortcuts.map(item => {
+                holder.innerHTML = bookmarkShortcuts.map(item => {
                     let host = item.url;
                     try { host = new URL(item.url).hostname; } catch(error) {}
                     return `<a class="shortcut-option" href="${escapeHtml(item.url)}">
@@ -1013,6 +1088,12 @@ body.theme-ember { --neon-cyan: #ff8a3d; --neon-pink: #ff3333; --neon-purple: #f
                     <div class="shortcut-manager-info">
                         <div class="shortcut-manager-label">${escapeHtml(item.label)}</div>
                         <div class="shortcut-manager-url">${escapeHtml(host)}</div>
+                        <select class="shortcut-position-select" aria-label="${escapeHtml(item.label)}の配置" onchange="moveShortcut(${index}, Number(this.value))">
+                            ${Array.from({ length: APP_SHORTCUT_CAPACITY }, (_, slot) =>
+                                `<option value="${slot}" ${index === slot ? 'selected' : ''} ${slot >= customShortcuts.length ? 'disabled' : ''}>アプリ ${slot + 5}</option>`
+                            ).join('')}
+                            <option value="-1" ${index >= APP_SHORTCUT_CAPACITY ? 'selected' : ''} ${customShortcuts.length <= APP_SHORTCUT_CAPACITY ? 'disabled' : ''}>ブックマーク</option>
+                        </select>
                     </div>
                     <button class="arch-btn" type="button" onclick="editShortcut(${index})">編集</button>
                     <button class="arch-btn delete-shortcut" type="button" onclick="removeShortcut(${index})">削除</button>
